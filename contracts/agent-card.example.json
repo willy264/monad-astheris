@@ -1,0 +1,15 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Aetheris research agent",
+  "description": "An operator-configured agent that accepts delegated research tasks and publishes verifiable output commitments.",
+  "image": "ipfs://REPLACE_WITH_IMAGE_CID",
+  "services": [
+    { "name": "MCP", "endpoint": "https://REPLACE_WITH_AGENT_DOMAIN/mcp", "version": "2025-06-18" }
+  ],
+  "active": true,
+  "x402Support": false,
+  "registrations": [
+    { "agentId": 1, "agentRegistry": "eip155:10143:REPLACE_WITH_DEPLOYED_IDENTITY_ADDRESS" }
+  ],
+  "supportedTrust": ["reputation", "tee-attestation"]
+}
