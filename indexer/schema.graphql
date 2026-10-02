@@ -1,0 +1,84 @@
+type Agent {
+  id: ID!
+  chainId: Int!
+  registry: String!
+  agentId: BigInt!
+  owner: String!
+  agentURI: String!
+  registeredAt: BigInt!
+  shardsCreated: BigInt!
+  tasksCompleted: BigInt!
+  shards: [EphemeralShard!]! @derivedFrom(field: "agent")
+}
+
+type EphemeralShard {
+  id: ID!
+  chainId: Int!
+  address: String!
+  router: String!
+  agent: Agent!
+  agentId: BigInt!
+  taskId: String!
+  sequenceNonce: BigInt!
+  executor: String!
+  inputHash: String!
+  outputHash: String
+  proofHash: String
+  status: String!
+  createdBlock: BigInt!
+  createdAt: BigInt!
+  creationTx: String!
+  completedBlock: BigInt
+  execution: TaskExecution
+}
+
+type TaskExecution {
+  id: ID!
+  chainId: Int!
+  router: String!
+  shard: EphemeralShard!
+  agent: Agent!
+  agentId: BigInt!
+  taskId: String!
+  inputHash: String!
+  outputHash: String!
+  proofHash: String!
+  leaf: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  timestamp: BigInt!
+  transactionHash: String!
+  logIndex: Int!
+  batch: MerkleBatch!
+}
+
+type MerkleBatch {
+  id: ID!
+  chainId: Int!
+  router: String!
+  batchId: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  root: String!
+  leafCount: BigInt!
+  frontier: [String!]!
+  status: String!
+  committedRoot: String
+  committedLeafCount: BigInt
+  commitmentTx: String
+  commitmentBlock: BigInt
+  executions: [TaskExecution!]! @derivedFrom(field: "batch")
+}
+
+type BatchCommitment {
+  id: ID!
+  chainId: Int!
+  router: String!
+  batchId: String!
+  root: String!
+  leafCount: BigInt!
+  fromBlock: BigInt!
+  toBlock: BigInt!
+  verified: Boolean!
+  transactionHash: String!
+}
