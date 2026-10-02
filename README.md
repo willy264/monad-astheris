@@ -98,7 +98,7 @@ JavaScript and Rust dependencies have lockfiles; Solidity dependencies are pinne
 
 Each task gets a deterministic CREATE2 contract containing immutable inputs and a write-once result. Executing a task modifies its shard, without updating shared router counters. Tests demonstrate distinct task addresses, non-overlapping storage writes, rejection of repeated execution, and authorization rules. They do **not** measure Monad's scheduler or prove zero transaction re-executions. Factory deployment, signer nonces, and other shared account accesses can still contend.
 
-“Ephemeral” describes the task's active lifetime. Shards remain available as an audit trail; no SELFDESTRUCT-based cleanup is claimed. `TaskExecuted` records an authorized output commitment, not evidence that arbitrary agent computation was correct. Validation is a separate registry workflow.
+"Ephemeral" describes the task's active lifetime. Shards remain available as an audit trail; no SELFDESTRUCT-based cleanup is claimed. `TaskExecuted` records an authorized output commitment, not evidence that arbitrary agent computation was correct. Validation is a separate registry workflow.
 
 TEE verification authenticates signed statements from explicitly trusted attestation verifiers and approved measurements. Vendor-specific Intel/AMD/Nitro quote and certificate-chain validation belongs to those verifiers. Merkle committers attest that a root represents canonical logs; the indexer independently recomputes and compares it. A committed root is not a consensus-verified execution proof.
 
@@ -117,5 +117,3 @@ Payment, persistence, retry, and reorganization behavior are documented in the d
 See [protocol.md](docs/protocol.md) for the shared byte encoding.
 
 See [VERIFICATION.md](VERIFICATION.md) for the commands run and the limits of local validation.
-#   m o n a d - a s t h e r i s  
- 
