@@ -2,6 +2,8 @@ import 'server-only';
 import { createPublicClient, formatUnits, http } from 'viem';
 import { contracts, identityAbi, monadTestnet, reputationAbi, routerAbi } from './contracts';
 import type { Agent, AgentPage, Shard, Snapshot } from './types';
+import { getIndexedAgents, getIndexedSnapshot, indexerConfigured } from './indexer';
+import { IndexerError } from './indexer-protocol';
 
 const rpc = createPublicClient({ chain: monadTestnet, transport: http(process.env.MONAD_RPC_URL || monadTestnet.rpcUrls.default.http[0], { timeout: 12000, retryCount: 1 }) });
 const configuredLookback = Number(process.env.EVENT_LOOKBACK_BLOCKS || 200);
@@ -38,6 +40,20 @@ async function loadSnapshot(): Promise<Snapshot> {
       routerAddress = undefined;
     }
   }
+  if (indexerConfigured) {
+    if (!routerAddress || !contracts.identity) throw new IndexerError('The configured router and identity registry must match before Envio data can be used.');
+    const [indexed, sampleResult] = await Promise.all([
+      getIndexedSnapshot(head, lookback, deployment),
+      Promise.all(Array.from({ length: Math.min(12, Number(head + 1n)) }, (_, index) => index === 0 ? Promise.resolve(latest) : rpc.getBlock({ blockNumber: head - BigInt(index) }))).then(value => value.reverse()).catch(() => []),
+    ]);
+    const seconds = sampleResult.length > 1 ? Number(sampleResult[sampleResult.length - 1].timestamp - sampleResult[0].timestamp) : 0;
+    if (!sampleResult.length) errors.push('RPC throughput samples are unavailable. Indexed agent activity is still shown.');
+    if (BigInt(indexed.source.lagBlocks) > lookback) errors.push('The indexer is behind the network. Activity below is measured at the displayed indexed block.');
+    return { ...indexed, blockNumber: head.toString(), chainId, sampledAt: new Date().toISOString(),
+      tps: seconds > 0 ? sampleResult.slice(1).reduce((sum, block) => sum + block.transactions.length, 0) / seconds : null,
+      sampleSeconds: seconds, blockSamples: sampleResult.map(block => ({ block: block.number!.toString(), transactions: block.transactions.length })),
+      errors, routerConfigured: true, registryConfigured: true, eventsAvailable: true };
+  }
   const [sampleResult, supplyResult, shardResult, executionResult] = await Promise.allSettled([
     Promise.all(Array.from({ length: Math.min(12, Number(head + 1n)) }, (_, index) => index === 0 ? Promise.resolve(latest) : rpc.getBlock({ blockNumber: head - BigInt(index) }))),
     contracts.identity ? rpc.readContract({ address: contracts.identity, abi: identityAbi, functionName: 'totalSupply', blockNumber: head }) : Promise.resolve(null),
@@ -70,6 +86,7 @@ async function loadSnapshot(): Promise<Snapshot> {
     executions: routerAddress && executionResult.status === 'fulfilled' ? executions.length : null,
     shards, errors, routerConfigured: Boolean(routerAddress), registryConfigured: Boolean(contracts.identity),
     eventsAvailable: Boolean(routerAddress) && shardResult.status === 'fulfilled' && executionResult.status === 'fulfilled',
+    source: { kind: 'rpc' }, batches: [], resultsLimited: false,
   };
 }
 
@@ -131,21 +148,30 @@ async function loadAgentPage(page: number): Promise<AgentPage> {
       reputationAddress = undefined;
     }
   }
-  const total = await rpc.readContract({ address: registry, abi: identityAbi, functionName: 'totalSupply', blockNumber });
+  const indexed = indexerConfigured ? await getIndexedAgents(page) : undefined;
+  if (indexed) {
+    if (!contracts.router) throw new IndexerError('Envio requires a router address.');
+    const identity = await rpc.readContract({ address: contracts.router, abi: routerAbi, functionName: 'identityRegistry', blockNumber });
+    if (identity.toLowerCase() !== registry.toLowerCase()) throw new IndexerError('Router and indexed identity registry do not match.');
+    const progress = BigInt(indexed.source.indexedThrough);
+    if (progress > blockNumber || progress < deployment) throw new IndexerError('Envio progress is outside the configured deployment range.');
+  }
+  const total = indexed?.total ?? await rpc.readContract({ address: registry, abi: identityAbi, functionName: 'totalSupply', blockNumber });
   const pageSize = 12;
   const start = BigInt(page * pageSize) + 1n;
   const remaining = total >= start ? total - start + 1n : 0n;
-  const count = Number(remaining > BigInt(pageSize) ? BigInt(pageSize) : remaining);
+  const count = indexed ? indexed.agents.length : Number(remaining > BigInt(pageSize) ? BigInt(pageSize) : remaining);
   const results: PromiseSettledResult<Agent>[] = [];
   // Four identities at a time bounds upstream RPC and IPFS load.
   for (let offset = 0; offset < count; offset += 4) {
     results.push(...await Promise.allSettled(Array.from({ length: Math.min(4, count - offset) }, async (_, index): Promise<Agent> => {
-      const id = start + BigInt(offset + index);
-      const [owner, uri] = await Promise.all([
+      const indexedAgent = indexed?.agents[offset + index];
+      const id = indexedAgent ? BigInt(indexedAgent.id) : start + BigInt(offset + index);
+      const [owner, uri] = indexedAgent ? [indexedAgent.owner, indexedAgent.uri] : await Promise.all([
         rpc.readContract({ address: registry, abi: identityAbi, functionName: 'ownerOf', args: [id], blockNumber }),
         rpc.readContract({ address: registry, abi: identityAbi, functionName: 'tokenURI', args: [id], blockNumber }),
       ]);
-      const agent: Agent = { id: id.toString(), owner, uri, name: `Agent #${id}`, description: '', capabilities: [], endpoints: [], score: null, feedbackCount: null };
+      const agent: Agent = { id: id.toString(), owner, uri, name: `Agent #${id}`, description: '', capabilities: [], endpoints: [], score: null, feedbackCount: null, tasksCompleted: indexedAgent?.tasksCompleted };
       const [card, reputation] = await Promise.allSettled([
         agentCard(uri),
         reputationAddress ? (async () => {
@@ -172,5 +198,6 @@ async function loadAgentPage(page: number): Promise<AgentPage> {
     })));
   }
   if (results.some((result) => result.status === 'rejected')) errors.push('Some identities could not be loaded. Refresh to retry.');
-  return { agents: results.flatMap((result) => result.status === 'fulfilled' ? [result.value] : []), total: total.toString(), page, pageSize, errors };
+  return { agents: results.flatMap((result) => result.status === 'fulfilled' ? [result.value] : []), total: total.toString(), page, pageSize, errors,
+    source: indexed ? { ...indexed.source, lagBlocks: (blockNumber - BigInt(indexed.source.indexedThrough)).toString() } : { kind: 'rpc' } };
 }
