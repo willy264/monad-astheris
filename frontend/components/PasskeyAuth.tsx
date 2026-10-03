@@ -1,10 +1,11 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { Icon } from './Icon';
+import Tooltip, { glossary } from './Tooltip';
 const WalletAccess = dynamic(() => import('./WalletAccess'), { ssr: false, loading: () => <p className="muted-text">Loading secure wallet access…</p> });
 const MeraAccess = dynamic(() => import('./MeraAccess'), { ssr: false, loading: () => <p className="muted-text">Loading Mera account access…</p> });
 export default function PasskeyAuth() {
-  return <section className="panel access-panel" id="access"><div className="panel-heading"><div><h2><Icon name="shield" /> Agent access</h2><p>Authenticate your wallet and authorize an executor for a limited time.</p></div><span className="tag">{process.env.NEXT_PUBLIC_MERA_ENABLED === 'true' ? 'DYNAMIC / MERA' : 'DYNAMIC'}</span></div>
+  return <section className="panel access-panel" id="access"><div className="panel-heading"><div><h2><Icon name="shield" /> <Tooltip content={glossary.passkey}>Passkeys & agent access</Tooltip></h2><p>Sign in with a supported wallet, then give an executor access for a limited time.</p></div><span className="tag">{process.env.NEXT_PUBLIC_MERA_ENABLED === 'true' ? 'DYNAMIC / MERA' : 'DYNAMIC'}</span></div>
     {process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID ? <WalletAccess /> : <div className="access-unconfigured"><Icon name="shield" size={28} /><div><h3>Dynamic wallet access is not configured</h3><p>Connect a Dynamic environment to enable wallet sign-in, passkeys, and agent delegation.</p></div></div>}
     {process.env.NEXT_PUBLIC_MERA_ENABLED === 'true' && <MeraAccess />}
   </section>;
