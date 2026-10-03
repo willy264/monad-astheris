@@ -10,7 +10,7 @@ The homepage separates a **Guided preview** from **Live testnet**. Preview works
 4. Watch the five progress bars finish. Their labels say **Simulated**; there are no transaction links or charges.
 5. Open `/visualizer`. Switch between **Standard EVM Mode** and **Aetheris Parallel Mode** to explain shared storage versus isolated task lanes. Use **Pause animation** when describing the graph.
 
-Preview sign-in does not authenticate a wallet. The comparison's collision/delay/efficiency/settlement numbers are explicitly illustrative, including `+1,200ms`, `100%` and `300ms Single-Slot`. The live ledger below the comparison remains a separate view of real events.
+Preview sign-in does not authenticate a wallet. The comparison's collision/delay/efficiency/settlement numbers are explicitly illustrative, including `12 re-executions`, `+1,200ms`, `100%` and `300ms Single-Slot`. The live ledger below the comparison remains a separate view of real events.
 
 ## Prepare the live environment
 

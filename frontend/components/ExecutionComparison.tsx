@@ -53,12 +53,12 @@ export function ExecutionComparison() {
         </svg>
         <div className={styles.waitingAgents}>{agents.map((agent) => <div className={styles.waitingAgent} key={agent}><span aria-hidden="true">◈</span> Agent {agent}</div>)}</div>
         <div className={styles.conflictFlag}><span aria-hidden="true">!</span> Conflict</div>
-        <div className={styles.sharedState}><span className={styles.storageIcon} aria-hidden="true">▤</span><strong>Shared state</strong><small>One contested storage slot</small><span className={styles.waitingTag}>TASKS WAIT / RETRY</span></div>
+        <div className={styles.sharedState}><span className={styles.storageIcon} aria-hidden="true">▤</span><strong>Shared state</strong><small>One contested storage slot</small><span className={styles.waitingTag}>12 RE-EXECUTIONS IN THIS EXAMPLE</span></div>
       </div>}
 
       <p className={styles.explanation} id={descriptionId}>{parallel
         ? 'Aetheris creates a separate contract address for each task. Agents can write their outputs without competing for that task’s storage.'
-        : 'In this example, five tasks try to update shared storage. Conflicting writes can force tasks to wait or run again.'}</p>
+        : 'State access collision! In this example, five tasks compete for shared storage and need 12 re-executions. These illustrative retries create a latency bottleneck.'}</p>
     </div>
 
     <dl className={styles.metrics} aria-label="Illustrative scenario metrics">
@@ -72,6 +72,6 @@ export function ExecutionComparison() {
         <div><dt>Throughput Bottleneck</dt><dd>ACTIVE <span>tasks share a storage slot</span></dd></div>
       </>}
     </dl>
-    <p className={styles.footnote}>Illustrative comparison, not a benchmark. The delay, 100% efficiency and 300ms settlement are scenario values, not measured results or network guarantees. Shared-state contention depends on the workload. Explore actual on-chain events below.</p>
+    <p className={styles.footnote}>Illustrative comparison, not a benchmark. The 12 re-executions, delay, 100% efficiency and 300ms settlement are scenario values, not measured results or network guarantees. Shared-state contention depends on the workload. Explore actual on-chain events below.</p>
   </section>;
 }
