@@ -34,7 +34,7 @@ The supplied project brief targets **Monad Metropolis, Track 04: Trust, Identity
 | Indexing | Envio entities for identities, shards, executions, and batches, with independently calculated roots and commitment comparisons. |
 | Dashboard | Overview, agent directory, execution visualizer, Dynamic authentication, and delegation/revocation controls. |
 
-The daemon accepts authorized output hashes; the [task client](scripts/README.md) invokes an actual MCP tool, hashes its output, signs the task and handles an x402 EIP-3009 payment. It also records completion and can publish an explicitly reviewed independent assessment. The frontend reads Envio GraphQL when configured and labels its RPC fallback otherwise. Task submission remains a CLI flow; no browser task form is implied.
+The daemon accepts authorized output hashes; the [task client](scripts/README.md) invokes an actual MCP tool, hashes its output, signs the task and handles an x402 EIP-3009 payment. It also records completion and can publish an explicitly reviewed independent assessment. The frontend reads Envio GraphQL when configured and labels its RPC fallback otherwise. Its [guided browser demo](frontend/README.md#guided-judge-demonstration) offers a labeled preview and, when configured, five real signed and paid checksum tasks. Actual MCP invocation remains available through the CLI.
 
 ## Example lifecycle
 

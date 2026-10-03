@@ -1,6 +1,6 @@
 # Aetheris dashboard
 
-Next.js 14 App Router, TypeScript, React Query, Viem, Tailwind CSS, Dynamic wallet authentication and optional Category Labs Mera passkey accounts. The dashboard reads actual Monad Testnet state through Envio when configured, with an explicitly labeled RPC fallback otherwise. It contains no seed agents, generated performance numbers or simulated execution events. Use **Node 24 or newer** for the Mera dependency.
+Next.js 14 App Router, TypeScript, React Query, Viem, Tailwind CSS, Dynamic wallet authentication and optional Category Labs Mera passkey accounts. The dashboard reads actual Monad Testnet state through Envio when configured, with an explicitly labeled RPC fallback otherwise. A clearly labeled comparison and guided preview explain task isolation; metric cards show labeled sample values when their source is unavailable. Agent records, activity tables and explorer links always require real data. Use **Node 24 or newer** for the Mera dependency.
 
 For the complete system setup and current submission gaps, see the [runbook](../docs/runbook.md) and [submission checklist](../docs/submission-readiness.md).
 
@@ -36,7 +36,10 @@ With no Envio endpoint, the dashboard explicitly displays **RPC fallback** and c
 - **Active agents** counts distinct agents in `TaskExecuted` logs in the displayed observation window. It is not total registration supply.
 - **Registered identities** reads `AgentRegistry.totalSupply()`.
 - **Observed TPS** divides transaction counts in the newer 11 of 12 consecutive blocks by the timestamp difference between the oldest and newest blocks. It is an observed short sample, not a network capacity claim.
-- **State collisions saved** is unavailable because standard RPC does not reveal optimistic execution retries or a counterfactual collision count.
+- **Parallel shards created** counts returned shards in the observed block window. A `+` and a capped-results note identify a truncated list; this is not a lifetime total.
+- **Total micropayments settled** counts independently verified payments in the current browser demo, not a network-wide payment total. Preview activity never increments it.
+- Animated metric cards preserve real zeroes, distinguish cached readings after a failed refresh, and show an explicit **Sample data** badge for illustrative fallbacks. Samples never enter the event ledger, GraphQL entities or receipt links.
+- Standard RPC does not reveal optimistic execution retries or a counterfactual collision count. The visualizer's red/green comparison, `+1,200ms`, `100%` and `300ms Single-Slot` figures are labeled illustrative scenario values; they are not measured network performance.
 - Shard tiles come from actual indexed entities or, in RPC fallback, `ShardCreated` events joined to `TaskExecuted` in the same window. The visualizer does not claim that scheduler execution was concurrent. An execution outside the fallback window is not shown. Observations can change during a reorganization.
 - The directory paginates indexed identities when configured, or sequential token IDs in RPC fallback (the supplied registry starts at 1 and has no burn). Quality scores use `getClients` and `getSummary(agentId, clients, 'quality', '')`. Feedback is uncurated and the mean is not a percentage, trust guarantee, or Sybil-resistant rating.
 - Agent Cards are untrusted. The server only fetches `ipfs://` metadata through `IPFS_GATEWAY`, rejects redirects and path traversal, applies a 6-second timeout and a 256 KiB cap, and renders strings as escaped React text. Service endpoints are displayed, never called automatically.
@@ -75,3 +78,32 @@ No account recovery service or private-key export UI is included. Keep access to
 - [Mera Viem transaction recipe](https://github.com/category-labs/mera/blob/main/docs/src/content/docs/recipes/send-a-transaction-with-viem.md)
 
 Next 14.2.35 is pinned as the latest published 14.x patch available during generation. Next 14 is an older major retained to satisfy this workspace's requested architecture; review framework support and security updates before exposing a production deployment.
+
+## Guided judge demonstration
+
+The homepage has two explicit modes. **Guided preview** walks through simulated sign-in and five animated progress lanes without a wallet, payment, daemon call or transaction hash. **Live testnet** uses a configured Dynamic passkey wallet, signs actual daemon task/payment messages, submits five requests concurrently, and checks their receipts before showing verified explorer links.
+
+The browser workload is disclosed as five deterministic document-checksum calculations. It demonstrates authorization, task isolation and paid routing; it does not call an AI model or MCP server. Use the [MCP task client](../scripts/README.md) to demonstrate actual agent service invocation.
+
+To enable live mode, configure `.env.local` with the existing router, identity, Dynamic and RPC settings, plus:
+
+| Server-only variable | Purpose |
+| --- | --- |
+| `DEMO_ENABLED=true` | Explicitly enables the live task proxy. |
+| `DAEMON_URL` | Task service origin, for example `http://127.0.0.1:8080` locally; HTTPS otherwise. |
+| `DEMO_AGENT_ID` | Real registered agent whose owner/delegate will sign. |
+| `DEMO_TASK_RESOURCE` | Exact task resource URL advertised in the daemon's x402 configuration. |
+| `DEMO_PAYMENT_ASSET` | Compatible EIP-3009 token address, pinned independently of the daemon response. |
+| `DEMO_PAYMENT_RECEIVER` | Expected settlement recipient. |
+| `DEMO_PAYMENT_MAX_AMOUNT` | Maximum allowed amount per task, in token base units. |
+| `DEMO_PAYMENT_ASSET_NAME` / `DEMO_PAYMENT_ASSET_VERSION` | Expected EIP-712 token domain. |
+
+Configure a real x402 `exact` facilitator on chain 10143 and fund the user's wallet with enough of the payment token for five tasks. This browser client does not support GraphTally. The agent owner must authorize every configured daemon relayer and the signing wallet. The browser signer must be distinct from the relayer accounts. Dynamic's origin, wallet and passkey settings must allow this deployment. Match `DEMO_TASK_RESOURCE` to the daemon's `PUBLIC_TASK_URL`; `MAX_INFLIGHT` should allow at least five tasks. Multiple relayers can submit independently; a single relayer still serializes its own transaction nonces.
+
+The three same-origin API paths are `/api/demo/config`, `/api/demo/tasks` and `/api/demo/tasks/[requestId]`. The proxy reads only its configured upstream, rejects redirects, bounds request/response sizes, and requires same-origin JSON for submissions. It has no server wallet or signing key. The daemon remains authoritative for signatures, replay protection and settlement.
+
+Wallet approval remains explicit: five task signatures and five EIP-3009 payment signatures precede concurrent dispatch. If signing outlasts the payment window, nothing is posted. Active signatures stay in memory; the recovery journal stores only public task metadata and payment nonces in browser storage. An ambiguous paid POST is followed only by status requests, never an automatic new payment. Preserve the browser journal for recovery. A Web Locks lease and a fresh journal check prevent concurrent tabs from overwriting an unfinished run; use a current browser on HTTPS or localhost. Recovered completions are independently checked again before turning green.
+
+Each completed lane checks the exact request, CREATE2 salt/predicted address, `ShardCreated` and `TaskExecuted` fields, the payment token's exact transfer and consumed EIP-3009 nonce, transaction hashes and canonical block hashes with two confirmations. A green completion means these recorded results and payment match; it does not prove arbitrary AI computation correct. Missing credentials, pending settlement or unavailable receipts remain visibly unconfirmed.
+
+Tooltips work by pointer, keyboard focus and touch, and dismiss with Escape. Counters and illustrations respect reduced-motion preferences. The comparison includes a pause control. Plain-English explanations explicitly distinguish identity registration from verified claims, public task storage from confidentiality, variable batch sizes from the 100-task example, and passkey sign-in from gas-funded on-chain delegation.

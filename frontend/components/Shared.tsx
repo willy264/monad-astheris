@@ -11,6 +11,6 @@ export function LiveStatus() {
 }
 export function Notice({ children, error = false }: { children: ReactNode; error?: boolean }) { return <div className={`notice ${error ? 'notice-error' : ''}`} role={error ? 'alert' : 'status'}><Icon name="activity" size={17} /><div>{children}</div></div>; }
 export function EmptyState({ title, description }: { title: string; description: string }) { return <div className="empty-state"><div className="empty-icon"><Icon name="layers" size={30} /></div><h3>{title}</h3><p>{description}</p></div>; }
-export function Metric({ title, value, detail, icon, accent = false }: { title: string; value: string; detail: string; icon: 'agents' | 'shield' | 'activity' | 'layers'; accent?: boolean }) {
-  return <div className={`metric-card ${accent ? 'metric-accent' : ''}`}><div className="metric-label">{title}<Icon name={icon} size={18} /></div><div className={`metric-value ${value === 'Unavailable' ? 'metric-unavailable' : ''}`}>{value}</div><div className="metric-detail">{detail}</div></div>;
+export function Metric({ title, value, detail, icon, accent = false, badge, provenance, id }: { title: ReactNode; value: ReactNode; detail: ReactNode; icon: 'agents' | 'shield' | 'activity' | 'layers'; accent?: boolean; badge?: string; provenance?: string; id?: string }) {
+  return <div className={`metric-card ${accent ? 'metric-accent' : ''}`} data-testid={id} data-provenance={provenance}><div className="metric-label"><span>{title}</span><Icon name={icon} size={18} /></div><div className={`metric-value ${value === 'Unavailable' ? 'metric-unavailable' : ''}`}>{value}</div>{badge && <span className={`metric-source metric-source-${provenance || 'live'}`}>{badge}</span>}<div className="metric-detail">{detail}</div></div>;
 }
