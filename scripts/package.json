@@ -1,0 +1,28 @@
+{
+  "name": "@aetheris/scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.32.1",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "submit-task": "tsx submit_task.ts",
+    "deploy": "tsx deploy.ts",
+    "finalize-deployment": "tsx finalize-deployment.ts",
+    "agent-card": "tsx agent-card.ts",
+    "submission-proof": "tsx submission-proof.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test --test-concurrency=1 test/*.test.ts ops.test.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.0",
+    "viem": "2.57.2",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.15",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  },
+  "pnpm": { "onlyBuiltDependencies": ["esbuild"] }
+}

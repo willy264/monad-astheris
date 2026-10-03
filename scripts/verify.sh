@@ -5,4 +5,5 @@ cd "$(dirname "$0")/.."
 node scripts/check-interfaces.mjs
 (cd daemon && cargo check --locked --jobs 2 && cargo test --locked --jobs 2)
 (cd indexer && pnpm install --frozen-lockfile && pnpm codegen && pnpm typecheck && pnpm test)
-(cd frontend && pnpm install --frozen-lockfile && pnpm typecheck && pnpm build)
+(cd scripts && pnpm install --frozen-lockfile && pnpm typecheck && pnpm test)
+(cd frontend && pnpm install --frozen-lockfile && pnpm typecheck && pnpm test && pnpm build)
