@@ -11,6 +11,15 @@ type Agent {
   shards: [EphemeralShard!]! @derivedFrom(field: "agent")
 }
 
+# Previous fully processed block; scoped to the exact identity/router deployment.
+type SyncStatus {
+  id: ID!
+  chainId: Int!
+  router: String!
+  registry: String!
+  blockNumber: BigInt!
+}
+
 type EphemeralShard {
   id: ID!
   chainId: Int!
