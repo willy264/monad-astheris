@@ -76,7 +76,7 @@ No production CRE forwarder on Monad is assumed. Keep the adapter disabled until
 
 ## 5. Run the indexer and dashboard against the same deployment
 
-Envio's full code generation, generated-type checking and Merkle tests passed on the [Linux CI runner](https://github.com/willy264/monad-astheris/actions/runs/37099687709). Native Windows still lacks its native addon. Use a Linux/macOS/working WSL host or Envio Cloud for runtime indexing.
+Envio's fresh code generation, generated-type checking and both Merkle tests passed on the [Linux CI runner](https://github.com/willy264/monad-astheris/actions/runs/37158285726) at source `916ee37`. Native Windows still lacks its native addon. Use a Linux/macOS/working WSL host or Envio Cloud for runtime indexing.
 
 Set `ENVIO_AGENT_REGISTRY_ADDRESS`, `ENVIO_ROUTER_ADDRESS` and `ENVIO_START_BLOCK`, then follow the indexer README. The default local GraphQL endpoint is port 8081; the daemon uses 8080.
 

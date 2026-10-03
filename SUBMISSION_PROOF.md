@@ -1,6 +1,6 @@
 # Aetheris submission proof
 
-Evidence generated: 2026-10-03T05:54:23.022Z. Target: Monad Testnet, chain 10143.
+Evidence generated: 2026-10-03T22:28:08.148Z. Target: Monad Testnet, chain 10143.
 
 This file records observed evidence. Missing credentials, receipts or indexing results remain explicit blockers; local compilation alone does not establish a live submission.
 

@@ -26,7 +26,7 @@ The dashboard uses `Agent_aggregate` and `TaskExecution_aggregate` for accurate 
 
 `.github/workflows/indexer-check.yml` runs pinned installation, codegen, full TypeScript checking and Merkle tests on Ubuntu/Node 24. It uploads `.envio/types.d.ts` as evidence. This checks generated API compatibility without deploying contracts, starting hosted services or using credentials; it does not establish live indexing. Windows does not run a substitute handwritten generated-types file.
 
-The supported-host check **passed on 2026-10-03** at commit `b3b9174`: [GitHub Actions run 37099687709](https://github.com/willy264/monad-astheris/actions/runs/37099687709). Code generation, full generated-type checking and both Merkle tests passed; the generated-types artifact is available from that run. Native Windows remains unsupported, while the previous codegen verification gap is resolved by this Linux result. Live deployment and GraphQL responses still require an actual configured indexer.
+The latest supported-host check **passed on 2026-10-03** at commit `916ee37`: [GitHub Actions run 37158285726](https://github.com/willy264/monad-astheris/actions/runs/37158285726). Fresh code generation, full generated-type checking and both Merkle tests passed on Ubuntu/Node 24; the generated-types artifact is available from that run. The earlier run at `b3b9174` also passed. Native Windows remains unsupported. Live deployment and GraphQL responses still require an actual configured indexer.
 
 Only single-block commitments that match the indexed history become `verified: true`. A commitment mismatch stays visible; it never overwrites the independently calculated root. Tree conventions are in [protocol.md](../docs/protocol.md).
 

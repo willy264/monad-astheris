@@ -9,9 +9,9 @@ This is an engineering checklist for the intended Monad Metropolis Track 04 subm
 | Area | Implemented behavior | Observed verification | Remaining live work |
 | --- | --- | --- | --- |
 | Contracts | Agent identities, delegation, isolated task results, reputation, validation and batch commitments | 38 Foundry tests, including two 256-case fuzz tests | Deploy and verify all four contracts and their configuration. |
-| Daemon | Signed paid requests, relayer routing, durable job journal and finalized-block batching | Rust compilation passed October 3; 13 tests passed October 2 | Exercise the funded provider, relayers, payment and recovery path. |
+| Daemon | Signed paid requests, relayer routing, durable job journal and finalized-block batching | Rust compilation and 13 tests passed October 3 | Exercise the funded provider, relayers, payment and recovery path. |
 | Client and deployment tools | Actual MCP invocation, signed x402 tasks, receipt checks, registration and proof export | 17 scripts tests and typechecking | Supply real endpoints, keys and payment policy; collect receipts. |
-| Frontend | Overview, directory, comparison visualizer, labeled preview and five-task paid browser flow | 18 tests, typecheck/build and 40 browser checks | Configure live contracts, wallet provider and payment service. |
+| Frontend | Overview, directory, comparison visualizer, labeled preview and five-task paid browser flow | 18 tests, typecheck/build; 40 judge-flow checks and 32 branding/browser checks | Configure live contracts, wallet provider and payment service. |
 | Indexer | Agent/shard/execution entities, deployment-scoped GraphQL and independently calculated batch roots | Linux generation/typechecking and 2 Merkle tests | Run indexing against the deployed contracts and expose a reachable endpoint. |
 | Shared interfaces | Contract ABI exports and consumer declarations | 61 declarations matched | Verify that runtime configuration points to the deployed version. |
 

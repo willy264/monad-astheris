@@ -83,7 +83,7 @@ pnpm test
 pnpm build
 ```
 
-Recorded results: **38 Solidity tests**, **17 scripts tests**, **18 frontend tests**, **40 browser checks**, **61 ABI declarations**, and successful Rust compilation. The **13 Rust tests** passed on 2026-10-02; Rust compilation was rerun on 2026-10-03. Envio generation, typechecking and **2 Merkle tests** passed on Linux. These are prior observed results, detailed in [VERIFICATION.md](VERIFICATION.md).
+The October 3 verification passed **38 Solidity tests**, **13 Rust tests** and Rust compilation, **17 scripts tests**, **18 frontend tests**, and **61 ABI declarations**. Fresh Envio generation, typechecking and **2 Merkle tests** passed on Linux. The production frontend build and **32 branding/browser checks** also passed; the earlier **40-check judge-flow run** is recorded separately in [VERIFICATION.md](VERIFICATION.md).
 
 ### Deployment manifest and explorer
 
