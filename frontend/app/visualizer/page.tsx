@@ -6,6 +6,7 @@ import { Icon } from '@/components/Icon';
 import { EmptyState, LiveStatus, Notice, PageHeading } from '@/components/Shared';
 import { ShardTable } from '@/components/ShardTable';
 import { MerkleBatches, SourceNotice } from '@/components/IndexedData';
+import { ExecutionComparison } from '@/components/ExecutionComparison';
 export default function Visualizer() {
   const { data, error, isPending } = useSnapshot();
   const [filter, setFilter] = useState<'all' | 'created' | 'executed'>('all');
@@ -13,6 +14,7 @@ export default function Visualizer() {
   const shards = data?.eventsAvailable ? data.shards.filter((shard) => filter === 'all' || shard.status === filter) : [];
   const detail = data?.shards.find((shard) => shard.address === selected);
   return <><PageHeading eyebrow="STATE ISOLATION ENGINE" title="Parallel work. Independent state." description="Follow deterministic shards from creation to committed output."><LiveStatus /></PageHeading>
+    <ExecutionComparison />
     {error && <Notice error>{error.message}</Notice>}{data?.errors.map((message) => <Notice error key={message}>{message}</Notice>)}
     <SourceNotice source={data?.source} />
     {data?.resultsLimited && <Notice>Showing the latest 200 indexed shards. Execution and active-agent counts cover the full displayed block window.</Notice>}
