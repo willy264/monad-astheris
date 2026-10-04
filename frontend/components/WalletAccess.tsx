@@ -1,13 +1,16 @@
 'use client';
 import { useState, type FormEvent } from 'react';
-import { DynamicContextProvider, DynamicWidget, useDynamicContext, useRegisterPasskey, useSignInWithPasskey } from '@dynamic-labs/sdk-react-core';
+import { DynamicContextProvider, DynamicWidget, useDynamicContext, useProjectSettings, useRegisterPasskey, useSignInWithPasskey } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors, isEthereumWallet } from '@dynamic-labs/ethereum';
 import { isAddress, type Hash } from 'viem';
 import { contracts, explorerTx, identityAbi, monadTestnet, routerAbi, walletPublicClient } from '@/lib/contracts';
 import { Notice } from './Shared';
+import { dynamicEnvironmentId } from '@/lib/dynamic-config';
 
 function Delegation() {
   const { primaryWallet, user } = useDynamicContext();
+  const projectSettings = useProjectSettings();
+  const passkeyLoginEnabled = projectSettings?.providers?.some(provider => provider.provider === 'passkey' && Boolean(provider.enabledAt)) ?? false;
   const signInWithPasskey = useSignInWithPasskey();
   const registerPasskey = useRegisterPasskey();
   const [agentId, setAgentId] = useState('');
@@ -21,6 +24,7 @@ function Delegation() {
   const [passkeyMessage, setPasskeyMessage] = useState('');
   async function authenticatePasskey() {
     setError(''); setPasskeyMessage('');
+    if (!user && !passkeyLoginEnabled) return;
     if (!window.isSecureContext || !window.PublicKeyCredential) { setError('Passkeys require a supported browser on HTTPS or localhost.'); return; }
     setPasskeyBusy(true);
     try {
@@ -55,7 +59,7 @@ function Delegation() {
     } catch (cause) { setError(cause instanceof Error ? cause.message.slice(0, 300) : 'Wallet request failed.'); }
     finally { setBusy(false); }
   }
-  return <div className="wallet-access"><div className="wallet-login"><div><h3>Your wallet. Your agents.</h3><p>Use your configured Dynamic sign-in method. Passkey availability depends on your wallet and environment settings.</p></div><DynamicWidget /></div><div className="passkey-actions"><button className="button" type="button" disabled={passkeyBusy || busy} onClick={() => void authenticatePasskey()}>{passkeyBusy ? 'Waiting for your device…' : user ? 'Register a passkey' : 'Sign in with passkey'}</button><span className="muted-text">Device authentication with WebAuthn</span></div>
+  return <div className="wallet-access"><div className="wallet-login"><div><h3>Your wallet. Your agents.</h3><p>Sign in with email or a wallet, then manage your agent's execution permissions.</p></div><DynamicWidget /></div><div className="passkey-actions"><button className="button" type="button" disabled={passkeyBusy || busy || (!user && !passkeyLoginEnabled)} onClick={() => void authenticatePasskey()}>{passkeyBusy ? 'Waiting for your device…' : user ? 'Register a passkey' : 'Sign in with passkey'}</button><span className="muted-text">{!projectSettings ? 'Loading sign-in options…' : !user && !passkeyLoginEnabled ? 'Passkey sign-in is not enabled yet. Use email or a wallet to get started.' : user ? 'Add device authentication to this account.' : 'Use a passkey previously registered on this site. New here? Sign in with email or a wallet first.'}</span></div>
     <form className="delegate-form" onSubmit={authorize}><div className="form-field"><label htmlFor="agent-id">Agent ID</label><input id="agent-id" value={agentId} onChange={(event) => setAgentId(event.target.value)} placeholder="e.g. 1" inputMode="numeric" required disabled={busy} /></div><div className="form-field executor-field"><label htmlFor="executor">Executor wallet</label><input id="executor" value={delegate} onChange={(event) => setDelegate(event.target.value)} placeholder="0x…" autoComplete="off" required disabled={busy} /></div><div className="form-field"><label htmlFor="duration">Authorization</label><select id="duration" value={hours} onChange={(event) => setHours(event.target.value)} disabled={busy}><option value="1">1 hour</option><option value="6">6 hours</option><option value="24">24 hours</option><option value="168">7 days</option><option value="0">Revoke access</option></select></div><button className="button button-primary" type="submit" disabled={busy || !primaryWallet}>{busy ? 'Confirming…' : hours === '0' ? 'Revoke executor' : 'Authorize executor'}</button></form>
     <p className="form-note">The executor may create and execute tasks for this agent until expiry. This permission does not transfer the agent identity or grant access to wallet funds.</p>
     {error && <Notice error>{error}</Notice>}{passkeyMessage && <Notice>{passkeyMessage}</Notice>}{hash && <Notice>{confirmed ? 'Delegation confirmed.' : 'Transaction submitted; awaiting confirmation.'} <a href={explorerTx(hash)} target="_blank" rel="noreferrer" className="text-link">View transaction ↗</a></Notice>}
@@ -63,5 +67,5 @@ function Delegation() {
 }
 
 export default function WalletAccess() {
-  return <DynamicContextProvider settings={{ environmentId: process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID!, walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><Delegation /></DynamicContextProvider>;
+  return <DynamicContextProvider settings={{ environmentId: dynamicEnvironmentId, walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><Delegation /></DynamicContextProvider>;
 }
