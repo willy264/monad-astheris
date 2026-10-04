@@ -22,7 +22,7 @@ contract RegistriesTest is Test {
         identity = new AgentRegistry();
         reputation = new ReputationRegistry(address(identity), address(this));
         validation = new ValidationRegistry(address(identity), address(this));
-        router = new AetherisRouter(address(identity), address(this));
+        router = new AetherisRouter(address(identity), address(validation), address(this));
         reputation.setTaskRouter(address(router));
         attestor = vm.addr(attestorKey);
         vm.prank(alice);

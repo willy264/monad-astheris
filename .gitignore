@@ -17,4 +17,7 @@
 **/*.redb*
 **/data/
 **/coverage/
+scripts/.state/
+scripts/.artifacts/
+contracts/deployments/*.candidate.json
 !**/.env.example

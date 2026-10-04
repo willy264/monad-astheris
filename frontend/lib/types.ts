@@ -8,10 +8,14 @@ export interface Snapshot {
   tps: number | null; sampleSeconds: number; blockSamples: { block: string; transactions: number }[];
   registeredAgents: string | null; activeAgents: number | null; executions: number | null;
   shards: Shard[]; errors: string[]; routerConfigured: boolean; registryConfigured: boolean; eventsAvailable: boolean;
+  source: DataSource; batches: MerkleBatch[]; resultsLimited: boolean;
 }
+export interface DataSource { kind: 'envio' | 'rpc'; indexedThrough?: string; lagBlocks?: string }
+export interface MerkleBatch { batchId: string; root: string; blockNumber: string; leafCount: string; verified: boolean; status: 'observed' | 'complete' | 'committed' | 'mismatch'; commitmentTx?: string }
 export interface Agent {
   id: string; owner: string; uri: string; name: string; description: string;
   capabilities: string[]; endpoints: { name: string; endpoint: string }[];
   score: string | null; feedbackCount: string | null; metadataError?: string; reputationError?: string;
+  tasksCompleted?: string;
 }
-export interface AgentPage { agents: Agent[]; total: string; page: number; pageSize: number; errors: string[]; }
+export interface AgentPage { agents: Agent[]; total: string; page: number; pageSize: number; errors: string[]; source: DataSource; }
