@@ -121,7 +121,7 @@ Use the verified manifest's `earliestDeploymentBlock` across these settings so r
 | Contracts | `PRIVATE_KEY` | Deployment signer's local testnet key, required by the supplied script; no default |
 | Contracts | `ADMIN_ADDRESS`, `COMMITTER_ADDRESS` | Optional explicit addresses; remove empty entries to use the deployer defaults |
 | Daemon | `RELAYER_PRIVATE_KEYS` | Comma-separated 1–32 unique funded keys, exclusively used by this daemon process |
-| Daemon | `LISTEN_ADDR`, `CORS_ORIGIN` | Defaults `127.0.0.1:8080` and `http://localhost:3000`; CORS allows one configured browser origin |
+| Daemon | `LISTEN_ADDR`, `PORT`, `CORS_ORIGIN` | Listener: explicit `LISTEN_ADDR`, otherwise `0.0.0.0:PORT` when supplied, otherwise `127.0.0.1:8080`. CORS defaults to `http://localhost:3000` and allows one configured browser origin; see [Render setup](../daemon/README.md#render-deployment-and-startup-errors) |
 | Daemon | `DATABASE_PATH` | Durable replay protection and task/broadcast journal; default `aetheris.redb` |
 | Daemon | `MAX_INFLIGHT`, `CONFIRMATIONS` | Default 32 concurrent jobs and 12 transaction confirmations; concurrency range 1–256, confirmations must be positive |
 | Daemon | `BATCH_ENABLED`, `RUST_LOG` | Batch worker starts only for literal `true`; default logging is in the template |
