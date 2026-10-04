@@ -1,6 +1,6 @@
 //! ACID durable replay protection. redb runs on blocking threads, never on Tokio workers.
-use anyhow::{Context, Result};
-use redb::{Database, ReadableTable, TableDefinition};
+use anyhow::{anyhow, ensure, Context, Result};
+use redb::{Database, DatabaseError, ReadableTable, TableDefinition};
 use serde::{de::DeserializeOwned, Serialize};
 use std::{path::Path, sync::Arc};
 
@@ -11,7 +11,29 @@ pub struct Store(Arc<Database>);
 
 impl Store {
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
-        let db = Database::create(path)?;
+        let path = path.as_ref();
+        ensure!(
+            path.file_name().is_some() && !path.as_os_str().is_empty(),
+            "DATABASE_PATH must name a database file"
+        );
+        let parent = path
+            .parent()
+            .filter(|parent| !parent.as_os_str().is_empty())
+            .unwrap_or_else(|| Path::new("."));
+        let metadata = std::fs::metadata(parent).map_err(|error| match error.kind() {
+            std::io::ErrorKind::NotFound => anyhow!("DATABASE_PATH parent directory is missing; mount the persistent disk or create the chosen local directory before startup. No directory or replacement database was created"),
+            _ => anyhow!("DATABASE_PATH parent directory is inaccessible; check mount and filesystem permissions"),
+        })?;
+        ensure!(
+            metadata.is_dir(),
+            "DATABASE_PATH parent must be a directory"
+        );
+        // Never create parent directories or select a fallback path: an absent durable
+        // mount must not silently become an empty ephemeral payment/replay journal.
+        let db = Database::create(path).map_err(|error| match error {
+            DatabaseError::DatabaseAlreadyOpen => anyhow!("DATABASE_PATH is locked by another process; run one daemon instance per journal with exclusive relayer keys"),
+            _ => anyhow!("DATABASE_PATH could not be opened; check file permissions, disk space and journal integrity. Preserve the existing journal for reconciliation"),
+        })?;
         let tx = db.begin_write()?;
         tx.open_table(RECORDS)?;
         tx.commit()?;
@@ -128,6 +150,43 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn missing_database_parent_is_actionable_and_not_created() {
+        let dir = tempfile::tempdir().unwrap();
+        let parent = dir.path().join("unmounted-volume");
+        let error = Store::open(parent.join("state.redb"))
+            .err()
+            .unwrap()
+            .to_string();
+        assert!(error.contains("DATABASE_PATH parent directory is missing"));
+        assert!(error.contains("persistent disk"));
+        assert!(!parent.exists());
+    }
+
+    #[test]
+    fn database_lock_conflict_preserves_the_existing_journal() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("state.redb");
+        let first = Store::open(&path).unwrap();
+        let error = Store::open(&path).err().unwrap().to_string();
+        assert!(error.contains("DATABASE_PATH is locked"));
+        drop(first);
+        assert!(Store::open(&path).is_ok());
+    }
+
+    #[test]
+    fn database_path_rejects_a_file_as_parent() {
+        let dir = tempfile::tempdir().unwrap();
+        let parent = dir.path().join("not-a-directory");
+        std::fs::write(&parent, b"keep these bytes").unwrap();
+        let error = Store::open(parent.join("state.redb"))
+            .err()
+            .unwrap()
+            .to_string();
+        assert!(error.contains("DATABASE_PATH parent must be a directory"));
+        assert_eq!(std::fs::read(parent).unwrap(), b"keep these bytes");
+    }
     #[tokio::test]
     async fn interrupted_jobs_are_explicitly_quarantined_after_restart() {
         let dir = tempfile::tempdir().unwrap();

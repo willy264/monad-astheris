@@ -479,13 +479,7 @@ mod tests {
             base,
             storage_salt(U256::from(1), B256::repeat_byte(2), U256::from(4))
         );
-        let encoded = [
-            U256::from(1).to_be_bytes::<32>(),
-            [2; 32],
-            U256::from(3).to_be_bytes::<32>(),
-        ]
-        .concat();
-        assert_eq!(base, B256::from(web3::signing::keccak256(&encoded)));
+        // Fixed independent Solidity/viem vectors are checked in merkle::tests.
     }
 
     #[test]

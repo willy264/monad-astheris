@@ -13,7 +13,7 @@ Observed on **2026-10-04**, Monad Testnet, chain **10143**. Four contracts are d
 
 The [deployment manifest](contracts/deployments/10143.json) records deployment transaction/block evidence, runtime/source hashes, compiler settings and verified router linkages. Earliest deployment block: **67972561**. Compiler: Solidity **0.8.24**, optimizer enabled with **200** runs, `viaIR: true`, EVM target `cancun`. Receipt/runtime verification does not imply explorer source verification or an external audit.
 
-The six project Solidity source files in the manifest match [revision `b19b976`](https://github.com/willy264/monad-astheris/tree/b19b9767606f92ee8abf71c6fa222c0ab1958a5b/contracts/src) byte-for-byte by Keccak hash. Use that revision to inspect the deployed implementation; it includes contract work retained on a separate feature branch. Publishing this evidence does not merge the remaining feature stack into `main`.
+The six project Solidity source files in the manifest match [revision `b19b976`](https://github.com/willy264/monad-astheris/tree/b19b9767606f92ee8abf71c6fa222c0ab1958a5b/contracts/src) byte-for-byte by Keccak hash. That revision is the original deployment source reference. The integrated repository includes that contract implementation together with the task client, judge dashboard and production service fixes. These historical deployment hashes remain the reference when checking that later source changes match the live code.
 
 ## Registered agent
 
@@ -81,8 +81,14 @@ These acceptance checks remain before claiming a complete submission:
 
 1. Complete an actual Dynamic passkey ceremony and verify expiring wallet-signed executor delegation. Enabling the provider and opening its modal do not establish these outcomes.
 2. Configure and fund the intended payment path, invoke this MCP tool from the task producer, sign the exact EIP-712 authorization, and submit it to the daemon. Capture confirmed `ShardCreated` and `TaskExecuted` receipts plus the actual payment settlement result. No paid-task hash or signed sample is claimed in this record.
-3. Run Envio code generation and generated-type checks in a supported environment, configure the deployed addresses/start block, and publish GraphQL output matching agent, shard and execution logs. No hosted GraphQL output is yet recorded here.
+3. Configure Envio with the deployed addresses/start block and publish GraphQL output matching agent, shard and execution logs. Code generation, generated-type checking and two Merkle tests already passed on [Ubuntu CI](https://github.com/willy264/monad-astheris/actions/runs/37158285726); a local/CI generation result does not supply a running hosted endpoint.
 4. Verify a committed Merkle root against canonical execution events; separately record any reputation feedback and validation/CRE/TEE results claimed in the submission. Registering this observer does not perform those workflows.
 5. Verify daemon persistence/recovery on its hosting plan, complete the demo video and submission form, and confirm organizer access requirements. A public repository is accessible for reading, but no email-specific access invitation is claimed.
 
 The deployed observer and its identity provide a real starting point for the task demonstration. They do not establish network-wide collision-free execution or a measured throughput/settlement guarantee.
+
+## Integration verification
+
+The live artifacts above remain the evidence of deployment, registration and the MCP observation. The combined feature/production integration must be checked on its own revision; component results from earlier commits are not substituted for that run. Record completed integration checks and their actual outcomes in [VERIFICATION.md](VERIFICATION.md). The [submission checklist](docs/submission-readiness.md) distinguishes remaining service configuration and live receipts from source integration.
+
+`pnpm submission-proof` writes a separate generated report at `submission/LIVE_CHECKS.md`. It does not overwrite this curated deployment, registration and MCP record. Review that report and link only newly verified outcomes when expanding this submission proof.

@@ -1,0 +1,21 @@
+diff --git a/dist/node.js b/dist/node.js
+--- a/dist/node.js
++++ b/dist/node.js
+@@ -1,15 +1,8 @@
+ 'use strict';
+ 
+ Object.defineProperty(exports, "__esModule", { value: true });
+-let converter;
+-{
+-    try {
+-        converter = require('bindings')('bigint_buffer');
+-    }
+-    catch (e) {
+-        console.warn('bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)');
+-    }
+-}
++// Use the existing JS implementation; never load the vulnerable native addon.
++const converter = undefined;
+ /**
+  * Convert a little-endian buffer into a BigInt.
+  * @param buf The little-endian buffer to convert

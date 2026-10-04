@@ -3,23 +3,62 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@10.32.1",
-  "engines": { "node": ">=20.9.0" },
-  "scripts": { "dev": "next dev", "build": "next build", "start": "next start", "typecheck": "tsc --noEmit", "test:rpc": "node --test test/rpc-events.test.mjs", "test:mcp": "tsx --test --test-concurrency=1 test/mcp-server.test.ts", "test:agent-card": "tsx --test test/agent-card.test.ts" },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test:rpc": "node --test test/rpc-events.test.mjs",
+    "test:mcp": "tsx --test --test-concurrency=1 test/mcp-server.test.ts",
+    "test:agent-card": "tsx --test test/agent-card.test.ts",
+    "test": "tsx --test --test-concurrency=1 test/*.test.ts test/*.test.mjs"
+  },
   "dependencies": {
     "@dynamic-labs/ethereum": "5.9.2",
     "@dynamic-labs/sdk-react-core": "5.9.2",
     "@modelcontextprotocol/sdk": "1.32.0",
     "@tanstack/react-query": "5.104.1",
-    "next": "14.2.35",
+    "next": "15.5.27",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "viem": "2.57.2",
-    "wagmi": "2.19.5",
-    "zod": "4.3.6"
+    "zod": "4.3.6",
+    "@category-labs/mera": "0.2.0",
+    "@scure/bip32": "2.0.1",
+    "@scure/bip39": "2.0.1"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0", "@types/react": "^18.3.0", "@types/react-dom": "^18.3.0",
-    "autoprefixer": "^10.4.20", "postcss": "^8.5.6", "tailwindcss": "3.4.17", "tsx": "4.21.0", "typescript": "^5.7.3"
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "8.5.28",
+    "tailwindcss": "3.4.17",
+    "tsx": "4.23.15",
+    "typescript": "^5.7.3"
   },
-  "pnpm": { "onlyBuiltDependencies": ["@swc/core", "bufferutil", "esbuild", "utf-8-validate", "unrs-resolver"] }
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "bufferutil",
+      "esbuild",
+      "utf-8-validate",
+      "unrs-resolver"
+    ],
+    "overrides": {
+      "postcss@<8.5.23": "8.5.28",
+      "axios@<1.20.0": "1.20.0",
+      "ws@>=8.0.0 <8.21.0": "8.22.0",
+      "uuid@<11.1.1": "11.1.1",
+      "http-cache-semantics@<4.3.0": "4.3.0"
+    },
+    "patchedDependencies": {
+      "bigint-buffer@1.1.5": "patches/bigint-buffer@1.1.5.patch",
+      "braces@3.0.3": "patches/braces@3.0.3.patch",
+      "stream-json@1.9.1": "patches/stream-json@1.9.1.patch"
+    }
+  }
 }

@@ -2,7 +2,7 @@
 
 Rust 2021 service using Tokio, Axum, Alloy, reqwest and a transactional redb journal. It creates a CREATE2 shard, then submits a caller-authorized output commitment, waiting for successful transaction receipts. Separate funded relayer keys submit independently; transactions sharing one relayer are serialized with an explicit pending nonce. Each signer must be exclusive to one daemon process. The journal holds an exclusive filesystem lock; sharing keys with another deployment invalidates the nonce guarantee.
 
-For the complete system setup and current submission gaps, see the [runbook](../docs/runbook.md) and [submission checklist](../docs/submission-readiness.md).
+Use Rust 1.94 or newer with the committed lockfile. For the complete system setup and current submission gaps, see the [runbook](../docs/runbook.md) and [submission checklist](../docs/submission-readiness.md).
 
 ```sh
 cp .env.example .env
@@ -12,7 +12,19 @@ cargo test --locked --jobs 2
 cargo run --locked --release
 ```
 
-The default listener is `127.0.0.1:8080`. Bind a public listener only behind a TLS proxy with rate limits and request timeouts appropriate for receipt confirmation. The server rejects an RPC on any chain other than Monad Testnet 10143 and rejects an address without deployed bytecode. Each agent owner must authorize its selected relayer through `setDelegate(agentId, relayer, expiresAt)`. Delegation is scoped to agent and expiry. The router owner must separately call `setCommitter(firstRelayer, true)` before enabling `BATCH_ENABLED` (or configure `COMMITTER_ADDRESS` in the deployment script).
+The default listener is `127.0.0.1:8080`. When the host supplies `PORT`, the daemon instead binds `0.0.0.0:PORT`; an explicit `LISTEN_ADDR` overrides both defaults. Bind a public listener only behind a TLS proxy with rate limits and request timeouts appropriate for receipt confirmation. The server rejects an RPC on any chain other than Monad Testnet 10143 and rejects an address without deployed bytecode. Each agent owner must authorize its selected relayer through `setDelegate(agentId, relayer, expiresAt)`. Delegation is scoped to agent and expiry. The router owner must separately call `setCommitter(firstRelayer, true)` before enabling `BATCH_ENABLED` (or configure `COMMITTER_ADDRESS` in the deployment script).
+
+## Render deployment and startup errors
+
+Use root directory `daemon`, build command `cargo build --release --locked --jobs 1`, start command `./target/release/aetheris-daemon`, and health check `/health`. Set `RUSTUP_TOOLCHAIN=1.94.0` and `CARGO_TARGET_DIR=target`. Render supplies `PORT` (normally `10000`); remove `LISTEN_ADDR` to use it, or explicitly set `LISTEN_ADDR=0.0.0.0:10000` when `PORT=10000`. Do not enter the literal string `$PORT` in `LISTEN_ADDR`. See [Render's port binding documentation](https://render.com/docs/web-services#port-binding).
+
+Configure the required values from [.env.example](.env.example) with actual deployed contracts and payment services. Mount persistent storage at `/var/data`, set `DATABASE_PATH=/var/data/aetheris.redb`, and run one instance with exclusive relayer keys. Set `CORS_ORIGIN` to the frontend's HTTPS origin and `PUBLIC_TASK_URL` to `https://YOUR-SERVICE.onrender.com/v1/tasks`. Keep `BATCH_ENABLED=false` until the batch publisher has been authorized. The paid endpoint is `/v1/tasks`; this daemon does not host `/v1/mcp`.
+
+If an older build exits with just **`Error: odd number of digits`**, check `AETHERIS_ROUTER_ADDRESS` first. It must contain the deployed **AetherisRouter contract address**: `0x` followed by 40 hexadecimal digits, with no quotes, ellipsis or placeholder text. A funded owner/relayer wallet is a different address. Do not pad or guess a missing contract address. Deploy and verify the contracts using the [deployment workflow](../scripts/README.md), then copy the router address from `contracts/deployments/10143.json` and its decimal deployment block into Render. This version names malformed router and relayer settings without logging their supplied values.
+
+`RELAYER_PRIVATE_KEYS` contains actual signer private keys (64 hexadecimal digits each, optionally prefixed with `0x`), separated by commas. Set them privately in Render's environment settings. Empty entries and quoted keys fail startup. A valid router and key still require the correct network, database path, and a supported payment provider before the HTTP listener starts. A port-scan warning while the process exits is a consequence of that startup failure; changing the port alone cannot fix an invalid contract address.
+
+An error naming a missing `DATABASE_PATH` parent means the configured volume/directory is absent. Mount the persistent disk or create the intended local directory before starting. The daemon does not create parent directories or choose another database automatically. A locked database means another process already owns the journal; stop that duplicate process, and preserve the database. Storage errors must never be fixed by deleting replay records or switching to ephemeral storage.
 
 ## API and signed requests
 
@@ -52,6 +64,8 @@ Output and proof hashes are supplied by the authorized task executor/client. The
 `accepted`, `completed`, `settlement_pending`, and `reconciliation_required` are durable status values. A concurrent retry may return 202 for an accepted job; failures return 502 with its persisted status. Canonical identity is `(chain, router, agentId, taskId, sequenceNonce)`: renewing the signed deadline returns the original job without another payment, and changing its inputs/output/proof/executor returns 409. Job, canonical identity, payment replay ID and signed materials are reserved in one database transaction. Do not delete the database when restarting: it contains payment anti-replay state.
 
 The daemon persists the selected nonce, calldata hash and per-relayer broadcast intent **before** calling the node, then journals the returned transaction hash before waiting for confirmations. If a crash or transport failure leaves an intent without a known hash, that signer halts across all tasks. It cannot silently reuse the nonce or rebroadcast. Restart explicitly changes interrupted `accepted`/`settlement_pending` jobs to `reconciliation_required`, retaining known results. Reconcile recorded nonce, transaction receipts and payment facilitator before resolving the journal. A settlement failure retains the confirmed task result in `settlement_pending`; an operator must reconcile it against the facilitator. This deliberately fails closed at ambiguous cross-system boundaries and does not promise exactly-once delivery across independent systems.
+
+On Unix hosts, SIGTERM and Ctrl+C both stop new HTTP requests and let active requests drain. The host must allow enough shutdown time for receipt confirmation. A forced process exit or interrupted detached worker still requires the persisted-journal reconciliation described above; graceful shutdown does not guarantee completion of in-flight chain or payment operations.
 
 ## Payments and Graph Tally trust boundary
 

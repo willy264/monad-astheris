@@ -8,8 +8,13 @@
     "node": ">=22"
   },
   "scripts": {
+    "submit-task": "tsx submit_task.ts",
+    "deploy": "tsx deploy.ts",
+    "finalize-deployment": "tsx finalize-deployment.ts",
     "agent-card": "tsx agent-card.ts",
+    "submission-proof": "tsx submission-proof.ts",
     "typecheck": "tsc --noEmit",
+    "test": "tsx --test --test-concurrency=1 test/*.test.ts ops.test.ts",
     "verify-mcp": "node verify-mcp.mjs"
   },
   "dependencies": {
@@ -19,7 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "22.19.15",
-    "tsx": "4.21.0",
+    "tsx": "4.23.15",
     "typescript": "5.9.3"
   },
   "pnpm": {

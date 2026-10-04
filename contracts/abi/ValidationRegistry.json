@@ -32,6 +32,21 @@
     },
     {
         "type":  "function",
+        "name":  "CRE_MAX_REPORT_AGE",
+        "inputs":  [
+
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "uint256",
+                            "internalType":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
         "name":  "acceptOwnership",
         "inputs":  [
 
@@ -40,6 +55,25 @@
 
                     ],
         "stateMutability":  "nonpayable"
+    },
+    {
+        "type":  "function",
+        "name":  "allowedCREWorkflows",
+        "inputs":  [
+                       {
+                           "name":  "",
+                           "type":  "bytes32",
+                           "internalType":  "bytes32"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view"
     },
     {
         "type":  "function",
@@ -117,6 +151,88 @@
                         }
                     ],
         "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "consumedCREReports",
+        "inputs":  [
+                       {
+                           "name":  "",
+                           "type":  "bytes32",
+                           "internalType":  "bytes32"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "consumedCRERequests",
+        "inputs":  [
+                       {
+                           "name":  "",
+                           "type":  "bytes32",
+                           "internalType":  "bytes32"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "creForwarder",
+        "inputs":  [
+
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "address",
+                            "internalType":  "address"
+                        }
+                    ],
+        "stateMutability":  "view"
+    },
+    {
+        "type":  "function",
+        "name":  "creWorkflowKey",
+        "inputs":  [
+                       {
+                           "name":  "workflowId",
+                           "type":  "bytes32",
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "workflowName",
+                           "type":  "bytes10",
+                           "internalType":  "bytes10"
+                       },
+                       {
+                           "name":  "workflowOwner",
+                           "type":  "address",
+                           "internalType":  "address"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bytes32",
+                            "internalType":  "bytes32"
+                        }
+                    ],
+        "stateMutability":  "pure"
     },
     {
         "type":  "function",
@@ -311,6 +427,26 @@
     },
     {
         "type":  "function",
+        "name":  "onReport",
+        "inputs":  [
+                       {
+                           "name":  "metadata",
+                           "type":  "bytes",
+                           "internalType":  "bytes"
+                       },
+                       {
+                           "name":  "report",
+                           "type":  "bytes",
+                           "internalType":  "bytes"
+                       }
+                   ],
+        "outputs":  [
+
+                    ],
+        "stateMutability":  "nonpayable"
+    },
+    {
+        "type":  "function",
         "name":  "owner",
         "inputs":  [
 
@@ -349,6 +485,25 @@
 
                     ],
         "stateMutability":  "nonpayable"
+    },
+    {
+        "type":  "function",
+        "name":  "requestCreatedAt",
+        "inputs":  [
+                       {
+                           "name":  "",
+                           "type":  "bytes32",
+                           "internalType":  "bytes32"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "uint256",
+                            "internalType":  "uint256"
+                        }
+                    ],
+        "stateMutability":  "view"
     },
     {
         "type":  "function",
@@ -391,6 +546,51 @@
         "inputs":  [
                        {
                            "name":  "attestor",
+                           "type":  "address",
+                           "internalType":  "address"
+                       },
+                       {
+                           "name":  "allowed",
+                           "type":  "bool",
+                           "internalType":  "bool"
+                       }
+                   ],
+        "outputs":  [
+
+                    ],
+        "stateMutability":  "nonpayable"
+    },
+    {
+        "type":  "function",
+        "name":  "setCREForwarder",
+        "inputs":  [
+                       {
+                           "name":  "forwarder",
+                           "type":  "address",
+                           "internalType":  "address"
+                       }
+                   ],
+        "outputs":  [
+
+                    ],
+        "stateMutability":  "nonpayable"
+    },
+    {
+        "type":  "function",
+        "name":  "setCREWorkflow",
+        "inputs":  [
+                       {
+                           "name":  "workflowId",
+                           "type":  "bytes32",
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "workflowName",
+                           "type":  "bytes10",
+                           "internalType":  "bytes10"
+                       },
+                       {
+                           "name":  "workflowOwner",
                            "type":  "address",
                            "internalType":  "address"
                        },
@@ -464,6 +664,25 @@
 
                     ],
         "stateMutability":  "nonpayable"
+    },
+    {
+        "type":  "function",
+        "name":  "supportsInterface",
+        "inputs":  [
+                       {
+                           "name":  "interfaceId",
+                           "type":  "bytes4",
+                           "internalType":  "bytes4"
+                       }
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "bool",
+                            "internalType":  "bool"
+                        }
+                    ],
+        "stateMutability":  "pure"
     },
     {
         "type":  "function",
@@ -594,6 +813,105 @@
         "inputs":  [
                        {
                            "name":  "attestor",
+                           "type":  "address",
+                           "indexed":  true,
+                           "internalType":  "address"
+                       },
+                       {
+                           "name":  "allowed",
+                           "type":  "bool",
+                           "indexed":  false,
+                           "internalType":  "bool"
+                       }
+                   ],
+        "anonymous":  false
+    },
+    {
+        "type":  "event",
+        "name":  "CREForwarderSet",
+        "inputs":  [
+                       {
+                           "name":  "previousForwarder",
+                           "type":  "address",
+                           "indexed":  true,
+                           "internalType":  "address"
+                       },
+                       {
+                           "name":  "forwarder",
+                           "type":  "address",
+                           "indexed":  true,
+                           "internalType":  "address"
+                       }
+                   ],
+        "anonymous":  false
+    },
+    {
+        "type":  "event",
+        "name":  "CREReportAccepted",
+        "inputs":  [
+                       {
+                           "name":  "requestHash",
+                           "type":  "bytes32",
+                           "indexed":  true,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "workflowId",
+                           "type":  "bytes32",
+                           "indexed":  true,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "workflowOwner",
+                           "type":  "address",
+                           "indexed":  true,
+                           "internalType":  "address"
+                       },
+                       {
+                           "name":  "reportId",
+                           "type":  "bytes2",
+                           "indexed":  false,
+                           "internalType":  "bytes2"
+                       },
+                       {
+                           "name":  "reportHash",
+                           "type":  "bytes32",
+                           "indexed":  false,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "outputHash",
+                           "type":  "bytes32",
+                           "indexed":  false,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "response",
+                           "type":  "uint8",
+                           "indexed":  false,
+                           "internalType":  "uint8"
+                       }
+                   ],
+        "anonymous":  false
+    },
+    {
+        "type":  "event",
+        "name":  "CREWorkflowSet",
+        "inputs":  [
+                       {
+                           "name":  "workflowId",
+                           "type":  "bytes32",
+                           "indexed":  true,
+                           "internalType":  "bytes32"
+                       },
+                       {
+                           "name":  "workflowName",
+                           "type":  "bytes10",
+                           "indexed":  false,
+                           "internalType":  "bytes10"
+                       },
+                       {
+                           "name":  "workflowOwner",
                            "type":  "address",
                            "indexed":  true,
                            "internalType":  "address"
@@ -798,6 +1116,13 @@
     },
     {
         "type":  "error",
+        "name":  "CREReportAlreadyConsumed",
+        "inputs":  [
+
+                   ]
+    },
+    {
+        "type":  "error",
         "name":  "DuplicateRequest",
         "inputs":  [
 
@@ -813,6 +1138,20 @@
     {
         "type":  "error",
         "name":  "InvalidAttestation",
+        "inputs":  [
+
+                   ]
+    },
+    {
+        "type":  "error",
+        "name":  "InvalidCREMetadata",
+        "inputs":  [
+
+                   ]
+    },
+    {
+        "type":  "error",
+        "name":  "InvalidCREReport",
         "inputs":  [
 
                    ]

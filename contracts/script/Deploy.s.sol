@@ -25,7 +25,7 @@ contract Deploy is Script {
         identity = new AgentRegistry();
         reputation = new ReputationRegistry(address(identity), deployer);
         validation = new ValidationRegistry(address(identity), deployer);
-        router = new AetherisRouter(address(identity), deployer);
+        router = new AetherisRouter(address(identity), address(validation), deployer);
         reputation.setTaskRouter(address(router));
         if (committer != deployer) {
             router.setCommitter(committer, true);
@@ -37,15 +37,24 @@ contract Deploy is Script {
             validation.transferOwnership(admin);
         }
         vm.stopBroadcast();
+        // forge script also runs locally without --broadcast. Never label these predicted addresses live.
         string memory key = "deployment";
+        vm.serializeUint(key, "schemaVersion", 1);
+        vm.serializeString(key, "status", "candidate");
         vm.serializeUint(key, "chainId", block.chainid);
+        vm.serializeAddress(key, "deployer", deployer);
+        vm.serializeAddress(key, "admin", admin);
         vm.serializeAddress(key, "identityRegistry", address(identity));
         vm.serializeAddress(key, "reputationRegistry", address(reputation));
         vm.serializeAddress(key, "validationRegistry", address(validation));
         vm.serializeAddress(key, "router", address(router));
         vm.serializeAddress(key, "committer", committer);
-        string memory json = vm.serializeAddress(key, "pendingAdmin", admin);
+        vm.serializeString(key, "expectedSolcVersion", "0.8.24");
+        vm.serializeString(key, "expectedEvmVersion", "cancun");
+        vm.serializeBool(key, "expectedOptimizer", true);
+        vm.serializeUint(key, "expectedOptimizerRuns", 200);
+        string memory json = vm.serializeBool(key, "expectedViaIR", true);
         vm.createDir("deployments", true);
-        vm.writeJson(json, string.concat("deployments/", vm.toString(block.chainid), ".json"));
+        vm.writeJson(json, string.concat("deployments/", vm.toString(block.chainid), ".candidate.json"));
     }
 }

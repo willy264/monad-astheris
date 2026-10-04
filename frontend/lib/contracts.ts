@@ -16,6 +16,7 @@ export const routerAbi = parseAbi([
   'function setDelegate(uint256 agentId,address delegate,uint64 expiresAt)',
   'function isAuthorized(uint256 agentId,address account) view returns (bool)',
   'function identityRegistry() view returns (address)',
+  'function predictShardAddress(uint256 agentId,bytes32 taskId,uint256 sequenceNonce,address executor,bytes32 inputHash) view returns (address)',
   'function createShard(uint256 agentId,bytes32 taskId,uint256 sequenceNonce,address executor,bytes32 inputHash) returns (address)',
   'function executeTask(address shard,bytes32 outputHash,bytes32 proofHash)',
   'event ShardCreated(address indexed shard,uint256 indexed agentId,bytes32 indexed taskId,uint256 sequenceNonce,address executor,bytes32 inputHash)',

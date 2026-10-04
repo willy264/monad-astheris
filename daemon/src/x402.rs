@@ -122,7 +122,7 @@ impl TallyConfig {
 
 pub enum Mode {
     X402,
-    GraphTally(TallyConfig),
+    GraphTally(Box<TallyConfig>),
 }
 
 pub struct Payments {
@@ -172,7 +172,7 @@ impl Payments {
                 let domain = Eip712Domain { name:Some(Cow::Owned(required("GRAPH_TALLY_DOMAIN_NAME")?)), version:Some(Cow::Owned(required("GRAPH_TALLY_DOMAIN_VERSION")?)), chain_id:Some(U256::from(chain_id)), verifying_contract:Some(verifier), salt:None };
                 let config = TallyConfig { collection:required("GRAPH_TALLY_COLLECTION_ID")?.parse()?, service:required("GRAPH_TALLY_DATA_SERVICE")?.parse()?, receiver, amount, max_age:number("GRAPH_TALLY_MAX_AGE_SECONDS", 300)?, domain };
                 let requirements = json!({"scheme":"graph-tally","network":format!("eip155:{chain_id}"),"amount":amount.to_string(),"asset":"GRT","payTo":receiver,"maxTimeoutSeconds":config.max_age,"extra":{"adapter":"aetheris-graph-tally-v1","collectionId":config.collection,"dataService":config.service,"domain":config.domain_json()}});
-                (Mode::GraphTally(config), endpoint, env::var("GRAPH_TALLY_ADAPTER_TOKEN").ok().filter(|token| !token.is_empty()), requirements)
+                (Mode::GraphTally(Box::new(config)), endpoint, env::var("GRAPH_TALLY_ADAPTER_TOKEN").ok().filter(|token| !token.is_empty()), requirements)
             }
             _ => bail!("PAYMENT_MODE must be x402 or graph-tally; unpaid mode is intentionally unavailable"),
         };

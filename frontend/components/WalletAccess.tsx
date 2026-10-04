@@ -6,6 +6,7 @@ import { isAddress, type Hash } from 'viem';
 import { contracts, explorerTx, identityAbi, monadTestnet, routerAbi, walletPublicClient } from '@/lib/contracts';
 import { Notice } from './Shared';
 import { dynamicEnvironmentId } from '@/lib/dynamic-config';
+import { verifyDelegationReceipt } from '@/lib/delegation';
 
 function Delegation() {
   const { primaryWallet, user } = useDynamicContext();
@@ -54,7 +55,7 @@ function Delegation() {
       const transaction = await client.writeContract({ ...request, chain: monadTestnet });
       setHash(transaction);
       const receipt = await walletPublicClient.waitForTransactionReceipt({ hash: transaction, confirmations: 1, timeout: 120000 });
-      if (receipt.status !== 'success') throw new Error('The delegation transaction reverted.');
+      verifyDelegationReceipt(receipt, transaction, contracts.router, owner);
       setConfirmed(true);
     } catch (cause) { setError(cause instanceof Error ? cause.message.slice(0, 300) : 'Wallet request failed.'); }
     finally { setBusy(false); }

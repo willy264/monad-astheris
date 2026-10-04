@@ -5,10 +5,12 @@ import {Test} from "forge-std/Test.sol";
 import {AgentRegistry} from "../src/AgentRegistry.sol";
 import {AetherisRouter} from "../src/AetherisRouter.sol";
 import {EphemeralShard} from "../src/EphemeralShard.sol";
+import {ValidationRegistry} from "../src/ValidationRegistry.sol";
 
 contract AetherisRouterTest is Test {
     AgentRegistry internal identity;
     AetherisRouter internal router;
+    ValidationRegistry internal validation;
     address internal alice = makeAddr("alice");
     address internal bob = makeAddr("bob");
     address internal delegate = makeAddr("delegate");
@@ -19,7 +21,8 @@ contract AetherisRouterTest is Test {
 
     function setUp() public {
         identity = new AgentRegistry();
-        router = new AetherisRouter(address(identity), address(this));
+        validation = new ValidationRegistry(address(identity), address(this));
+        router = new AetherisRouter(address(identity), address(validation), address(this));
         vm.prank(alice);
         agentId = identity.register("ipfs://bafy-agent-card");
     }
@@ -27,6 +30,17 @@ contract AetherisRouterTest is Test {
     function _create(bytes32 taskId, uint256 nonce) internal returns (address shard) {
         vm.prank(alice);
         shard = router.createShard(agentId, taskId, nonce, alice, INPUT);
+    }
+
+    function testValidationRegistryLinkageRejectsWrongIdentityOrUndeployedAddress() public {
+        assertEq(address(router.validationRegistry()), address(validation));
+        assertEq(router.validationRegistry().getIdentityRegistry(), address(identity));
+        AgentRegistry otherIdentity = new AgentRegistry();
+        ValidationRegistry otherValidation = new ValidationRegistry(address(otherIdentity), address(this));
+        vm.expectRevert(AetherisRouter.InvalidArgument.selector);
+        new AetherisRouter(address(identity), address(otherValidation), address(this));
+        vm.expectRevert(AetherisRouter.InvalidArgument.selector);
+        new AetherisRouter(address(identity), address(123), address(this));
     }
 
     function testCreate2PredictionAndSaltEncoding() public {

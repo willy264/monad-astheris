@@ -62,7 +62,10 @@ export function liveManifest() {
   return manifest;
 }
 export async function boundedResponse(response: Response, maximum = 1024 * 1024): Promise<string> {
-  if (!response.ok) throw new Error(`Remote service returned HTTP ${response.status}`);
+  if (!response.ok) {
+    await response.body?.cancel().catch(() => {});
+    throw new Error(`Remote service returned HTTP ${response.status}`);
+  }
   if (!response.body) throw new Error('Remote service returned an empty body');
   const reader = response.body.getReader(); const chunks: Uint8Array[] = []; let size = 0;
   try {
