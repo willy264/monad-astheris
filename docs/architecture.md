@@ -6,6 +6,8 @@ An external agent runs the computation and supplies its hashes. Aetheris current
 
 This document describes the implemented repository. Use the [project README](../README.md) for entry points, the [runbook](runbook.md) for setup and operation, the [submission checklist](submission-readiness.md) for remaining demo work, and the [verification record](../VERIFICATION.md) for checks actually completed.
 
+The 2026-10-03 additions are described in the [live submission workflow](live-submission.md): the repository now includes the MCP/payment task client, optional Envio dashboard reads, Mera delegation and a trusted Chainlink CRE receiver. The daemon's task/payment boundary and CREATE2/Merkle encodings below remain the same.
+
 ## System layout and actual connections
 
 ```mermaid
@@ -65,12 +67,13 @@ flowchart LR
     Worker -->|Finalized blocks and logs| RPC
     Handlers -->|Chain events| RPC
     Consumers -->|Queries| GraphQL
+    API -->|When ENVIO_GRAPHQL_URL is configured| GraphQL
     RPC <--> Contracts
 ```
 
-The dashboard currently reads contracts and logs through its own Next.js API routes. **It does not call the daemon task API or query Envio GraphQL.** The browser polls `/api/overview` every 12 seconds and queries `/api/agents` for directory pages. Wallet delegation is a direct contract transaction. The daemon and indexer are independently useful services, connected through the deployed contracts and their events.
+The dashboard reads through its Next.js API routes. With `ENVIO_GRAPHQL_URL` configured, those routes query deployment-scoped Envio data and expose indexing progress; otherwise they use explicitly labeled RPC fallback. The browser polls `/api/overview` every 12 seconds and queries `/api/agents` for directory pages. Wallet delegation is a direct contract transaction. The new task CLI invokes MCP and calls the daemon API; the browser does not submit paid tasks.
 
-Consequently, the dashboard can show chain activity while the daemon is offline. An Envio outage does not stop the current dashboard, and successful dashboard rendering does not establish that paid task routing or GraphQL indexing works. Wiring task submission and indexed history into the dashboard remains an explicit integration step.
+The dashboard can show existing chain activity while the daemon is offline. A configured Envio outage produces a visible service error. Successful rendering alone does not establish that paid task routing or a passkey ceremony works. The task client's chain/payment checks and live evidence collection remain separate steps.
 
 Sources: [frontend data reads](../frontend/lib/server.ts), [browser query hooks](../frontend/lib/queries.ts), [wallet delegation](../frontend/components/WalletAccess.tsx), [daemon API](../daemon/src/main.rs), [indexer handlers](../indexer/src/EventHandlers.ts).
 

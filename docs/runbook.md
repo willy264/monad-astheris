@@ -1,6 +1,6 @@
 # Aetheris operator runbook
 
-This guide runs the code that is present in this workspace. The dashboard can run immediately in read-only mode on Windows. A paid task additionally requires deployed contracts, funded and authorized wallets, an actual payment provider, and a client that signs the documented requests. The repository does not include that signing/payment client, an MCP execution service, or a Graph Tally settlement adapter.
+The dashboard can run in read-only mode on Windows. A paid task additionally requires deployed contracts, funded authorized wallets, a working MCP service and an actual payment provider. The repository now includes the [MCP task/payment client](../scripts/README.md); it does not host the remote MCP service or a Graph Tally settlement adapter. Follow the [2026-10-03 live workflow](live-submission.md) for the new deployment, registration and evidence tools; the service-level commands below remain useful.
 
 Use [architecture.md](architecture.md) for component boundaries, [protocol.md](protocol.md) for exact hashing rules, [submission-readiness.md](submission-readiness.md) for the readiness assessment, and [VERIFICATION.md](../VERIFICATION.md) for checks already completed. Commands below are instructions for an operator; documenting them does not deploy contracts or submit payments.
 
@@ -133,7 +133,7 @@ Use the earliest identity-registry deployment block across these settings so reg
 | Frontend | `EVENT_LOOKBACK_BLOCKS` | Event observation window, default 200; code bounds it to 12–1000 blocks |
 | Frontend | `IPFS_GATEWAY` | Gateway for `ipfs://` cards, default `https://ipfs.io/ipfs/`; HTTP card URIs are not fetched |
 
-There is no `DAEMON_URL` or `INDEXER_URL` setting in the current frontend. Changing either service's listener does not wire it into the dashboard.
+There is no `DAEMON_URL` setting in the frontend; task submission uses the scripts client. Server-only `ENVIO_GRAPHQL_URL` now selects indexed dashboard reads, with optional `ENVIO_GRAPHQL_ADMIN_SECRET` or `ENVIO_GRAPHQL_TOKEN`. An absent endpoint uses labeled RPC fallback; a configured endpoint failure remains visible.
 
 ## 4. Full-stack sequence
 
@@ -306,7 +306,7 @@ From `frontend`, run `pnpm install --frozen-lockfile`, then either `pnpm dev` or
 
 ## 5. Submit a signed, paid task
 
-There is no supplied task-signing/payment CLI or dashboard task-submission form. Implement or connect a client using [daemon/README.md](../daemon/README.md#api-and-signed-requests) before using the send-only commands below. The client must already have a real output commitment from its execution workflow; this daemon does not invoke the advertised MCP endpoint or generate that output.
+Use the supplied [task-signing/payment CLI](../scripts/README.md), which invokes the MCP tool and supplies the exact daemon authorization/payment formats. The dashboard has no task-submission form. The manual commands below remain send-only examples for existing signed artifacts; the daemon itself does not generate outputs.
 
 The required sequence is:
 

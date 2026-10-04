@@ -16,6 +16,7 @@ The supplied project brief targets **Monad Metropolis, Track 04: Trust, Identity
 | [Architecture](docs/architecture.md) | System and sequence diagrams, component responsibilities, data flow, authorization, storage isolation, and trust boundaries. |
 | [Runbook](docs/runbook.md) | Prerequisites, a quick dashboard preview, full-stack configuration, deployment, service startup, verification, and troubleshooting. |
 | [Submission readiness](docs/submission-readiness.md) | What is done, what remains, acceptance criteria, demonstration steps, and submission deliverables. |
+| [Live submission workflow](docs/live-submission.md) | Deployment and IPFS tooling, the MCP/payment client, Mera/CRE integration, indexed dashboard setup, and evidence collection. |
 | [Shared protocol](docs/protocol.md) | Exact salt, Merkle leaf, batch ID, ordering, and signature conventions. |
 | [Verification record](VERIFICATION.md) | Results actually observed in this workspace and checks still outstanding. |
 
@@ -33,7 +34,7 @@ The supplied project brief targets **Monad Metropolis, Track 04: Trust, Identity
 | Indexing | Envio entities for identities, shards, executions, and batches, with independently calculated roots and commitment comparisons. |
 | Dashboard | Overview, agent directory, execution visualizer, Dynamic authentication, and delegation/revocation controls. |
 
-The daemon accepts authorized output hashes; it does not run an AI model or invoke MCP tools to produce those outputs. A real agent/client must supply that computation. The frontend currently reads contracts and logs through its own Next.js API and Monad RPC. It does not yet use Envio GraphQL or provide a signed, paid task-submission interface.
+The daemon accepts authorized output hashes; the [task client](scripts/README.md) invokes an actual MCP tool, hashes its output, signs the task and handles an x402 EIP-3009 payment. It also records completion and can publish an explicitly reviewed independent assessment. The frontend reads Envio GraphQL when configured and labels its RPC fallback otherwise. Task submission remains a CLI flow; no browser task form is implied.
 
 ## Example lifecycle
 
@@ -46,9 +47,9 @@ The daemon accepts authorized output hashes; it does not run an AI model or invo
 
 ## Current status
 
-As recorded on **2026-10-02**, the project has implemented components and passing local checks: **22 Solidity tests, 13 Rust tests, 2 indexer Merkle tests, 27 matching interface declarations, and a passing frontend typecheck, production build, and desktop/mobile browser smoke check**.
+The 2026-10-03 integration adds receipt-verified deployment and IPFS registration tools, the MCP/payment client, CRE delivery validation, Mera delegation, and GraphQL dashboard data. Contracts now pass **38 tests**. Envio code generation, full generated-type checking and Merkle tests passed on a supported [Linux runner](https://github.com/willy264/monad-astheris/actions/runs/37099687709). See [VERIFICATION.md](VERIFICATION.md) for the full check record and live-service limits.
 
-It is not yet an end-to-end demonstrated submission. No contracts have been deployed from this workspace and no paid task has been run through the complete stack. Envio code generation and generated-type validation remain blocked locally by the unavailable Windows addon and a WSL startup failure. Dynamic passkeys, payment settlement, hosted indexing, and trusted TEE validation need their actual external configuration and integration checks.
+It is not yet an end-to-end demonstrated submission. No funded deployment key, MCP/payment service configuration, IPFS token, Dynamic environment or hosted Envio endpoint was supplied. No contracts have been deployed and no paid task has been submitted from this workspace. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) records live evidence only when available, with remaining blockers shown explicitly.
 
 The next milestone is one reproducible testnet demonstration: registered agent, working delegation, real signed paid task, confirmed shard result, matching indexed batch commitment, and dashboard evidence. The [submission checklist](docs/submission-readiness.md) breaks this into concrete completion criteria.
 
@@ -65,7 +66,7 @@ scripts/     ABI consistency checks and local verification helpers
 
 ## Local verification
 
-Prerequisites: Foundry, Rust 1.94 or newer, Node.js 22 or newer, pnpm 10. Envio 3.12.1 requires Linux/macOS (use WSL2 on Windows); its local database stack also requires Docker. On this Windows workspace a checksum-verified Foundry installation is available in `.tools/foundry/`.
+Prerequisites: Foundry, Rust 1.94 for the recorded checks, Node.js 24 or newer for the complete stack, pnpm 10. Envio 3.12.1 requires Linux/macOS (use WSL2 on Windows); its local database stack also requires Docker. On this Windows workspace a checksum-verified Foundry installation is available in `.tools/foundry/`.
 
 ```powershell
 # From aetheris/; omit this line if forge is already on PATH.

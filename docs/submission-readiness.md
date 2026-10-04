@@ -1,6 +1,8 @@
 # Submission readiness
 
-Aetheris has an implemented codebase and passing local checks. It does **not yet have a deployed, paid, end-to-end agent demonstration**. The next work is to connect real services, implement the missing task client/output producer, and collect evidence that the components work together.
+Aetheris has an implemented codebase and passing local checks. It does **not yet have a deployed, paid, end-to-end agent demonstration**. The task client and provider-facing tools have now been implemented; the remaining live work is to configure actual services/wallets and collect evidence that the components work together.
+
+**2026-10-03 update:** this document preserves the original readiness assessment below for scope tracking. The MCP/payment client, receipt-verified deployment/IPFS tools, Mera/CRE adapters and Envio dashboard path are now implemented, and Linux CI has passed Envio code generation/full typing. References below to those items as missing describe the initial 2026-10-02 assessment, not their current source status. Use [live-submission.md](live-submission.md), [VERIFICATION.md](../VERIFICATION.md) and [SUBMISSION_PROOF.md](../SUBMISSION_PROOF.md) for current implementation, checks and external blockers.
 
 This assessment reflects the workspace checked on **2026-10-02**. The supplied project brief names **Monad Metropolis Hackathon, Track 04: Trust, Identity & AI Infrastructure** as its intended destination. No organizer rubric, deadline, submission URL, eligibility rules, or required video format was supplied. The checklist below is a technical acceptance plan, not a statement of official competition requirements.
 
