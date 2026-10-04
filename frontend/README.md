@@ -18,6 +18,8 @@ Set the three `NEXT_PUBLIC_*_ADDRESS` values to the matching contracts from your
 
 The server API uses short-lived in-memory request coalescing, RPC timeouts, bounded event windows, capped directory pages, and four-agent fetch batches. React Query polls the overview every 12 seconds and cancels HTTP requests when abandoned. Load-balancer rate limiting is recommended for a public service; caches are local to a server process.
 
+The [Monad Network Observer MCP service](docs/mcp-agent.md) exposes `get_monad_block` at `/api/mcp` through the same Vercel deployment. It reads real Monad Testnet block metadata for agent workflows and requires no signing key.
+
 ## Reading the dashboard
 
 - **Active agents** counts distinct agents in `TaskExecuted` logs in the displayed observation window. It is not total registration supply.
