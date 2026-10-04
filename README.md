@@ -12,7 +12,7 @@ Aetheris gives every task its own **Express Checkout Lane**: a separate contract
 
 The goal is to support many agents working concurrently on Monad. Today, tests demonstrate isolated task storage; they do not establish thousands of simultaneous agents or zero speed bottlenecks. Shared accounts, deployment and payment infrastructure still matter.
 
-**Status:** locally tested prototype; live testnet deployment and a paid end-to-end demonstration remain outstanding. See the [verification record](VERIFICATION.md) and [submission evidence](SUBMISSION_PROOF.md). Intended track: Monad Metropolis Track 04, Trust, Identity & AI Infrastructure.
+**Status:** all four core contracts are deployed and receipt-verified on Monad Testnet as of October 4, 2026. Agent registration, paid execution and live indexing remain outstanding. See the [deployment manifest](contracts/deployments/10143.json), [verification record](VERIFICATION.md) and [submission evidence](SUBMISSION_PROOF.md). Intended track: Monad Metropolis Track 04, Trust, Identity & AI Infrastructure.
 
 ## 2. Plain-English glossary
 
@@ -83,22 +83,22 @@ pnpm test
 pnpm build
 ```
 
-The October 3 verification passed **38 Solidity tests**, **13 Rust tests** and Rust compilation, **17 scripts tests**, **18 frontend tests**, and **61 ABI declarations**. Fresh Envio generation, typechecking and **2 Merkle tests** passed on Linux. The production frontend build and **32 branding/browser checks** also passed; the earlier **40-check judge-flow run** is recorded separately in [VERIFICATION.md](VERIFICATION.md).
+Recorded checks include **38 Solidity tests**, **17 Rust tests** and Rust compilation, **17 scripts tests**, **18 frontend tests**, and **61 ABI declarations**. Fresh Envio generation, typechecking and **2 Merkle tests** passed on Linux. The production frontend build and **32 branding/browser checks** also passed; the earlier **40-check judge-flow run** is recorded separately in [VERIFICATION.md](VERIFICATION.md). The Rust total includes the subsequent startup-configuration checks.
 
 ### Deployment manifest and explorer
 
 Target network: **Monad Testnet — chain ID `10143`**. [Network information](https://docs.monad.xyz/developer-essentials/testnet) · [Monadscan testnet explorer](https://testnet.monadscan.com).
 
-**No receipt-verified deployment is recorded yet.** The table below names the contracts to deploy; no live contract address or transaction link is available.
+**Four contracts are deployed and receipt-verified.** The [live manifest](contracts/deployments/10143.json) was verified on October 4, 2026 and records earliest deployment block **67,972,561**. The links below identify the actual contracts and their deployment transactions; agent and paid-task activity has not yet been demonstrated.
 
 | Contract | What a reviewer will inspect | Live address / explorer receipt |
 | --- | --- | --- |
-| [AgentRegistry](contracts/src/AgentRegistry.sol) | Agent ownership and the IPFS profile URI. | Pending deployment |
-| [ReputationRegistry](contracts/src/ReputationRegistry.sol) | Completion records and client feedback. | Pending deployment |
-| [ValidationRegistry](contracts/src/ValidationRegistry.sol) | Explicit validation requests and authenticated responses. | Pending deployment |
-| [AetherisRouter](contracts/src/AetherisRouter.sol) | Registry links, permissions, CREATE2 shards and batch commitments. | Pending deployment |
+| [AgentRegistry](contracts/src/AgentRegistry.sol) | Agent ownership and the IPFS profile URI. | [0x754d7f2fd55a9841dbff248f9cb91d497116f231](https://testnet.monadscan.com/address/0x754d7f2fd55a9841dbff248f9cb91d497116f231) · [deployment](https://testnet.monadscan.com/tx/0x9a30b9b3d8ce9efc2854c6015faf322adcbfb6befdb3a40a9633248c20c55924) |
+| [ReputationRegistry](contracts/src/ReputationRegistry.sol) | Completion records and client feedback. | [0x8f1fe9beef6df891189355129bf48f073d9ab322](https://testnet.monadscan.com/address/0x8f1fe9beef6df891189355129bf48f073d9ab322) · [deployment](https://testnet.monadscan.com/tx/0xd33a1d00bbcff1a71520478a03843aa718e80f90fccf9855527e5ed4441992d3) |
+| [ValidationRegistry](contracts/src/ValidationRegistry.sol) | Explicit validation requests and authenticated responses. | [0xcd0cf354acd2c79145caeac7d4f0639f8957308d](https://testnet.monadscan.com/address/0xcd0cf354acd2c79145caeac7d4f0639f8957308d) · [deployment](https://testnet.monadscan.com/tx/0x4e57487e9c8e249f83dc9ea294fa29c4d13de0b98177654d125900706c8b02d0) |
+| [AetherisRouter](contracts/src/AetherisRouter.sol) | Registry links, permissions, CREATE2 shards and batch commitments. | [0xac4a33521b32122c9f014eac8800144dd9aa5ebe](https://testnet.monadscan.com/address/0xac4a33521b32122c9f014eac8800144dd9aa5ebe) · [deployment](https://testnet.monadscan.com/tx/0xabc10b999bf0114783274620a1f3bdb03cdc8d828d56c078ac9403780863a69a) |
 
-After broadcast, the [deployment finalizer](scripts/finalize-deployment.ts) writes `contracts/deployments/10143.json` only after checking successful receipts, code, constructor inputs and contract linkages. It records addresses, deployment transactions, earliest block and compiler settings. A dry-run `10143.candidate.json` is not that live manifest. The [live workflow](docs/live-submission.md) explains deployment, registration and evidence collection; [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) records which evidence is still missing.
+The [deployment finalizer](scripts/finalize-deployment.ts) checked successful canonical receipts, deployed code, constructor inputs, registry/router links and configured roles before writing the live manifest. It contains addresses, deployment transactions, earliest block and compiler settings. These checks are distinct from explorer source-code verification. Preserve the existing deployment and its receipts; do not redeploy to resume setup. The [live workflow](docs/live-submission.md) covers the remaining registration and evidence steps, and [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) records missing paid-task and indexer evidence.
 
 The Rust task route is **`POST /v1/tasks`**. See the [protocol and API reference](docs/protocol.md) for JSON examples, field descriptions, signatures, payment headers and recovery behavior.
 
