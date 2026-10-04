@@ -96,9 +96,15 @@ indexer.onEvent({ contract: "AetherisRouter", event: "TaskExecuted", fields }, a
 // Close the previous block, irrespective of the ordering of this block's own events.
 indexer.onBlock({ name: "CompleteExecutionBlocks" }, async ({ block, context }) => {
   if (block.number === 0) return;
+  const registry = indexer.chains[context.chain.id].AgentRegistry.addresses[0];
+  if (!registry) throw new Error("AgentRegistry address is required");
   for (const router of indexer.chains[context.chain.id].AetherisRouter.addresses) {
     const batch = await context.MerkleBatch.get(blockKey(context.chain.id, router, block.number - 1));
     if (batch?.status === "observed") context.MerkleBatch.set({ ...batch, status: "complete" });
+    context.SyncStatus.set({
+      id: `${entityId(context.chain.id, router)}:${registry.toLowerCase()}`,
+      chainId: context.chain.id, router, registry, blockNumber: BigInt(block.number - 1),
+    });
   }
 });
 
