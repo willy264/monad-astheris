@@ -28,6 +28,10 @@ The repository's operation tools prepare the card, upload it through Pinata, ver
 
 The dashboard reads the registry and IPFS card. A registered identity can therefore appear in the directory before it has executed an Aetheris task or received feedback. Registration does not produce a reputation score, a task receipt, a shard, or payment settlement.
 
+**Registered on 2026-10-04:** Aetheris Monad Observer is agent **1**, owned by `0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57`. See the [confirmed registration](../../contracts/deployments/10143.agent.json), [exact published card](../../contracts/deployments/10143.agent-card.json), and [live verification record](../../SUBMISSION_PROOF.md). The service domain publishes its registry association at `/.well-known/agent-registration.json`.
+
+To verify the service again, install dependencies in `scripts` and run `pnpm verify-mcp https://monad-astheris.vercel.app/api/mcp`. The [registration runbook](../../scripts/README.md) describes preparing and registering additional services without committing credentials.
+
 ## Use it in the Aetheris task client
 
 Set these public service values in the task client's local environment:

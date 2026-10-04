@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAgentPage } from '@/lib/server';
 import { contracts } from '@/lib/contracts';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 export async function GET(request: NextRequest) {
   const value = request.nextUrl.searchParams.get('page') || '0';
   if (!/^\d{1,6}$/.test(value)) return NextResponse.json({ error: 'Invalid page number.' }, { status: 400 });
