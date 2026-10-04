@@ -1,6 +1,6 @@
 # What remains before submission?
 
-**As of 2026-10-03, Aetheris is locally tested but still needs a live, paid demonstration on Monad Testnet.** The deployment tools, MCP client, browser demo and integrations exist. Actual service configuration, deployed contracts and matching evidence are the main remaining work.
+**As of 2026-10-04, all four core contracts are deployed and receipt-verified on Monad Testnet.** The [live deployment manifest](../contracts/deployments/10143.json) records their addresses, transactions and configuration. Agent registration, a real paid task, live GraphQL indexing and matching dashboard evidence remain outstanding; the full demonstration is not complete.
 
 This is an engineering checklist for the intended Monad Metropolis Track 04 submission. The organizer's deadline, rubric, eligibility and required assets have not been verified. Use the [live workflow](live-submission.md) for commands, the [runbook](runbook.md) for configuration and [SUBMISSION_PROOF.md](../SUBMISSION_PROOF.md) for the evidence currently available.
 
@@ -8,21 +8,21 @@ This is an engineering checklist for the intended Monad Metropolis Track 04 subm
 
 | Area | Implemented behavior | Observed verification | Remaining live work |
 | --- | --- | --- | --- |
-| Contracts | Agent identities, delegation, isolated task results, reputation, validation and batch commitments | 38 Foundry tests, including two 256-case fuzz tests | Deploy and verify all four contracts and their configuration. |
-| Daemon | Signed paid requests, relayer routing, durable job journal and finalized-block batching | Rust compilation and 13 tests passed October 3 | Exercise the funded provider, relayers, payment and recovery path. |
+| Contracts | Agent identities, delegation, isolated task results, reputation, validation and batch commitments | 38 Foundry tests, including two 256-case fuzz tests; four live deployments with verified receipts, code, links and roles | Register an agent and exercise task, reputation and validation operations as claimed. |
+| Daemon | Signed paid requests, relayer routing, durable job journal and finalized-block batching | Rust compilation and 17 tests, including startup-configuration checks | Exercise the funded provider, relayers, payment and recovery path. |
 | Client and deployment tools | Actual MCP invocation, signed x402 tasks, receipt checks, registration and proof export | 17 scripts tests and typechecking | Supply real endpoints, keys and payment policy; collect receipts. |
 | Frontend | Overview, directory, comparison visualizer, labeled preview and five-task paid browser flow | 18 tests, typecheck/build; 40 judge-flow checks and 32 branding/browser checks | Configure live contracts, wallet provider and payment service. |
 | Indexer | Agent/shard/execution entities, deployment-scoped GraphQL and independently calculated batch roots | Linux generation/typechecking and 2 Merkle tests | Run indexing against the deployed contracts and expose a reachable endpoint. |
 | Shared interfaces | Contract ABI exports and consumer declarations | 61 declarations matched | Verify that runtime configuration points to the deployed version. |
 
-These results are recorded in [VERIFICATION.md](../VERIFICATION.md). They establish the stated local behavior; live provider compatibility, a real passkey ceremony, CRE delivery and production capacity remain unverified. No live `contracts/deployments/10143.json` exists yet.
+These results are recorded in [VERIFICATION.md](../VERIFICATION.md). The [deployment manifest](../contracts/deployments/10143.json) has status `live-verified`, earliest deployment block `67972561`, and accepted administrator ownership with no pending handoff. Contract receipt verification is complete; it does not establish payment-provider compatibility, agent registration, live indexing, a passkey ceremony, CRE delivery or production capacity. Actual address and deployment-transaction links are in the [README](../README.md#deployment-manifest-and-explorer).
 
 ## Finish the live path in this order
 
 | Step | Action | Evidence needed to mark it complete |
 | --- | --- | --- |
 | 1. Configure services and funding | Choose a real x402 v2 exact facilitator supporting EIP-3009 on chain 10143, a compatible token, an MCP service and IPFS pinning. Fund transaction-sending accounts with testnet MON for gas and the task payer with the payment token. | Supported network/asset response, reachable MCP tool, working IPFS access and the two kinds of balance. A configured URL alone is insufficient. |
-| 2. Deploy the contracts | Simulate, broadcast and finalize the four-contract deployment. Complete any intended two-step ownership transfers. | Canonical successful receipts, code and linkages checked by the finalizer; `contracts/deployments/10143.json` with addresses, transaction hashes, blocks and compiler settings. The proof collector adds explorer links to `SUBMISSION_PROOF.md`. The candidate file is only a deployment input. |
+| 2. Contracts deployed — complete | Reuse the existing four-contract deployment and its verified manifest; do not broadcast another deployment to continue setup. | [Manifest](../contracts/deployments/10143.json) verified October 4: successful canonical receipts, creation code, five registry/router links and configured roles. Administrator ownership is accepted. Explorer links are in the [README](../README.md#deployment-manifest-and-explorer). |
 | 3. Register the agent | Publish a truthful Agent Card, retrieve its exact IPFS bytes and call the implemented `register(string)` method. | Registration receipt, actual agent ID, matching owner/URI/wallet reads and `10143.agent.json`. |
 | 4. Authorize and start the daemon | Grant the executor expiring authority and authorize the task signer separately when it is not the agent owner. Configure matching addresses and preserve the durable database. Keep relayer keys exclusive to this daemon. | Healthy `/health` and `/v1/config`, valid owner/delegate checks for both signer and executor, and a supported payment configuration. |
 | 5. Execute a real paid MCP task | Run `scripts/submit_task.ts` through the documented package command. Retain its input/output artifacts and run directory. | Actual MCP result, task/payment authorizations, successful `ShardCreated` and `TaskExecuted` receipts, exact CREATE2 address and payment settlement checks. |
@@ -54,7 +54,8 @@ An agent-registration form and arbitrary MCP-task form are possible product impr
 
 - [ ] Point reviewers at the **complete branch and commit**. The feature stack is intentionally staged in separate draft PRs; `main` does not yet contain the complete implementation. Preserve that rollout until the planned merges are authorized.
 - [ ] Confirm repository visibility and the organizer's actual access requirement. The repository is public, so `metropolis@hackathon.monad.xyz` can read it without an invitation. If collaborator access is required, obtain the reviewer's GitHub username and required role; no invitation has been sent.
-- [ ] Include the receipt-verified deployment manifest, agent registration export and generated submission proof with matching chain/contract/task identifiers.
+- [x] Produce the [receipt-verified deployment manifest](../contracts/deployments/10143.json) for all four core contracts.
+- [ ] Add the agent registration export and complete submission proof with matching chain/contract/task identifiers; deployment alone does not complete these artifacts.
 - [ ] Provide a reachable dashboard and Envio endpoint, plus clear daemon/client startup instructions or a stated availability window.
 - [ ] Include the [README](../README.md), [architecture](architecture.md), [protocol/API examples](protocol.md), [frontend judge guide](../frontend/docs/README.md) and verification record for the selected commit.
 - [ ] Choose a repository-level license. There is currently no root `LICENSE`; package metadata alone does not license the whole project.
@@ -62,6 +63,6 @@ An agent-registration form and arbitrary MCP-task form are possible product impr
 
 ## Submission readiness versus production readiness
 
-A coherent submission should demonstrate a registered agent, real service output, an authorized paid task, isolated recorded results and matching transaction/indexer/dashboard evidence. Include the additional live proofs above for every integration advertised. Until those receipts and services exist, describe the project as a locally tested prototype.
+A coherent submission should demonstrate a registered agent, real service output, an authorized paid task, isolated recorded results and matching transaction/indexer/dashboard evidence. Include the additional live proofs above for every integration advertised. The current milestone is a tested prototype with four deployed core contracts; the paid agent workflow still needs its own receipts and services.
 
 Production operation requires separate security review, wallet recovery checks, capacity measurements, service monitoring and tested journal backup/reconciliation. The daemon deliberately quarantines uncertain outcomes; preserve its database and investigate them rather than deleting state or resubmitting a paid request. Passing tests and a successful hackathon demo do not establish production readiness.

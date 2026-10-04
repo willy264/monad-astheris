@@ -1,15 +1,19 @@
 # Aetheris submission proof
 
-Evidence generated: 2026-10-03T22:28:08.148Z. Target: Monad Testnet, chain 10143.
+Evidence generated: 2026-10-04T00:31:59.111Z. Target: Monad Testnet, chain 10143.
 
 This file records observed evidence. Missing credentials, receipts or indexing results remain explicit blockers; local compilation alone does not establish a live submission.
 
+- identityRegistry: [0x754d7f2fd55a9841dbff248f9cb91d497116f231](https://testnet.monadexplorer.com/address/0x754d7f2fd55a9841dbff248f9cb91d497116f231) — [deployment transaction](https://testnet.monadexplorer.com/tx/0x9a30b9b3d8ce9efc2854c6015faf322adcbfb6befdb3a40a9633248c20c55924).
+- reputationRegistry: [0x8f1fe9beef6df891189355129bf48f073d9ab322](https://testnet.monadexplorer.com/address/0x8f1fe9beef6df891189355129bf48f073d9ab322) — [deployment transaction](https://testnet.monadexplorer.com/tx/0xd33a1d00bbcff1a71520478a03843aa718e80f90fccf9855527e5ed4441992d3).
+- validationRegistry: [0xcd0cf354acd2c79145caeac7d4f0639f8957308d](https://testnet.monadexplorer.com/address/0xcd0cf354acd2c79145caeac7d4f0639f8957308d) — [deployment transaction](https://testnet.monadexplorer.com/tx/0x4e57487e9c8e249f83dc9ea294fa29c4d13de0b98177654d125900706c8b02d0).
+- router: [0xac4a33521b32122c9f014eac8800144dd9aa5ebe](https://testnet.monadexplorer.com/address/0xac4a33521b32122c9f014eac8800144dd9aa5ebe) — [deployment transaction](https://testnet.monadexplorer.com/tx/0xabc10b999bf0114783274620a1f3bdb03cdc8d828d56c078ac9403780863a69a).
 
 ## Evidence status
 
 | Item | Status | Detail |
 | --- | --- | --- |
-| Live contracts | BLOCKED | No receipt-verified deployment manifest. Configure a funded contracts/.env deployment account and run pnpm run deploy --broadcast from scripts. |
+| Live contracts | VERIFIED | Four deployment receipts, runtime code hashes and canonical blocks rechecked; compiler/linkage evidence is in contracts/deployments/10143.json. |
 | Agent registration | BLOCKED | Needs actual MCP endpoint/card, public IPFS pin, funded owner and registration receipt. |
 | Task execution | BLOCKED | Configure an authorized funded client/payment provider, run submit-task and set TASK_PROOF_PATH to its client-proof.json. |
 | Envio and Merkle batch | BLOCKED | Needs a hosted GraphQL URL, verified task and finalized committed block. |
