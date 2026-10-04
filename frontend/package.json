@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.32.1",
   "engines": { "node": ">=20.9.0" },
-  "scripts": { "dev": "next dev", "build": "next build", "start": "next start", "typecheck": "tsc --noEmit" },
+  "scripts": { "dev": "next dev", "build": "next build", "start": "next start", "typecheck": "tsc --noEmit", "test:rpc": "node --test test/rpc-events.test.mjs" },
   "dependencies": {
     "@dynamic-labs/ethereum": "5.9.2",
     "@dynamic-labs/sdk-react-core": "5.9.2",
