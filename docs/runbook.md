@@ -297,7 +297,7 @@ Here `$relayerAddress` must be the **first** configured relayer and `$adminAccou
 
 ### F. Start indexing on a supported platform
 
-Use Linux/macOS or a working WSL2 distribution with Docker available. Native Windows Envio 3.12.1 cannot load its required addon, and this host's WSL startup failed. Code generation and full generated-type checking have since passed on the supported Linux runner recorded in [VERIFICATION.md](../VERIFICATION.md); that does not make the Windows addon available. Run the supported-platform checks again when changing indexer configuration or handlers.
+Use Linux/macOS or a working WSL2 distribution with Docker available. Native Windows Envio 3.12.1 cannot load its required addon. The latest probe starts WSL successfully, but native Linux Node still needs installation there. Fresh code generation and full generated-type checking passed on the Ubuntu runner recorded in [VERIFICATION.md](../VERIFICATION.md). Run the supported-platform checks again when changing indexer configuration or handlers.
 
 In a Linux/macOS/WSL terminal at `aetheris/indexer`, with `.env` filled and Docker running:
 
@@ -400,7 +400,7 @@ The daemon and indexer do not automatically publish reputation feedback or valid
 
 ## 6. Verification without deploying or paying
 
-The existing [verification record](../VERIFICATION.md) reports 38 contract tests, 17 script tests, 18 frontend tests, two indexer tests, 61 matching ABI declarations and 40 judge-facing browser checks, plus successful typechecks/builds. The 13 Rust tests are the recorded earlier run; cargo check was rerun during the subsequent integration work. Linux Envio code generation and full generated-type checking passed. These checks were not rerun for this documentation update. No deployment, paid task, live passkey enrollment or hosted GraphQL run was performed; those still require actual configuration and receipts.
+The [verification record](../VERIFICATION.md) reports 38 contract tests, 13 Rust tests, 17 script tests, 18 frontend tests, two indexer tests and 61 matching ABI declarations, plus successful typechecks/builds. Those checks were refreshed on October 3, including fresh Linux Envio generation and typing. The record separately describes the earlier 40-check judge browser run and subsequent branding checks. No deployment, paid task, live passkey enrollment or hosted GraphQL run was performed; those still require actual configuration and receipts.
 
 From each indicated directory, these checks require no funded keys:
 
