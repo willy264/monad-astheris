@@ -1,12 +1,12 @@
 # Aetheris operator runbook
 
-The dashboard can run in read-only mode on Windows. A paid task additionally requires deployed contracts, funded authorized wallets, a working MCP service and an actual payment provider. The repository now includes the [MCP task/payment client](../scripts/README.md); it does not host the remote MCP service or a Graph Tally settlement adapter. Follow the [2026-10-03 live workflow](live-submission.md) for the new deployment, registration and evidence tools; the service-level commands below remain useful.
+The dashboard and guided preview can run on Windows without signing keys. Live paid tasks require deployed contracts, funded authorized wallets and a real payment provider. The browser's live flow submits five checksum tasks through Next.js proxies; the [MCP task/payment client](../scripts/README.md) invokes a configured external MCP tool. The repository does not host that remote tool or a Graph Tally settlement adapter. The [live workflow](live-submission.md) covers deployment, registration and evidence tools alongside the service commands below.
 
 Use [architecture.md](architecture.md) for component boundaries, [protocol.md](protocol.md) for exact hashing rules, [submission-readiness.md](submission-readiness.md) for the readiness assessment, and [VERIFICATION.md](../VERIFICATION.md) for checks already completed. Commands below are instructions for an operator; documenting them does not deploy contracts or submit payments.
 
 ## 1. Fastest path: read-only dashboard on Windows
 
-Open PowerShell in the repository's `aetheris` directory. Install Node 22 and pnpm 10.32.1 if they are not already available. The frontend and indexer each have their own lockfile; there is no root pnpm workspace install.
+Open PowerShell in the repository's `aetheris` directory. Use Node 24 or newer and pnpm 10.32.1; the frontend declares Node 24 as its minimum. Frontend, indexer and operation scripts each have their own lockfile; there is no root pnpm workspace install.
 
 ```powershell
 node --version
@@ -17,9 +17,9 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open `http://localhost:3000`, then `/agents` and `/visualizer`. Leave the contract addresses and Dynamic environment ID blank for this first run. The overview reads actual Monad Testnet blocks through the public RPC. Contract-dependent panels explain their missing configuration; the directory API returns 503 until an identity registry is configured. There are no seeded agents or simulated execution events. An unavailable RPC produces an error state rather than invented statistics.
+Open `http://localhost:3000`, then `/agents` and `/visualizer`. Leave contract addresses and the Dynamic environment ID blank for this first run. The overview reads actual Monad Testnet blocks through public RPC. Contract-dependent panels explain missing configuration; the directory API returns 503 until an identity registry is configured. The guided preview deliberately simulates five lanes without a wallet, payment or transaction. Illustrative metric examples remain labeled as examples; live event tables and explorer links are never populated with fabricated activity. RPC failures remain visible.
 
-This path needs no Rust process, Envio process, Docker, wallet, or private key. Next.js server routes read RPC directly; the dashboard does not consume the daemon API or indexer's GraphQL endpoint. To display an existing deployment, fill its three public contract addresses and deployment block in `.env.local`, then restart Next.js. Do not substitute an unrelated ERC-8004 deployment for this router's identity registry.
+This path needs no Rust process, Envio process, Docker, wallet or private key. Next.js uses labeled RPC fallback while `ENVIO_GRAPHQL_URL` is unset. Setting it enables indexed dashboard reads; enabling the live demo also connects Next.js task proxies to the daemon. Neither optional connection is needed for the first read-only run. To display an existing deployment, fill its three public contract addresses and deployment block in `.env.local`, then restart Next.js. Use this router's actual identity registry.
 
 For a production-mode local preview, stop `pnpm dev`, then run:
 
@@ -38,7 +38,8 @@ The default port remains 3000. A production build captures `NEXT_PUBLIC_*` value
 | Contracts | Foundry 1.8.4 was tested; Solidity 0.8.24 is pinned in `foundry.toml`; OpenZeppelin 5.4.0 and forge-std 1.9.7 are pinned to commits | Git to restore vendor dependencies; RPC and testnet MON only for deployment/transactions |
 | Daemon | Rust/Cargo 1.94.0 was tested; use 1.94 or newer with the committed `Cargo.lock` | Native C/C++ linker; RPC, deployed router, dedicated relayer keys, persistent disk, payment provider |
 | Indexer | Node 22+, pnpm 10.32.1, Envio 3.12.1 | Linux/macOS or working WSL2; Docker for local storage, or an Envio Cloud project |
-| Frontend | Node 22 works across the stack; pnpm 10.32.1; Next 14.2.35, React 18.3.1, Dynamic 5.9.2, Tailwind 3.4.17 | RPC; Dynamic project only for wallet/passkey functions |
+| Frontend | Node 24+; pnpm 10.32.1; Next 14.2.35, React 18.3.1, Dynamic 5.9.2, Mera 0.2.0, Tailwind 3.4.17 | RPC; Dynamic project for its wallet/passkey and live-demo functions; Mera is a separate optional integration |
+| Operation/task scripts | Node 22+; pnpm 10.32.1; Viem 2.57.2 and MCP SDK 1.32.0 | Node 24 can be used across all JavaScript components; live operations need their actual provider and signer configuration |
 | Optional RPC probe | Python 3, standard library only | Read access to the chosen RPC |
 
 `Cargo.toml` declares Rust 1.91. Successful verification used Rust/Cargo 1.94.0; the minimum supported toolchain has not been independently verified. Use 1.94.0 to reproduce the recorded checks. The Windows build used the GNU Rust target and an MSYS2 MinGW linker. A fresh Windows installation needs a linker appropriate to its chosen Rust target.
@@ -62,7 +63,7 @@ if (Test-Path .tools/foundry/forge.exe) {
 }
 ```
 
-That ignored tool directory is not a portable installation guarantee. Restore missing Solidity dependencies from `contracts` with `./script/install-deps.ps1` on PowerShell or `bash script/install-deps.sh` on Linux/macOS. These scripts check the pinned commits. Keep both pnpm lockfiles and `daemon/Cargo.lock`; use `--frozen-lockfile` and `--locked` when installing/building.
+That ignored tool directory is not a portable installation guarantee. Restore missing Solidity dependencies from `contracts` with `./script/install-deps.ps1` on PowerShell or `bash script/install-deps.sh` on Linux/macOS. These scripts check the pinned commits. Keep all three pnpm lockfiles and `daemon/Cargo.lock`; use `--frozen-lockfile` and `--locked` when installing/building.
 
 ## 3. Services, ports, and environment loading
 
@@ -71,7 +72,8 @@ That ignored tool directory is not a portable installation guarantee. Restore mi
 | Contracts | No local HTTP service; deployed on Monad Testnet, chain ID 10143 | On-chain state; deployment manifest and Foundry broadcast receipts |
 | Daemon | `http://127.0.0.1:8080` | `daemon/aetheris.redb` by default |
 | Indexer, local | GraphQL: `http://localhost:8081/v1/graphql`; Hasura administration: `/v1/metadata` | Envio-managed PostgreSQL/Docker storage |
-| Frontend | `http://localhost:3000` | Build output and transient process caches; authoritative data stays on-chain |
+| Frontend | `http://localhost:3000` | Build/cache files; browser localStorage holds public live-demo recovery metadata, never payment signatures |
+| Operation/task scripts | No listener | Private journals, exact MCP bytes and signed transactions under ignored `scripts/.state`; separate public proof exports |
 
 The indexer template explicitly moves Hasura to 8081 so it does not collide with the daemon. PostgreSQL and any additional Envio service ports follow the generated Envio/Docker configuration; inspect that configuration on the host rather than assuming another fixed port. Envio Cloud supplies its own storage and GraphQL URL.
 
@@ -83,6 +85,7 @@ if (-not (Test-Path contracts/.env)) { Copy-Item contracts/.env.example contract
 if (-not (Test-Path daemon/.env)) { Copy-Item daemon/.env.example daemon/.env }
 if (-not (Test-Path indexer/.env)) { Copy-Item indexer/.env.example indexer/.env }
 if (-not (Test-Path frontend/.env.local)) { Copy-Item frontend/.env.example frontend/.env.local }
+if (-not (Test-Path scripts/.env)) { Copy-Item scripts/.env.example scripts/.env }
 ```
 
 | Location | How values are loaded |
@@ -91,6 +94,7 @@ if (-not (Test-Path frontend/.env.local)) { Copy-Item frontend/.env.example fron
 | `daemon/.env` | `dotenvy` loads `.env` at startup, searching upward from the working directory. Existing process environment values take precedence. Run from `daemon` so the file and relative database path are unambiguous. |
 | `indexer/.env` | Envio uses project environment configuration. Before `dev`/`start`, `scripts/check-config.mjs` also loads local `.env` with Node's `loadEnvFile()` and rejects missing/zero addresses. Run from `indexer`. |
 | `frontend/.env.local` | Next.js loads local environment files. `NEXT_PUBLIC_*` values are browser-visible and compiled into production bundles; other listed values are used by server code. Restart development or rebuild/restart production after configuration changes. |
+| `scripts/.env` | The task client explicitly loads this file. Operation tools load it first, then the relevant component `.env`; existing process values take precedence, followed by values already loaded from `scripts/.env`. Run from `scripts` so relative task paths are unambiguous. |
 
 Copying a `.env` file does not export its variables into PowerShell, Bash, Python, or another project's process. The Cast examples below use explicitly assigned public variables. Do not dot-source a dotenv file as a shell script. Environment files are ignored by Git; public frontend variables must never contain signing keys, provider secrets, or a Dynamic API secret.
 
@@ -108,7 +112,7 @@ After a successful broadcast, map the actual addresses from `contracts/deploymen
 | Earliest confirmed registry deployment block | Record from broadcast receipts | `DEPLOYMENT_BLOCK` | `ENVIO_START_BLOCK` | `DEPLOYMENT_BLOCK` |
 | Batch publisher | `COMMITTER_ADDRESS` at deployment, or later `setCommitter` | First address represented by `RELAYER_PRIVATE_KEYS` if batches are enabled | Observes commitments | Reads router events |
 
-Use the earliest identity-registry deployment block across these settings so registrations are not missed. Starting late can leave the indexer without an agent required by later task events. `deployments/10143.json` does not contain the deployment block. The deploy script writes that manifest during simulation too, so the file alone is not evidence that any code was deployed.
+Use the verified manifest's `earliestDeploymentBlock` across these settings so registrations are not missed. Starting late can leave the indexer without an agent required by later events. Foundry writes `deployments/10143.candidate.json`, including during simulation. Only the finalizer writes `deployments/10143.json` with status `live-verified`, after checking canonical successful receipts, constructor input, code and registry/router links. A candidate file is not live deployment evidence.
 
 ### Remaining environment variables
 
@@ -130,10 +134,14 @@ Use the earliest identity-registry deployment block across these settings so reg
 | Indexer | `ENVIO_API_TOKEN` | HyperSync access token when required by the selected local/provider setup; Envio Cloud manages access for its deployment |
 | Indexer, local | `HASURA_EXTERNAL_PORT`, `HASURA_GRAPHQL_ENDPOINT`, `HASURA_GRAPHQL_ADMIN_SECRET` | Local Hasura port, **metadata** endpoint, and admin secret. The example secret is for local development only; supply a private value for self-hosting |
 | Frontend | `NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID` | Public Dynamic environment identifier; blank keeps wallet access unconfigured |
+| Frontend | `NEXT_PUBLIC_MERA_ENABLED`, `NEXT_PUBLIC_MERA_RP_ID` | Optional separate Mera interface; requires PRF-capable passkeys and a stable HTTPS/localhost relying party. Empty RP ID uses the hostname |
+| Frontend | `ENVIO_GRAPHQL_URL`, optional `ENVIO_GRAPHQL_ADMIN_SECRET` / `ENVIO_GRAPHQL_TOKEN` | Server-only indexed reads. Missing URL selects labeled RPC fallback; configured endpoint failure stays visible |
+| Frontend | `DEMO_ENABLED`, `DAEMON_URL`, `DEMO_AGENT_ID` | Optional live demo, daemon origin and actual authorized agent ID; disabled by default |
+| Frontend | `DEMO_TASK_RESOURCE`, `DEMO_PAYMENT_ASSET`, `DEMO_PAYMENT_RECEIVER`, `DEMO_PAYMENT_MAX_AMOUNT`, `DEMO_PAYMENT_ASSET_NAME`, `DEMO_PAYMENT_ASSET_VERSION` | Server-only payment policy pinned to the daemon's advertised x402 resource, actual token/domain, recipient and maximum per-task base-unit amount; the browser signs five payments |
 | Frontend | `EVENT_LOOKBACK_BLOCKS` | Event observation window, default 200; code bounds it to 12–1000 blocks |
 | Frontend | `IPFS_GATEWAY` | Gateway for `ipfs://` cards, default `https://ipfs.io/ipfs/`; HTTP card URIs are not fetched |
 
-There is no `DAEMON_URL` setting in the frontend; task submission uses the scripts client. Server-only `ENVIO_GRAPHQL_URL` now selects indexed dashboard reads, with optional `ENVIO_GRAPHQL_ADMIN_SECRET` or `ENVIO_GRAPHQL_TOKEN`. An absent endpoint uses labeled RPC fallback; a configured endpoint failure remains visible.
+The browser live demo uses `DAEMON_URL` through server-side proxies. It supports the configured x402 EIP-3009 path; neither it nor the supplied MCP CLI creates Graph Tally receipts. Task-client variables and their independent spending limits are listed in [scripts/.env.example](../scripts/.env.example) and [scripts/README.md](../scripts/README.md). Copy deployment addresses deliberately; a daemon price is not itself authorization for the client to spend.
 
 ## 4. Full-stack sequence
 
@@ -147,7 +155,7 @@ Have these real resources available before attempting a paid task:
 4. An IPFS-pinned Agent Card and the actual MCP/A2A service endpoints it describes, if the directory is to advertise a usable agent.
 5. For wallet/passkey UI: a Dynamic environment configured for the chosen origin, EVM wallets and Monad Testnet. For local indexing: working Linux/macOS/WSL2 and Docker, or an Envio Cloud project.
 
-The repository does not supply faucet funds, token deployments, provider accounts, IPFS pinning, an MCP task runner, or a signed payment credential. Only configure a TEE attestor after the external verifier and trust policy exist; deployment begins with no trusted attestors or measurements.
+The repository supplies the MCP client and Pinata upload/registration tools, but no faucet funds, deployed payment token, provider account, hosted MCP tool or pre-signed payment credential. Configure your actual pinning provider credentials before using the upload tool. The browser's checksum workload does not require MCP. Only enable a TEE attestor or CRE workflow after its external verifier/forwarder and trust policy exist; ordinary task completion does not automatically validate output.
 
 ### B. Deploy and confirm the contracts
 
@@ -168,7 +176,16 @@ forge script script/Deploy.s.sol:Deploy --rpc-url monad_testnet --broadcast
 
 This particular script calls `vm.envUint("PRIVATE_KEY")`; adding a `--account` flag does not replace that requirement. A hardware-wallet or keystore-only deployment needs a reviewed deployment workflow compatible with that signer. Subsequent Cast operations below can use an existing encrypted keystore account.
 
-Inspect the successful transaction receipts in Foundry's `broadcast/Deploy.s.sol/10143/` output and confirm code at all four addresses. Distinguish actual broadcast output from dry-run artifacts. Record the earliest registry deployment block in decimal. A manifest written by a simulation can contain addresses with no code.
+Inspect the successful transaction receipts in Foundry's `broadcast/Deploy.s.sol/10143/` output. The Forge script writes a candidate, including during simulation; it does not label predicted addresses live. After an actual broadcast, finalize from the existing `contracts` directory:
+
+```powershell
+Set-Location ../scripts
+pnpm install --frozen-lockfile
+pnpm finalize-deployment
+Set-Location ../contracts
+```
+
+The finalizer checks canonical receipts, deployed code, constructor inputs and registry/router links before writing `contracts/deployments/10143.json` with `status: "live-verified"` and `earliestDeploymentBlock`. For a fresh deployment, the alternative wrapper from `scripts` is `pnpm run deploy` for simulation or `pnpm run deploy --broadcast` for broadcast plus finalization. Choose one deployment path; after an interrupted broadcast use finalization/reconciliation, not another deployment. Use `pnpm run deploy` because pnpm's built-in `deploy` command would otherwise take precedence.
 
 For read-only checks from `contracts`:
 
@@ -280,7 +297,7 @@ Here `$relayerAddress` must be the **first** configured relayer and `$adminAccou
 
 ### F. Start indexing on a supported platform
 
-Use Linux/macOS or a working WSL2 distribution with Docker available. Native Windows Envio 3.12.1 cannot load its required addon. The supplied machine's WSL startup also failed, so full code generation and generated-type checking remain an environment prerequisite; passing the standalone Merkle tests does not substitute for them.
+Use Linux/macOS or a working WSL2 distribution with Docker available. Native Windows Envio 3.12.1 cannot load its required addon, and this host's WSL startup failed. Code generation and full generated-type checking have since passed on the supported Linux runner recorded in [VERIFICATION.md](../VERIFICATION.md); that does not make the Windows addon available. Run the supported-platform checks again when changing indexer configuration or handlers.
 
 In a Linux/macOS/WSL terminal at `aetheris/indexer`, with `.env` filled and Docker running:
 
@@ -304,9 +321,32 @@ Set the frontend's router, identity and reputation addresses to the same deploym
 
 From `frontend`, run `pnpm install --frozen-lockfile`, then either `pnpm dev` or `pnpm build` followed by `pnpm start`. The UI can now discover registered identities and observe router events. A Dynamic login does not itself grant agent authorization. Passkey enrollment and signing depend on the actual Dynamic environment and supported wallet; the application does not extract a P-256 key or deploy a raw P-256 verifier.
 
+To use indexed reads, set the server-only `ENVIO_GRAPHQL_URL` to your actual query endpoint and provide its access credential if required. Leave it unset for RPC fallback. To show Mera independently, set `NEXT_PUBLIC_MERA_ENABLED=true` on a stable relying party; its derived account must own the agent and have testnet MON before granting delegation. It is separate from Dynamic and does not sponsor gas.
+
+To enable the browser's live demo, fill all `DEMO_*` values and `DAEMON_URL`, set `DEMO_ENABLED=true`, and restart/rebuild as needed. Match the daemon's exact token domain, recipient, resource and advertised amount, within your explicit maximum. The configured agent must authorize all advertised executors. The signing wallet must separately be its owner/delegate and hold enough tokens for five payments. `/api/demo/config` should then return validated configuration; this alone does not prove payment can settle. See the [frontend guide](../frontend/docs/README.md) for the preview, live flow and recovery controls.
+
 ## 5. Submit a signed, paid task
 
-Use the supplied [task-signing/payment CLI](../scripts/README.md), which invokes the MCP tool and supplies the exact daemon authorization/payment formats. The dashboard has no task-submission form. The manual commands below remain send-only examples for existing signed artifacts; the daemon itself does not generate outputs.
+Choose the browser's five-task live demo for checksum work or the supplied [task-signing/payment CLI](../scripts/README.md) for a real MCP invocation. Both use exact signed task and x402 payment formats. The daemon records supplied commitments; it does not itself generate outputs.
+
+For the CLI, fill `scripts/.env` with the actual task signer, agent/executor, deployment, MCP endpoint/tool/argument file and independently selected payment limits. From `scripts`:
+
+```powershell
+pnpm install --frozen-lockfile
+pnpm submit-task --run-dir .state/tasks/first-run --prepare-only
+```
+
+This calls the MCP tool and preserves exact input/output bytes without buying a task. Inspect the saved output, then explicitly continue with:
+
+```powershell
+pnpm submit-task --run-dir .state/tasks/first-run --resume
+```
+
+Expected successful output includes the request ID, shard, execution transaction and `client-proof.json` path after task/payment receipt verification and completion recording. Independent feedback is optional and requires both reviewer configuration and a reviewed assessment file. Keep the private task journal and exact MCP bytes out of published proof. Resume never repeats an ambiguous paid POST or MCP call.
+
+For the browser, choose **Live testnet**, connect the authorized Dynamic EVM wallet and approve the displayed five task authorizations and five payments. All five requests dispatch after signing. A green lane requires independent matching task and token-payment receipts. If submission or confirmation is uncertain, use **Recover saved status**, which polls existing IDs without another payment. Preserve localStorage; do not clear it to bypass an unresolved run. The five tasks use one configured agent identity and do not invoke an AI model or MCP server.
+
+The manual protocol below is for implementing another client or inspecting existing signed artifacts; it is not a replacement for the supplied clients' durable state and receipt checks.
 
 The required sequence is:
 
@@ -343,7 +383,8 @@ On Linux/macOS, use `curl` rather than `curl.exe`; equivalent header interpolati
 | 402 plus `PAYMENT-REQUIRED` | Missing/rejected payment; inspect the renewed requirements and provider-side reason without blindly repaying |
 | 409 | Conflicting canonical task intent or already reserved payment credential |
 | 429 | Daemon concurrency capacity exhausted; retry with bounded backoff |
-| 502, `settlement_pending` or `reconciliation_required` | Preserve the job and journal; reconcile transactions/payment before any new payment or attempt |
+| 502, `settlement_pending` | Can be a normal intermediate step; continue bounded GET polling. Preserve the journal and reconcile persistent settlement errors |
+| 502, `reconciliation_required` | Preserve the job and journal; reconcile transactions/payment before any new payment or attempt |
 | 400 or 413 | Malformed request or body over the 32 KiB limit |
 
 Axum may also return 422 for a JSON body whose types do not match the request schema. A missing job returns 404. To poll a known job:
@@ -355,11 +396,11 @@ curl.exe --include "http://127.0.0.1:8080/v1/tasks/$requestId"
 
 Canonical task identity is `(chain, router, agentId, taskId, sequenceNonce)`. Renewing only the signed deadline for the same intent returns the original job without another charge; changing input/output/proof/executor under that identity conflicts. An intentional fresh execution uses a new sequence nonce. Do not create a new identity simply to work around an unresolved payment or broadcast.
 
-Neither completed-task submission nor indexing automatically publishes reputation feedback or validates a TEE proof. Those are separate registry transactions and policies. A nonzero `proofHash` is only a commitment to bytes until the actual validation workflow verifies it.
+The daemon and indexer do not automatically publish reputation feedback or validate a TEE proof. The MCP client separately records completion and can post an eligible reviewer's explicitly supplied assessment. A nonzero `proofHash` is only a commitment to bytes until the actual validation workflow verifies it.
 
 ## 6. Verification without deploying or paying
 
-The completed local record is [VERIFICATION.md](../VERIFICATION.md): 22 contract tests, 13 Rust tests, two indexer Merkle tests, ABI consistency checks, frontend typecheck/build and browser smoke checks passed. No deployment, paid task, live passkey enrollment or hosted GraphQL run was performed. Native Windows Envio code generation was blocked; full generated-type checking must still run on a supported platform.
+The existing [verification record](../VERIFICATION.md) reports 38 contract tests, 17 script tests, 18 frontend tests, two indexer tests, 61 matching ABI declarations and 40 judge-facing browser checks, plus successful typechecks/builds. The 13 Rust tests are the recorded earlier run; cargo check was rerun during the subsequent integration work. Linux Envio code generation and full generated-type checking passed. These checks were not rerun for this documentation update. No deployment, paid task, live passkey enrollment or hosted GraphQL run was performed; those still require actual configuration and receipts.
 
 From each indicated directory, these checks require no funded keys:
 
@@ -369,7 +410,8 @@ From each indicated directory, these checks require no funded keys:
 | `aetheris` | `node scripts/check-interfaces.mjs` after contract artifacts/ABIs are available |
 | `daemon` | `cargo fmt -- --check`; `cargo check --locked --jobs 1`; `cargo test --locked --jobs 1` |
 | `indexer`, supported platform | `pnpm install --frozen-lockfile`; `pnpm codegen`; `pnpm typecheck`; `pnpm test` |
-| `frontend` | `pnpm install --frozen-lockfile`; `pnpm typecheck`; `pnpm build` |
+| `scripts` | `pnpm install --frozen-lockfile`; `pnpm typecheck`; `pnpm test` |
+| `frontend` | `pnpm install --frozen-lockfile`; `pnpm typecheck`; `pnpm test`; `pnpm build` |
 
 Use `--offline` for Cargo only after its dependencies are cached. On memory-constrained machines, run component builds sequentially and retain the single-job Rust commands. The Linux/macOS helper `bash scripts/verify.sh` runs the broader sequence, including dependency installation and Envio code generation; it uses two Cargo jobs and requires a supported Envio environment. There is no `scripts/verify.ps1` helper.
 
@@ -381,7 +423,7 @@ curl.exe --include 'http://localhost:3000/api/agents?page=0'
 curl.exe --include http://127.0.0.1:8080/health
 ```
 
-The overview can succeed without contract addresses; the agent endpoint requires its registry. A configured deployment with no agents/tasks should show honest empty states. Observed TPS is calculated from a short block sample; state-collision savings remain unavailable because standard RPC does not expose the required counterfactual scheduler measurements.
+The overview can succeed without contract addresses; the agent endpoint requires its registry. A configured deployment with no agents/tasks should show empty event states. Observed TPS comes from a short block sample. Standard RPC cannot measure state collisions avoided or a counterfactual speedup; illustrative metrics and preview animation retain example labels. Real zero values remain real zero values.
 
 For an optional read-only RPC latency probe from `daemon`, set the RPC in the shell and run:
 
@@ -412,7 +454,7 @@ The daemon journal is part of payment correctness. It stores task identity, rese
 
 Before sending a transaction, the daemon records its nonce and calldata hash. A crash or transport failure can leave the broadcast outcome unknown; that signer then stops accepting further sends. A confirmed reverted transaction consumes its nonce and, after the required confirmations, does not permanently lock unrelated future work. Interrupted `accepted` and `settlement_pending` jobs become `reconciliation_required` on startup, with known execution results retained. HTTP client disconnection alone does not cancel the spawned task.
 
-There is **no recovery CLI or journal-editing API** in this repository. An operator must preserve the database and correlate the original request ID, relayer address/nonce, any known transaction receipts and the payment provider's records. An unknown transaction may already have been accepted; a settlement timeout may already have charged the payer. Resolve those external facts before implementing and reviewing a targeted recovery procedure. Do not blindly resubmit, issue a new voucher, reuse a nonce, or edit/delete journal rows.
+There is **no daemon journal-repair CLI or journal-editing API**. The task CLI's `--resume` and browser's **Recover saved status** can follow durable existing requests, but cannot resolve an unknown daemon broadcast or provider charge. Preserve the database and correlate the original request ID, relayer address/nonce, known receipts and provider records. An unknown transaction may already have been accepted; a settlement timeout may already have charged the payer. Establish those facts before implementing a reviewed recovery procedure. Do not blindly resubmit, issue another voucher, reuse a nonce or edit/delete journal rows.
 
 The enabled batch worker stops on an unsupported finality query or canonical-history inconsistency. Restart only after investigating the cause; its durable cursor is not automatically discarded. A finalized reorganization can conflict with immutable on-chain batch commitments and requires explicit reconciliation. Indexer rollback handles its own derived entities, but cannot undo a submitted payment or immutable router commitment.
 

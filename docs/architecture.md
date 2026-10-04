@@ -1,261 +1,189 @@
 # Aetheris architecture
 
-Aetheris coordinates authorized agent task commitments on Monad Testnet, chain `10143`. It combines ERC-8004 identities, a separate CREATE2 contract for each task attempt, a Rust transaction service, and an event indexer. The result is an auditable connection between an agent identity, its input and output commitments, and later batch commitments.
+Aetheris gives agent tasks separate express-checkout lanes on Monad Testnet. Each task gets its own place to record a result, so unrelated results do not all update one shared storage slot. Identity answers who may use a lane, payment pays for the routing service, and receipts show what was recorded. Separate lanes reduce one source of contention; network capacity, transaction fees and the signers sending transactions still matter.
 
-An external agent runs the computation and supplies its hashes. Aetheris currently routes those commitments and records their lifecycle. It does not invoke arbitrary MCP tools or generate task outputs itself.
+Computation happens before the daemon records its commitments. There are two implemented ways to supply it: the browser runs five small checksum tasks, and the command-line client invokes a real configured MCP tool. Both can submit signed, paid tasks and check their blockchain receipts. The guided browser preview is explicitly simulated and makes no transactions.
 
-This document describes the implemented repository. Use the [project README](../README.md) for entry points, the [runbook](runbook.md) for setup and operation, the [submission checklist](submission-readiness.md) for remaining demo work, and the [verification record](../VERIFICATION.md) for checks actually completed.
+For setup, use the [project README](../README.md) and [runbook](runbook.md). The [shared protocol](protocol.md) specifies byte encodings and test vectors; the [frontend guide](../frontend/docs/README.md) explains the screens and their data sources. This document describes implemented connections, not evidence that external services have already been deployed.
 
-The 2026-10-03 additions are described in the [live submission workflow](live-submission.md): the repository now includes the MCP/payment task client, optional Envio dashboard reads, Mera delegation and a trusted Chainlink CRE receiver. The daemon's task/payment boundary and CREATE2/Merkle encodings below remain the same.
-
-## System layout and actual connections
+## The system at a glance
 
 ```mermaid
 flowchart LR
-    Caller[External agent or task client]
-    Dynamic[Dynamic wallet and passkey service]
-    Payment[Payment facilitator or Graph Tally adapter]
-    IPFS[Configured IPFS gateway]
-    RPC[Monad Testnet RPC]
-    Consumers[Operators and GraphQL consumers]
-
-    subgraph Frontend[Next.js dashboard]
-        Browser[Browser pages and wallet module]
-        API[Next.js read APIs]
-        Browser -->|Overview and directory requests| API
-    end
-
-    subgraph Engine[Rust daemon]
-        HTTP[Axum task API]
-        Relayers[Authorized relayer signers]
-        Worker[Optional Merkle worker]
-        Journal[(redb journal)]
-        HTTP --> Relayers
-        HTTP --> Journal
-        Relayers --> Journal
-        Worker --> Relayers
-        Worker --> Journal
-    end
-
-    subgraph Indexing[Envio HyperIndex]
-        Handlers[Identity and router event handlers]
-        GraphQL[(Entity database and GraphQL)]
-        Handlers --> GraphQL
-    end
-
-    subgraph Contracts[Deployed Solidity contracts]
-        Identity[AgentRegistry]
-        Router[AetherisRouter]
-        Shards[EphemeralShard contracts]
-        Reputation[ReputationRegistry]
-        Validation[ValidationRegistry]
-        Router -->|Reads agent ownership| Identity
-        Router -->|CREATE2 and completion| Shards
-        Reputation -->|Identity checks| Identity
-        Reputation -->|Verify registered shard| Router
-        Reputation -->|Read completion| Shards
-        Validation -->|Owner and operator checks| Identity
-    end
-
-    Browser <-->|Authentication and wallet access| Dynamic
-    Browser -->|Wallet-signed delegation| RPC
-    API -->|Contract reads and event queries| RPC
-    API -->|Agent Cards| IPFS
-    Caller -->|Signed task and payment credential| HTTP
-    HTTP <-->|Verify and settle| Payment
-    Relayers -->|Signed transactions| RPC
-    Worker -->|Finalized blocks and logs| RPC
-    Handlers -->|Chain events| RPC
-    Consumers -->|Queries| GraphQL
-    API -->|When ENVIO_GRAPHQL_URL is configured| GraphQL
-    RPC <--> Contracts
+    Browser[Browser dashboard and five-task demo] --> Next[Next.js APIs and task proxies]
+    Next -->|Signed paid tasks| Daemon[Rust task daemon]
+    CLI[MCP command-line client] -->|Invoke configured tool| MCP[External MCP server]
+    CLI -->|Signed paid task| Daemon
+    Daemon <-->|Verify and settle payment| Payment[Payment provider]
+    Daemon --> Journal[(Private redb journal)]
+    Daemon -->|Transactions through RPC| Chain[Monad contracts and task shards]
+    Chain -->|Events| Envio[Envio indexer and GraphQL]
+    Envio -->|Configured dashboard reads| Next
+    Chain -->|RPC reads and receipts| Next
 ```
 
-The dashboard reads through its Next.js API routes. With `ENVIO_GRAPHQL_URL` configured, those routes query deployment-scoped Envio data and expose indexing progress; otherwise they use explicitly labeled RPC fallback. The browser polls `/api/overview` every 12 seconds and queries `/api/agents` for directory pages. Wallet delegation is a direct contract transaction. The new task CLI invokes MCP and calls the daemon API; the browser does not submit paid tasks.
+Wallets also send delegation transactions directly to Monad. Browser and CLI clients independently read receipts through RPC. Agent cards come from the configured IPFS gateway. Validation and reputation are separate contract operations; a completed task does not implicitly complete either of them.
 
-The dashboard can show existing chain activity while the daemon is offline. A configured Envio outage produces a visible service error. Successful rendering alone does not establish that paid task routing or a passkey ceremony works. The task client's chain/payment checks and live evidence collection remain separate steps.
-
-Sources: [frontend data reads](../frontend/lib/server.ts), [browser query hooks](../frontend/lib/queries.ts), [wallet delegation](../frontend/components/WalletAccess.tsx), [daemon API](../daemon/src/main.rs), [indexer handlers](../indexer/src/EventHandlers.ts).
-
-## Component responsibilities
-
-| Component | Responsibility and stored state |
-| --- | --- |
-| [AgentRegistry](../contracts/src/AgentRegistry.sol) | ERC-721 identities with IDs starting at 1, registration URIs, named metadata, verified `agentWallet` metadata, and ownership epochs. Transfers clear the payment wallet and invalidate old router delegations through the epoch. |
-| [AetherisRouter](../contracts/src/AetherisRouter.sol) | Scoped task delegates, deterministic shard deployment, used-salt tracking, task completion routing, authorized batch committers, and immutable batch records. |
-| [EphemeralShard](../contracts/src/EphemeralShard.sol) | Immutable agent, task, sequence, executor and input context; one nonzero output hash, optional proof hash, and a completion flag. Only its creating router can write the result. |
-| [ReputationRegistry](../contracts/src/ReputationRegistry.sol) | Fixed-point client feedback, revocations, responses and filtered summaries. A separate `recordTaskExecution` call can record an actual completed shard once. |
-| [ValidationRegistry](../contracts/src/ValidationRegistry.sol) | Independent validation requests and validator responses, output-byte integrity checks, and an adapter for signed statements from approved attestation verifiers. |
-| [Rust daemon](../daemon/README.md) | HTTP authorization and payment handling, durable job records, per-signer transaction serialization, and optional finalized-log batching. |
-| [Envio indexer](../indexer/README.md) | Rebuilds agent and shard history, stores each execution leaf, derives per-block roots, and compares observed commitments against its own calculations. |
-| [Next.js frontend](../frontend/README.md) | Agent discovery, recent RPC-derived activity, shard inspection, Dynamic authentication, and owner-signed executor delegation. |
-
-The deployment script creates application-specific registries and a router. Their addresses must be configured consistently across services; they are not assumed to be pre-existing canonical registries on the network. The frontend checks that configured router and reputation contracts reference the expected identity registry.
-
-## Identity, discovery and access
-
-An agent owner registers an identity and associates it with a URI. The example [Agent Card](../contracts/agent-card.example.json) describes the ERC-8004 registration format and an MCP service endpoint. Contract registration proves control of the identity token and its metadata pointer; it does not prove that a service is reachable or that the agent has the advertised capabilities.
-
-The directory fetches `ipfs://` cards through an operator-configured HTTPS gateway. It rejects redirects and traversal paths, caps card bodies at 256 KiB, and applies a six-second timeout. It displays service URLs as text rather than invoking them. Although the identity contract accepts other URI schemes, the dashboard's current metadata reader supports IPFS cards only.
-
-There are separate permissions for separate operations:
-
-| Permission | Who grants or proves it | What it permits |
+| Component | Its job | What it does not establish |
 | --- | --- | --- |
-| Identity ownership / ERC-721 approval | The identity owner | Identity transfers and supported metadata management. ERC-721 approval alone does not authorize router tasks. |
-| Router delegation | Current identity owner calls `setDelegate` | A named address may create or execute tasks for that agent until expiry. An expiry of zero revokes it. |
-| HTTP task authorization | Authorized EOA signs `TaskAuthorization` | The daemon may route the exact signed task context using the chosen configured executor. |
-| Payment credential | Task signer supplies a valid credential | The daemon may verify and later settle payment under its configured scheme. |
-| Batch committer | Router administrator calls `setCommitter` | Publish Merkle batch records. This role is separate from agent delegation. |
-| TEE attestor and measurement | Validation administrator configures allowlists | The registry may accept an assigned validator's signed attestation for an approved measurement. |
+| [Next.js frontend](../frontend/app/page.tsx) | Discovery, activity and shard views; Dynamic wallet access; optional Mera access; preview and signed live browser demo | A working screen alone does not prove payment settlement or external agent computation |
+| [MCP task client](../scripts/submit_task.ts) | Invoke a configured MCP tool, preserve exact input/output bytes, submit a paid task, verify receipts and optionally publish reviewed feedback | A tool result is not automatically correct or independently validated |
+| [Rust daemon](../daemon/src/main.rs) | Check task permissions and payment, journal requests, route transactions, track settlement and optionally commit Merkle batches | It does not execute MCP tools, judge outputs or verify hardware quotes itself |
+| [AgentRegistry](../contracts/src/AgentRegistry.sol) | ERC-721 agent identities, card URIs, metadata and ownership | Registration does not verify capability claims |
+| [AetherisRouter](../contracts/src/AetherisRouter.sol) | Agent-scoped delegates, deterministic task deployment, result routing and authorized batch commitments | It does not enforce the HTTP payment policy or a cumulative spending budget |
+| [EphemeralShard](../contracts/src/EphemeralShard.sol) | One task's immutable context and one completed result | Storage separation is not confidentiality or deletion |
+| [ReputationRegistry](../contracts/src/ReputationRegistry.sol) | Client feedback, responses, revocations and separate records of completed shards | A rating is an opinion from its author, not a verified correctness score |
+| [ValidationRegistry](../contracts/src/ValidationRegistry.sol) | Explicit requests, validator responses, output-hash checks, trusted TEE statements and authenticated CRE reports | A stored proof hash alone is not a valid attestation |
+| [Envio HyperIndex](../indexer/src/EventHandlers.ts) | Searchable chain history and per-block Merkle roots; independent comparisons with committed roots | Indexing is not payment settlement, consensus finality or proof of computation |
 
-A router delegation stores the granting owner and ownership epoch. Transferring an identity away and back cannot reactivate the old grant. The creator and assigned executor must be authorized at shard creation; completion requires both the assigned executor and current authorization.
+These are application-specific deployments on chain `10143`. Services must use consistent router, registry and deployment-block settings. The router has immutable identity and validation registry references; deployment also connects the reputation registry to the router. A manifest supplies configuration, while successful canonical deployment receipts establish that its addresses actually exist.
 
-Dynamic provides passkey authentication and access to an EVM wallet. The application does not export a P-256 private key or validate raw WebAuthn assertions on-chain. A Dynamic login also does not establish agent ownership: the wallet module checks the registry, simulates the delegation call, obtains the wallet's signature, and waits for its receipt.
+## Two task flows, one recording protocol
 
-The daemon transport currently accepts an Ethereum ECDSA task signature. An owner using an ERC-1271 smart contract wallet can grant a scoped EOA delegate for this transport. ERC-1271 support in registry wallet proofs and validation attestations is distinct from the HTTP task signature format.
+### Browser: five signed, paid checksum tasks
 
-## Task lifecycle
+The live demo uses the configured agent identity for five separate task instances. Its visual lanes are not five newly registered agents. Each task hashes a small input document and records a checksum result calculated in the browser. This exercises real authorization, routing and settlement without claiming that an AI model or MCP server ran.
 
-The external caller supplies `agentId`, `taskId`, `sequenceNonce`, input/output/proof hashes, a configured executor, a short-lived deadline, and an EIP-712 signature. Large integer values travel as decimal strings in JSON. The signature includes the chain and deployed router through its EIP-712 domain; the exact layout is in the [daemon API documentation](../daemon/README.md#api-and-signed-requests).
-
-```mermaid
-sequenceDiagram
-    participant Client as External task client
-    participant Daemon as Axum API / worker
-    participant Pay as Payment service
-    participant DB as redb journal
-    participant Router as AetherisRouter
-    participant Shard as Task shard
-
-    Note over Client: Compute output externally and sign the task commitments
-    Client->>Daemon: POST /v1/tasks with task signature and payment header
-    Daemon->>Router: Check authorization of client and selected relayer
-    Daemon->>DB: Look up request and canonical task identity
-    alt Existing matching task
-        DB-->>Daemon: Original job
-        Daemon-->>Client: Original status and result; no second settlement
-    else New task
-        Daemon->>Pay: Verify payment credential
-        Pay-->>Daemon: Verification result and payer
-        Daemon->>DB: Atomically reserve task, job, payment ID and signed material
-        Note over Daemon: Acquire chosen signer's lock and recheck authorization
-        Daemon->>Router: Read predictShardAddress
-        Daemon->>DB: Persist creation broadcast intent
-        Daemon->>Router: Submit createShard transaction
-        Router->>Shard: Deploy with CREATE2
-        Router-->>Daemon: Creation receipt; wait configured confirmations
-        Daemon->>DB: Persist completion broadcast intent
-        Daemon->>Router: Submit executeTask transaction
-        Router->>Shard: Store outputHash and proofHash once
-        Router-->>Daemon: Execution receipt; wait configured confirmations
-        Daemon->>DB: Save result as settlement_pending
-        Daemon->>Pay: Settle verified payment
-        alt Settlement acknowledged
-            Daemon->>DB: Save completed status and payment receipt
-            Daemon-->>Client: 200 result with PAYMENT-RESPONSE
-        else Settlement failed or uncertain
-            Daemon->>DB: Retain result and settlement_pending status
-            Daemon-->>Client: Failure response requiring reconciliation
-        end
-    end
-```
-
-Missing or invalid payment credentials produce HTTP 402 with payment requirements. The new task is durably accepted only after successful task/payment checks and an atomic database reservation. A transaction failure or ambiguous submission produces `reconciliation_required`; no fabricated completion is returned.
-
-The request handler awaits a spawned worker. Disconnecting the HTTP client does not cancel that worker while the daemon process remains alive. A concurrent retry can return an existing `accepted` job with HTTP 202; clients can also query `GET /v1/tasks/{requestId}`. This is not a durable background queue that automatically resumes all interrupted work after a process restart.
-
-The router does not receive or verify the daemon's HTTP task signature or payment credential. It enforces the on-chain executor delegation. A delegated executor can therefore call the router directly, and such calls do not pass through the daemon payment gate. Grant that role only to an executor trusted to commit task results within its scope.
-
-Sources: [API orchestration](../daemon/src/main.rs), [signature checks and transaction dispatch](../daemon/src/router.rs), [payment handling](../daemon/src/x402.rs).
-
-## CREATE2 state isolation
-
-The task attempt key is `(agentId, taskId, sequenceNonce)`. The router computes:
-
-```text
-salt = keccak256(agentId:32 || taskId:32 || sequenceNonce:32)
-shard = last20(keccak256(0xff || router:20 || salt || keccak256(initCode)))
-```
-
-Each integer is a 32-byte unsigned big-endian value. `initCode` includes the compiled shard creation code and all constructor arguments. The daemon asks the deployed router for `predictShardAddress`, avoiding an assumption that locally compiled bytecode is identical to the deployment.
-
-The router consumes each salt once, including when a caller tries to reuse it with different constructor parameters. A deliberate new attempt needs a new sequence nonce. Each shard then accepts one result. Separate tasks write to separate contract storage; `executeTask` does not update a shared router counter or reputation summary.
-
-This removes shared application storage writes from that completion path. CREATE2 deployments, transaction sender nonces, fee and balance handling, and other accesses can still contend. The [Foundry tests](../contracts/test/AetherisRouter.t.sol) inspect storage write sets and authorization behavior using serial EVM tests. They do not establish Monad scheduler concurrency, measured collision savings, or guaranteed single-pass execution.
-
-Shards persist after completion. "Ephemeral" refers to their task scope, not deletion of their audit trail. The current deployment model allocates one contract per task attempt; this has deployment gas and long-term state costs.
-
-## Merkle batches and indexed history
-
-Two independent implementations derive the same per-block commitment: the daemon's [Merkle worker](../daemon/src/merkle.rs) and the indexer's [Merkle functions](../indexer/src/merkle.ts). Both use router `TaskExecuted` logs, including executions submitted by other clients directly to the router.
-
-The canonical leaf is:
-
-```text
-inner = keccak256(chainId:32 || router:20 || shard:20 || agentId:32 ||
-                  taskId:32 || inputHash:32 || outputHash:32 || proofHash:32)
-leaf = keccak256(inner:32)
-parent = keccak256(min(left,right):32 || max(left,right):32)
-```
-
-Leaves follow canonical log order. Pairs are sorted lexicographically; an odd final node is duplicated at each level. A singleton root is its leaf. Empty blocks have no root to submit. The batch ID commits to chain, router, block number and block hash. Exact encodings and shared vectors are in [protocol.md](protocol.md).
-
-The daemon scans from `DEPLOYMENT_BLOCK` through the RPC's `finalized` block tag. It retrieves logs by block hash, checks block identity and parent continuity, and commits one complete block at a time. The first configured relayer sends the batch transaction and needs the router's separate committer role. A stopped worker is exposed through `/health`; unsupported finalized-block reads or a changed finalized hash stop processing for reconciliation.
-
-The indexer consumes identity and router events from the earliest required deployment block. Its [schema](../indexer/schema.graphql) stores `Agent`, `EphemeralShard`, `TaskExecution`, `MerkleBatch` and `BatchCommitment` entities. Each batch carries a persisted binary frontier, so appending a leaf requires logarithmic work and participates in Envio's entity rollback behavior. Handler execution may be repeated during preload; handlers make no payment or transaction side effects.
-
-The next block marks the prior batch `complete`. This means the indexer has finished collecting that block's events; it does not mean consensus finality. On a commitment event, the indexer compares the batch ID, single-block range, root and leaf count. It records mismatches without replacing its independently computed root.
-
-The router trusts an authorized committer's assertion about historical logs. It does not reconstruct those logs or validate inclusion against consensus inside `commitMerkleBatch`. The indexer's comparison provides a separately computed consistency check; it is not a slashing mechanism or an on-chain dispute system.
-
-Batch submission currently records roots on the router. It does not automatically update reputation totals, submit validation responses, or redeem Graph Tally receipts. Those operations have separate interfaces and trust requirements.
-
-## Persistence, retries and finality
-
-The daemon uses transactional [redb storage](../daemon/src/store.rs), accessed through blocking worker tasks so database operations do not block Tokio's async workers. The journal preserves jobs, canonical task identities, payment replay IDs, original signed requests and payment contexts, broadcast intents, transaction hashes, and the Merkle cursor.
-
-`requestId` is the EIP-712 signing hash, so changing the signed deadline changes that ID. The canonical task key includes chain, router, agent, task and sequence and remains stable across deadline renewal. The stored intent additionally binds input, output, proof and executor. Renewing authorization returns the original job without another bill; changing the intent under the same canonical key is a conflict.
-
-Each signer has its own lock, and different configured signers can dispatch concurrently. The daemon obtains a pending account nonce and persists broadcast intent before contacting the node. A known transaction hash is journaled before receipt polling. If an intent has no known hash after a crash or transport error, further sends by that signer are blocked until the operator reconciles its nonce. A transaction with a confirmed revert still consumes the nonce and releases the signer for unrelated work.
-
-The durable job states are:
-
-| State | Meaning |
+| Step | Current behavior |
 | --- | --- |
-| `accepted` | Request and payment replay protection are reserved; execution or confirmation is in progress. |
-| `settlement_pending` | Confirmed task results are retained while payment settlement is pending, failed or uncertain. |
-| `completed` | Task transactions succeeded and the configured payment service acknowledged settlement or receipt acceptance. |
-| `reconciliation_required` | The process cannot safely determine or continue a prior operation; inspect the preserved journal and external state. |
+| Discover configuration | `/api/demo/config` reads daemon `/v1/config` and checks the dashboard deployment and payment policy. Live mode requires operator configuration and a supported Dynamic wallet |
+| Check permission and funds | Check Monad Testnet, agent ownership/delegation, authorized executor wallets and enough payment tokens for all five tasks |
+| Approve | Sign each exact task and a separate EIP-3009 payment. Pin chain, token, receiver, amount ceiling, signing domain, expiry and resource before signing |
+| Save and submit | Save public recovery metadata before submitting five tasks concurrently through `/api/demo/tasks` to `POST /v1/tasks`. Active task and payment signatures remain in memory |
+| Verify | Check predicted CREATE2 address and salt, canonical creation/execution receipts, exact task event fields, and token `Transfer` plus `AuthorizationUsed` events for the saved payment nonce |
+| Recover | Poll saved request IDs through `/api/demo/tasks/[requestId]`. Recovery creates no fresh payment or repeated POST; reloaded success is checked again on-chain |
 
-Startup changes interrupted `accepted` and `settlement_pending` jobs to `reconciliation_required`, preserving known results. Retrying does not silently re-broadcast or re-charge. Restoring availability after an ambiguous boundary requires operator reconciliation; there is no exactly-once transaction spanning redb, Monad and a payment service.
+The Next.js proxy restricts submissions to the configured agent and relayers, checks the origin, bounds payloads, validates payment policy and recovers both signatures to the same payer. The daemon independently checks current on-chain authority. Neither an origin header nor wallet login grants task permission. The proxy holds no relayer key and does not sign payments for visitors.
 
-Transaction confirmation depth, the Merkle worker's finalized-block policy, and the dashboard's latest-block observations are three different consistency levels. The dashboard can display recent events that later reorganize. Keep each relayer key exclusive to one daemon process and retain its journal across restarts.
+Browser verification waits for two confirmations and checks canonical block hashes. The daemon has its own configured confirmation threshold. These checks are distinct from the finalized-block requirement for Merkle batching. The browser flow does not automatically submit reputation feedback or validation requests.
 
-## Payments and validation boundaries
+Sources: [demo UI](../frontend/components/InteractiveDemo.tsx), [wallet orchestration](../frontend/components/DemoWallet.tsx), [task client and recovery](../frontend/lib/demo-client.ts), [proxy checks](../frontend/lib/demo-server.ts), [payment and receipt checks](../frontend/lib/demo-protocol.ts).
 
-The x402 mode implements HTTP v2 signaling and exact EIP-3009 payment verification through a configured facilitator. Startup checks the facilitator's advertised scheme and network. The service binds the payer to the task signer, enforces matching requirements and durable replay protection, and checks the settlement response. Verification precedes task routing; settlement follows confirmed execution, so a failed settlement can leave a completed chain task requiring payment reconciliation.
+### Command line: an actual MCP invocation
 
-Graph Tally mode checks the configured v2 receipt layout, EIP-712 signature, collection, payer, service, receiver, value and timestamp window. A deployment must supply the documented custom adapter to check real escrow and signer authorization and durably accept or aggregate receipts. The adapter's acknowledgment does not itself prove final on-chain redemption. No Graph Tally escrow deployment or permissive adapter is included. See the [payment integration contract](../daemon/README.md#payments-and-graph-tally-trust-boundary).
+The [task CLI](../scripts/README.md) uses the MCP SDK's Streamable HTTP transport to initialize a configured server connection, find a requested tool and invoke it. It rejects unsuccessful or malformed results. Canonical UTF-8 input/output bytes are preserved locally before their commitments are calculated; those bytes are not uploaded to the shard.
 
-Validation is separate from committing a task result. Generic validation requests identify an independent validator and request payload hash. For the TEE adapter, an approved service validates vendor quotes and certificate chains externally, then signs a request-bound statement. `ValidationRegistry` checks its signer, measurement allowlist, expiry, expected output, domain and replay state. A `proofHash` in `TaskExecuted` alone establishes none of those checks. `verifyOutputHash` establishes byte integrity against a commitment, not the correctness of the computation.
+The client obtains an HTTP 402 challenge, checks it against operator limits, signs the task and an x402 v2 EIP-3009 payment, and submits to `POST /v1/tasks`. It supports this payment path, not a Graph Tally client. `--prepare-only` permits output inspection before payment. `--resume` uses the private journal and does not repeat an ambiguous MCP invocation or task POST.
 
-Reputation likewise records public signals rather than certifying an agent. The contract rejects owner/operator self-feedback and supports client/tag filtering. The current dashboard averages the public `quality` tag and labels the result uncurated. Reviewer selection and Sybil resistance remain application policy.
+After independently verifying task and payment receipts, it calls the public `recordTaskExecution(shard)` function. Optional feedback requires a separately configured, eligible reviewer and an explicit assessment of the actual output. No rating is generated automatically. Reputation transactions are durably saved before broadcast and reconciled on resume, including a race where another caller records the completed shard first.
 
-## Interfaces and remaining integration work
+Public proof contains an allowlist of task and receipt evidence. Private journals, MCP contents, keys and payment credentials are not publication artifacts. A task signature can be exported only after its authorization expires. This proves which bytes were committed and paid for; judging output quality remains a separate responsibility.
 
-The shared Solidity ABI surface is exported in [contracts/abi](../contracts/abi). Rust uses Alloy bindings in [router.rs](../daemon/src/router.rs); the frontend uses Viem declarations in [contracts.ts](../frontend/lib/contracts.ts); Envio event signatures are configured in [config.yaml](../indexer/config.yaml). The [interface checker](../scripts/check-interfaces.mjs) compares those declarations with compiled Solidity artifacts. Shared encoding rules belong in [protocol.md](protocol.md) when interfaces change.
+Sources: [MCP transport](../scripts/lib/mcp.ts), [payment limits](../scripts/lib/payment.ts), [receipt verification](../scripts/lib/settlement.ts), [reputation operations](../scripts/lib/reputation.ts), [durable transactions](../scripts/lib/transactions.ts), [proof export](../scripts/lib/proof.ts).
 
-| Implemented in this repository | Required deployment or further integration |
+## Who can do what
+
+| Role | Authority | Boundary |
+| --- | --- | --- |
+| Agent owner | Own the ERC-721 identity, manage its card and authorize/revoke router delegates | Ownership is not an attestation of capabilities |
+| Task signer | Sign the exact agent, task, sequence, executor, input/output/proof hashes and deadline | Must be the current owner or an active router delegate; HTTP transport accepts Ethereum ECDSA EOA signatures |
+| Daemon executor | Create and complete tasks with its assigned relayer account | Must be configured in the daemon and authorized by the router; only the assigned executor can complete its shard |
+| Router administrator | Select batch committers | Administrative ownership does not replace per-agent task permission |
+| Batch committer | Submit immutable batch records | The router checks authority and structure, not a recomputation of historical logs |
+| Feedback author | Publish an eligible client's assessment and revoke their own feedback | Public feedback remains susceptible to low-quality or coordinated submissions |
+| Assigned validator / trusted attestor | Respond to an explicit validation request under its applicable checks | Separate from the executor, HTTP payment and ordinary task completion |
+| Payment provider | Verify and settle the configured payment mechanism | Provider acknowledgment and confirmed token transfer are different evidence |
+
+Router delegation names an agent, delegate and expiry. Grants bind to the owner's ownership epoch, so transferring an identity away and back cannot revive an old grant. ERC-721 approvals and router delegation are distinct permissions. The daemon checks both the task signer and selected executor; payment cannot substitute for either check.
+
+**Permission and budget are separate.** There is no cumulative per-agent spending-budget contract, daily cap or automatic gas sponsor. Client payment ceilings constrain what those clients sign. A router delegate can make authorized direct calls outside the HTTP payment gate. Transactions consume gas, and a signer still has an ordered account nonce. Operators must fund and isolate the relayer accounts they use.
+
+Task authorization uses EIP-712 domain `AetherisTask`, version `1`, chain `10143` and the router as verifier. The signing digest is the HTTP request ID, and deadlines must fit the daemon's allowed window. See the [daemon API](../daemon/README.md) and [shared protocol](protocol.md) for exact fields and encodings.
+
+## What a shard isolates
+
+A shard is a separate Solidity contract deployed with CREATE2. Its salt combines the agent ID, task ID and sequence nonce. The complete address also depends on the router, constructor bytecode and constructor arguments; clients call `predictShardAddress` against the deployed router instead of assuming the salt alone determines the address.
+
+The router rejects reused salts even when the proposed executor or input changes. Each shard fixes its agent, task, sequence, executor and input at creation. Only its creating router can write its output, and completion succeeds once. The router checks that the assigned executor remains authorized at completion.
+
+The narrow benefit is that completing unrelated shards writes separate result storage. Completion does not increment a shared router task counter or automatically update reputation. Creation still updates deployment bookkeeping; account nonces, gas payment, shared reads and other network work remain. Separate relayer accounts allow independent submissions, while each daemon signer's transactions are serialized.
+
+“Ephemeral” describes the task's lifetime. Contracts and their public commitments remain on-chain permanently. Hashes do not encrypt data, and predictable values can be guessed. This repository does not implement confidential execution or threshold encryption. Its write-set tests exercise storage isolation; they do not establish zero collisions, unlimited throughput, a speedup or a measured Monad scheduler result.
+
+Sources: [router and CREATE2](../contracts/src/AetherisRouter.sol), [write-once task storage](../contracts/src/EphemeralShard.sol), [router tests](../contracts/test/AetherisRouter.t.sol).
+
+## Daemon, payment and durable state
+
+The Axum daemon uses Tokio for concurrent work, Alloy for Monad interaction and a transactional redb database for durable state. That private journal is not a disposable cache: it contains jobs, canonical task identities, payment replay reservations, signed request context, transaction intent and the batch cursor.
+
+| Boundary | Implemented behavior |
 | --- | --- |
-| Registry contracts, scoped delegation and isolated task commitments | Matching deployed addresses, funded relayer accounts, registered Agent Cards and explicit permissions. |
-| Daemon HTTP task routing and persistent replay protection | A caller that performs computation, signs requests and supplies payment credentials. A dashboard task-submission workflow is not currently wired. |
-| Dynamic wallet UI, passkey actions and delegation transactions | A configured Dynamic environment, allowed origins, wallet recovery settings and live authentication/signing validation. |
-| x402 verification/settlement client | A facilitator and payment asset that support the configured scheme on Monad Testnet. |
-| Graph Tally receipt verification and adapter client | A real escrow/aggregation deployment and the documented adapter implementation. |
-| Generic validation and signed TEE statements | An independent validator or trusted hardware-attestation verifier with approved measurements. |
-| Envio handlers, schema, roots and commitment comparison | Native Envio code generation and generated-type checking on Linux/macOS or working WSL2, configured storage, and live indexing validation. The current verification record describes the environment block. |
-| RPC-backed dashboard and GraphQL indexer as separate paths | Connect the UI to indexed history if historical GraphQL views are part of the intended demo. |
-| Contract and service tests with shared vectors | A funded end-to-end task, paid settlement, batch commitment, deployment review and security review before handling real funds. |
+| Acceptance | Check task authority and payment before atomically reserving the job, canonical identity and payment replay ID |
+| Deduplication | Canonical identity is chain, router, agent, task ID and sequence. A renewed deadline returns the original matching job; changed execution intent conflicts instead of purchasing another execution |
+| Dispatch | Persist nonce and broadcast intent before sending; save the returned transaction hash before awaiting confirmations. Create the shard, then complete it |
+| Payment | After confirmed execution, retain the result and settle through the provider. Report completion only with a successful settlement response |
+| Uncertain broadcast | An intent without a known transaction hash stops that signer from silently reusing its nonce. A known, confirmed reverted transaction can release it for unrelated work |
+| Restart | Mark interrupted accepted or settlement-pending jobs `reconciliation_required`, retaining evidence instead of automatically charging again |
 
-Threshold encryption through Category Labs and a Privy fallback are not integrated. No network scheduler benchmark or avoided-collision counter is implemented. The current [verification record](../VERIFICATION.md) separates local checks from these external and live-network requirements.
+An HTTP disconnect does not cancel an already spawned daemon worker. A process crash is different: execution and payment are not one atomic cross-system transaction. A task may be on-chain while settlement remains uncertain. Durable statuses expose that distinction; exactly-once settlement across independent systems is not promised. Each relayer key must be exclusive to its daemon, and the database takes an exclusive filesystem lock.
+
+Normal payment uses x402 v2 `exact` signaling with an EIP-3009 token. An unpaid request receives `PAYMENT-REQUIRED`; a credential arrives in `PAYMENT-SIGNATURE`. The facilitator must actually support the chain and token. The daemon binds payer to task signer, reserves a payment-nonce replay key, calls verification/settlement and checks semantic success, payer, network and transaction hash. Browser and CLI clients add exact token-receipt checks.
+
+Alternative Graph Tally mode verifies the real v2 receipt structure and configured signature domain but uses a **custom Aetheris HTTP adapter** for escrow authorization and aggregation. That adapter is external; this is not an official Graph Tally HTTP API or a claim of an existing Monad deployment. Accepted aggregation is not automatically final on-chain redemption. See the [daemon payment section](../daemon/README.md#payments-and-graph-tally-trust-boundary) for the adapter contract and trust requirements.
+
+Sources: [request lifecycle](../daemon/src/main.rs), [transaction coordination](../daemon/src/router.rs), [redb journal](../daemon/src/store.rs), [payment verification](../daemon/src/x402.rs).
+
+## Merkle batches and independent indexing
+
+A Merkle root is a compact receipt for a collection of task events. It could summarize 100 events, for example, but 100 is not a fixed batch size and the root does not prove those computations correct.
+
+The optional daemon worker commits **one batch per nonempty finalized block**, not one per day. It includes all `TaskExecuted` events from the configured router in that block, including executions submitted outside the daemon. Empty blocks advance the cursor without an empty commitment. The RPC must support `finalized`; changed canonical hashes or broken continuity stop the worker for reconciliation.
+
+Leaves bind chain, router, shard, agent, task and input/output/proof hashes. Events follow chain order. Leaf double hashing, sorted pair hashing, odd-node duplication and the block-hash-bound batch ID must agree across Rust and TypeScript. The [shared protocol](protocol.md) gives exact definitions and fixed interoperability vectors.
+
+Envio separately derives `Agent`, `EphemeralShard`, `TaskExecution`, `MerkleBatch`, `BatchCommitment` and synchronization records. Tree state lives in its indexed database so normal chain rollback can rebuild it. When a commitment arrives, Envio compares its batch identity, root, leaf count and single-block range with its own calculation.
+
+| Indexed status | Meaning |
+| --- | --- |
+| `observed` | Execution events for a block are being collected |
+| `complete` | The indexer has advanced past that block; this alone is not consensus finality |
+| `committed` | An on-chain commitment matches the indexer's calculation |
+| `mismatch` | An observed commitment differs and requires investigation |
+
+The router trusts its approved committer to supply a correct historical root. The indexer's comparison is independent consistency evidence, not an on-chain fraud-proof or slashing mechanism. Merkle commitment also does not pay the individual tasks: x402 settlement is separate.
+
+Sources: [batch worker](../daemon/src/merkle.rs), [event handlers](../indexer/src/EventHandlers.ts), [TypeScript Merkle code](../indexer/src/merkle.ts), [entity schema](../indexer/schema.graphql).
+
+## Identity, reputation, validation and passkeys are different layers
+
+An agent card is a digital passport and resume: it connects an on-chain identity to descriptions and service endpoints. Registration does not check whether an advertised MCP service is available or its claims are true. The directory treats card contents as untrusted display data; the CLI calls the endpoint explicitly configured by its operator.
+
+Reputation holds fixed-point client feedback, responses and revocations. Contract summaries use an explicit client set; the dashboard's quality view is submitted feedback, not a universal or Sybil-resistant trust score. Separate task recording establishes that a router-created shard completed once. It does not award a positive review. CLI completion recording and optional reviewed feedback are different transactions.
+
+| Mechanism | What is checked | What must still exist outside ordinary task routing |
+| --- | --- | --- |
+| Output-hash validation | Supplied bytes match the expected commitment in an explicit validation request | A reason to believe those bytes answer the task correctly |
+| TEE adapter | An approved attestor's signature binds request, output, approved measurement, evidence hash and expiry; replay is rejected | A trusted verifier that actually checks hardware evidence and issues the statement |
+| Chainlink CRE receiver | Configured forwarder, allowed workflow identity/name/owner, matching request/output, chain/receiver, time bounds and replay checks | A real CRE workflow, target-chain forwarder and deployed configuration; the receiver is not a bundled workflow deployment |
+| Dynamic passkey access | A configured provider mediates device sign-in and wallet signing | Dynamic environment, supported wallet and agent ownership/delegation |
+| Mera passkey access | Authenticator PRF derives a standard secp256k1 EVM account; the UI signs explicit router delegation | HTTPS or localhost, PRF support, the same passkey/relying party, an owned identity and gas funds |
+
+The router's validation-registry reference does not make validation mandatory for `executeTask`. The daemon accepts an authorized proof hash as a commitment; payment and completion do not turn it into a verified TEE or CRE result. Validation must be requested and delivered separately.
+
+CRE requires the approved workflow owner to match the request's validator. The receiver authenticates its configured forwarder; it does not independently verify DON signatures or accept arbitrary caller reports. Deployment must establish that the chosen forwarder is the official target-chain service.
+
+Mera and Dynamic are separate wallet integrations. Mera supplies neither threshold encryption nor gas sponsorship nor an account recovery service. Derived key material stays out of persistent storage, and each delegation asks for a fresh passkey ceremony; browser memory and authenticator security remain trust boundaries. Passkeys can hide seed handling from users, while delegation still costs gas unless an external sponsor pays. The HTTP task transport expects ECDSA EOA authorization, not a raw P256 WebAuthn assertion or EIP-1271 smart-wallet signature.
+
+Sources: [identity](../contracts/src/AgentRegistry.sol), [reputation](../contracts/src/ReputationRegistry.sol), [validation and CRE](../contracts/src/ValidationRegistry.sol), [Dynamic delegation](../frontend/components/WalletAccess.tsx), [Mera UI](../frontend/components/MeraAccess.tsx), [Mera account derivation](../frontend/lib/mera-account.ts).
+
+## Dashboard data and operating conditions
+
+With `ENVIO_GRAPHQL_URL` configured, Next.js read APIs use deployment-scoped Envio data and expose index progress and lag. An unavailable configured indexer produces a visible error. RPC fallback is used when Envio is not configured; it reads a bounded recent event window instead of claiming complete history. Network throughput samples and contract reputation reads still use RPC.
+
+Active agents are identities with completed executions in the displayed window. Throughput is a recent network sample, not a daemon benchmark or performance guarantee. Public RPC data cannot measure speculative collisions avoided inside Monad's execution engine. Preview animation, simulated metric examples and live receipt counts must retain distinct labels.
+
+| Operation | Conditions and evidence |
+| --- | --- |
+| Read-only discovery/activity | Working RPC and consistent contract addresses; optional IPFS and Envio. The daemon may be offline |
+| Guided preview | Browser only; explicitly simulated, without wallet, payment or chain transaction |
+| Live five-task browser demo | Dynamic setup, enabled Next.js proxy, daemon, owned/delegated agent, authorized funded relayers, compatible token/facilitator and payer balance. Success is checked against task and payment receipts |
+| MCP task submission | Routing/payment prerequisites plus a reachable MCP tool and dedicated signing client; preserve exact input/output files and verified receipts |
+| Merkle commitment | Enabled worker, finalized-capable RPC, deployment cursor and approved funded committer; Envio can independently compare the result |
+| Reputation feedback | Eligible independent reviewer, explicit assessment and gas; omitted when unconfigured |
+| TEE or CRE validation | Explicit request and separately configured trusted validation provider; ordinary execution does not automatically validate it |
+
+`GET /health` checks RPC reachability and whether the optional batch worker is running, disabled or stopped. It is not a full payment, wallet, MCP or validation readiness check. Interrupted jobs, unknown broadcast intent and uncertain settlement require reconciliation using the retained journal and external receipts. The [runbook](runbook.md) covers operation; the [verification record](../VERIFICATION.md) distinguishes completed checks from live evidence.
+
+Sources: [dashboard reads](../frontend/lib/server.ts), [GraphQL client](../frontend/lib/indexer.ts), [indexed-data checks](../frontend/lib/indexer-protocol.ts), [browser query hooks](../frontend/lib/queries.ts).
+
+Aetheris connects identity, authorized paid task recording and independently inspectable receipts. Start with the [README](../README.md), use the [protocol](protocol.md) for implementation compatibility, and use the [frontend guide](../frontend/docs/README.md) to interpret live and preview views.
