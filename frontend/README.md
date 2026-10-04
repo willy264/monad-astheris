@@ -9,6 +9,7 @@ Live records come from Monad RPC and, when configured, Envio. Illustrations and 
 | [Dashboard guide for judges](docs/README.md) | The story, the three pages, and what the labels mean. |
 | [Demo guide](docs/demo-guide.md) | Preview steps, live paid tasks, passkeys, delegation and recovery. |
 | [Data, configuration and API reference](docs/data-and-api.md) | Every frontend environment variable, metric definitions and API behavior. |
+| [Logo and brand assets](docs/brand.md) | Download the separate logo PNG, editable SVG and favicon artwork. |
 | [System architecture](../docs/architecture.md) / [protocol](../docs/protocol.md) | How contracts, daemon, indexer and dashboard fit together. |
 | [Live submission guide](../docs/live-submission.md) | Deployment, agent registration and the remaining external setup. |
 

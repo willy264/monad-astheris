@@ -1,3 +1,5 @@
+<img src="frontend/public/brand/aetheris-icon-512.png" width="88" height="88" alt="Aetheris logo">
+
 # Aetheris
 
 **Express checkout lanes for AI-agent tasks on Monad.**
@@ -105,6 +107,7 @@ The Rust task route is **`POST /v1/tasks`**. See the [protocol and API reference
 | [Architecture](docs/architecture.md) | Which component does what, and where does trust enter? |
 | [Protocol & daemon API](docs/protocol.md) | What exactly must a client sign and send? |
 | [Frontend guide](frontend/docs/README.md) | What should a judge click, and which numbers are real? |
+| [Logo and brand assets](frontend/docs/brand.md) | Where can I download the logo PNG, editable SVG and icons? |
 | [Operator runbook](docs/runbook.md) | How do I configure and run every component? |
 | [Submission checklist](docs/submission-readiness.md) | What remains before the project is ready to submit? |
 
