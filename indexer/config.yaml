@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: aetheris
+description: ERC-8004 agents and isolated task execution on Monad Testnet
+handlers: src/handlers
+address_format: lowercase
+contracts:
+  - name: AgentRegistry
+    events:
+      - event: "Registered(uint256 indexed agentId, string agentURI, address indexed owner)"
+      - event: "URIUpdated(uint256 indexed agentId, string newURI, address indexed updatedBy)"
+      - event: "Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+  - name: AetherisRouter
+    events:
+      - event: "ShardCreated(address indexed shard, uint256 indexed agentId, bytes32 indexed taskId, uint256 sequenceNonce, address executor, bytes32 inputHash)"
+      - event: "TaskExecuted(address indexed shard, uint256 indexed agentId, bytes32 indexed taskId, bytes32 inputHash, bytes32 outputHash, bytes32 proofHash)"
+      - event: "MerkleBatchCommitted(bytes32 indexed batchId, bytes32 root, uint256 leafCount, uint256 fromBlock, uint256 toBlock)"
+chains:
+  - id: 10143
+    start_block: ${ENVIO_START_BLOCK:-0}
+    rpc: ${ENVIO_MONAD_RPC_URL:-https://testnet-rpc.monad.xyz}
+    contracts:
+      - name: AgentRegistry
+        address: "${ENVIO_AGENT_REGISTRY_ADDRESS:-0x0000000000000000000000000000000000000000}"
+      - name: AetherisRouter
+        address: "${ENVIO_ROUTER_ADDRESS:-0x0000000000000000000000000000000000000000}"
