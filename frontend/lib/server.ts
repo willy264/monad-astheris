@@ -1,7 +1,11 @@
 import 'server-only';
-import { createPublicClient, formatUnits, http } from 'viem';
+import { createPublicClient, formatUnits, http, type GetContractEventsReturnType } from 'viem';
 import { contracts, identityAbi, monadTestnet, reputationAbi, routerAbi } from './contracts';
 import type { Agent, AgentPage, Shard, Snapshot } from './types';
+import { readEventWindow } from './rpc-events.mjs';
+
+type ShardCreatedEvent = GetContractEventsReturnType<typeof routerAbi, 'ShardCreated', true, bigint, bigint>[number];
+type TaskExecutedEvent = GetContractEventsReturnType<typeof routerAbi, 'TaskExecuted', true, bigint, bigint>[number];
 
 const rpc = createPublicClient({ chain: monadTestnet, transport: http(process.env.MONAD_RPC_URL || monadTestnet.rpcUrls.default.http[0], { timeout: 12000, retryCount: 1 }) });
 const configuredLookback = Number(process.env.EVENT_LOOKBACK_BLOCKS || 200);
@@ -41,8 +45,8 @@ async function loadSnapshot(): Promise<Snapshot> {
   const [sampleResult, supplyResult, shardResult, executionResult] = await Promise.allSettled([
     Promise.all(Array.from({ length: Math.min(12, Number(head + 1n)) }, (_, index) => index === 0 ? Promise.resolve(latest) : rpc.getBlock({ blockNumber: head - BigInt(index) }))),
     contracts.identity ? rpc.readContract({ address: contracts.identity, abi: identityAbi, functionName: 'totalSupply', blockNumber: head }) : Promise.resolve(null),
-    routerAddress && fromBlock <= head ? rpc.getContractEvents({ address: routerAddress, abi: routerAbi, eventName: 'ShardCreated', fromBlock, toBlock: head, strict: true }) : Promise.resolve([]),
-    routerAddress && fromBlock <= head ? rpc.getContractEvents({ address: routerAddress, abi: routerAbi, eventName: 'TaskExecuted', fromBlock, toBlock: head, strict: true }) : Promise.resolve([]),
+    routerAddress && fromBlock <= head ? readEventWindow<ShardCreatedEvent>(fromBlock, head, range => rpc.getContractEvents({ address: routerAddress, abi: routerAbi, eventName: 'ShardCreated', ...range, strict: true } as const)) : Promise.resolve([]),
+    routerAddress && fromBlock <= head ? readEventWindow<TaskExecutedEvent>(fromBlock, head, range => rpc.getContractEvents({ address: routerAddress, abi: routerAbi, eventName: 'TaskExecuted', ...range, strict: true } as const)) : Promise.resolve([]),
   ]);
   const sample = sampleResult.status === 'fulfilled' ? sampleResult.value.reverse() : [];
   if (sampleResult.status === 'rejected') errors.push('Recent block samples are unavailable.');
