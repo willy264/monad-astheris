@@ -12,7 +12,17 @@ cargo test --locked --jobs 2
 cargo run --locked --release
 ```
 
-The default listener is `127.0.0.1:8080`. Bind a public listener only behind a TLS proxy with rate limits and request timeouts appropriate for receipt confirmation. The server rejects an RPC on any chain other than Monad Testnet 10143 and rejects an address without deployed bytecode. Each agent owner must authorize its selected relayer through `setDelegate(agentId, relayer, expiresAt)`. Delegation is scoped to agent and expiry. The router owner must separately call `setCommitter(firstRelayer, true)` before enabling `BATCH_ENABLED` (or configure `COMMITTER_ADDRESS` in the deployment script).
+The default listener is `127.0.0.1:8080`. When the host supplies `PORT`, the daemon instead binds `0.0.0.0:PORT`; an explicit `LISTEN_ADDR` overrides both defaults. Bind a public listener only behind a TLS proxy with rate limits and request timeouts appropriate for receipt confirmation. The server rejects an RPC on any chain other than Monad Testnet 10143 and rejects an address without deployed bytecode. Each agent owner must authorize its selected relayer through `setDelegate(agentId, relayer, expiresAt)`. Delegation is scoped to agent and expiry. The router owner must separately call `setCommitter(firstRelayer, true)` before enabling `BATCH_ENABLED` (or configure `COMMITTER_ADDRESS` in the deployment script).
+
+## Render deployment and startup errors
+
+Use root directory `daemon`, build command `cargo build --release --locked --jobs 1`, start command `./target/release/aetheris-daemon`, and health check `/health`. Set `RUSTUP_TOOLCHAIN=1.94.0` and `CARGO_TARGET_DIR=target`. Render supplies `PORT` (normally `10000`); remove `LISTEN_ADDR` to use it, or explicitly set `LISTEN_ADDR=0.0.0.0:10000` when `PORT=10000`. Do not enter the literal string `$PORT` in `LISTEN_ADDR`. See [Render's port binding documentation](https://render.com/docs/web-services#port-binding).
+
+Configure the required values from [.env.example](.env.example) with actual deployed contracts and payment services. Mount persistent storage at `/var/data`, set `DATABASE_PATH=/var/data/aetheris.redb`, and run one instance with exclusive relayer keys. Set `CORS_ORIGIN` to the frontend's HTTPS origin and `PUBLIC_TASK_URL` to `https://YOUR-SERVICE.onrender.com/v1/tasks`. Keep `BATCH_ENABLED=false` until the batch publisher has been authorized. The paid endpoint is `/v1/tasks`; this daemon does not host `/v1/mcp`.
+
+If an older build exits with just **`Error: odd number of digits`**, check `AETHERIS_ROUTER_ADDRESS` first. It must contain the deployed **AetherisRouter contract address**: `0x` followed by 40 hexadecimal digits, with no quotes, ellipsis or placeholder text. A funded owner/relayer wallet is a different address. Do not pad or guess a missing contract address. Deploy and verify the contracts using the [deployment workflow](../scripts/README.md), then copy the router address from `contracts/deployments/10143.json` and its decimal deployment block into Render. This version names malformed router and relayer settings without logging their supplied values.
+
+`RELAYER_PRIVATE_KEYS` contains actual signer private keys (64 hexadecimal digits each, optionally prefixed with `0x`), separated by commas. Set them privately in Render's environment settings. Empty entries and quoted keys fail startup. A valid router and key still require the correct network, database path, and a supported payment provider before the HTTP listener starts. A port-scan warning while the process exits is a consequence of that startup failure; changing the port alone cannot fix an invalid contract address.
 
 ## API and signed requests
 
