@@ -1,0 +1,14 @@
+{
+  "status": "live-verified",
+  "chainId": 10143,
+  "identityRegistry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+  "agentId": "1",
+  "owner": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+  "wallet": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+  "agentURI": "ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea",
+  "cardContentHash": "0x2bcfadcd0f5f2243257bf7ca9b0a454cd01047669e0c3eefec2dfa95dd14f356",
+  "transactionHash": "0xc9bbd6e8a390f4fb1788f3d305f241293ec919b49d35238c7aeda5c829f3a716",
+  "blockNumber": "68105690",
+  "blockHash": "0x1ed05d8b3af89a9d4449721fc2f6df5becccdc3a5385dd2b25fa63a379550292",
+  "verifiedAt": "2026-10-04T11:40:02.910Z"
+}

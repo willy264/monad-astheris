@@ -13,11 +13,11 @@ The supplied project brief targets **Monad Metropolis, Track 04: Trust, Identity
 | Read this | For |
 | --- | --- |
 | This README | Project purpose, implemented features, current status, and where to start. |
-| [Architecture](docs/architecture.md) | System and sequence diagrams, component responsibilities, data flow, authorization, storage isolation, and trust boundaries. |
-| [Runbook](docs/runbook.md) | Prerequisites, a quick dashboard preview, full-stack configuration, deployment, service startup, verification, and troubleshooting. |
-| [Submission readiness](docs/submission-readiness.md) | What is done, what remains, acceptance criteria, demonstration steps, and submission deliverables. |
-| [Shared protocol](docs/protocol.md) | Exact salt, Merkle leaf, batch ID, ordering, and signature conventions. |
-| [Verification record](VERIFICATION.md) | Results actually observed in this workspace and checks still outstanding. |
+| [Live verification and remaining work](SUBMISSION_PROOF.md) | Actual testnet contracts, registered agent, MCP checks, and the remaining submission gaps. |
+| [Agent registration](scripts/README.md) | Prepare an Agent Card, verify its MCP service, pin it to IPFS, and register its identity. |
+| [Contracts](contracts/README.md) / [Daemon](daemon/README.md) | On-chain components, deployment, task authorization, payment, and service configuration. |
+| [Frontend](frontend/README.md) / [Indexer](indexer/README.md) | Dashboard startup, wallet configuration, indexing, and component checks. |
+| [MCP observer](frontend/docs/mcp-agent.md) | The deployed read-only Monad block tool, its input/output, and verification commands. |
 
 ## What is implemented
 
@@ -35,6 +35,8 @@ The supplied project brief targets **Monad Metropolis, Track 04: Trust, Identity
 
 The daemon accepts authorized output hashes; it does not run an AI model or invoke MCP tools to produce those outputs. A real agent/client must supply that computation. The frontend currently reads contracts and logs through its own Next.js API and Monad RPC. It does not yet use Envio GraphQL or provide a signed, paid task-submission interface.
 
+The deployed [Monad Observer MCP service](frontend/docs/mcp-agent.md) supplies real block metadata to agent workflows. Its `get_monad_block` tool is read-only; it performs no AI inference or paid settlement.
+
 ## Example lifecycle
 
 1. An owner publishes an Agent Card to IPFS, registers an identity, and delegates routing access to a funded executor.
@@ -48,9 +50,9 @@ The daemon accepts authorized output hashes; it does not run an AI model or invo
 
 As recorded on **2026-10-02**, the project has implemented components and passing local checks: **22 Solidity tests, 13 Rust tests, 2 indexer Merkle tests, 27 matching interface declarations, and a passing frontend typecheck, production build, and desktop/mobile browser smoke check**.
 
-It is not yet an end-to-end demonstrated submission. No contracts have been deployed from this workspace and no paid task has been run through the complete stack. Envio code generation and generated-type validation remain blocked locally by the unavailable Windows addon and a WSL startup failure. Dynamic passkeys, payment settlement, hosted indexing, and trusted TEE validation need their actual external configuration and integration checks.
+On **2026-10-04**, all four contracts have receipt-verified Monad Testnet deployments in the [live manifest](contracts/deployments/10143.json). **Aetheris Monad Observer, agent #1**, is registered with an IPFS card and a working public MCP service. The [registration evidence](contracts/deployments/10143.agent.json) records its owner, URI, confirmed transaction and block; [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the public evidence.
 
-The next milestone is one reproducible testnet demonstration: registered agent, working delegation, real signed paid task, confirmed shard result, matching indexed batch commitment, and dashboard evidence. The [submission checklist](docs/submission-readiness.md) breaks this into concrete completion criteria.
+The full paid-task demonstration remains outstanding: working delegation, an EIP-712 signed paid request, a confirmed shard result, payment settlement, and matching indexed batch evidence. Hosted Envio output and trusted TEE/CRE verification have not been demonstrated. Dynamic passkeys are enabled, but an actual device authentication and wallet-signed delegation still require verification. See the remaining work in [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md).
 
 ## Repository layout
 
@@ -59,8 +61,7 @@ contracts/   Solidity 0.8.24, OpenZeppelin, Foundry tests and deployment
 daemon/      Rust / Tokio / Axum, signed task routing, HTTP 402, batch commits
 indexer/     Envio HyperIndex, GraphQL entities, per-block Merkle commitments
 frontend/    Next.js 14, Dynamic wallet authentication, agent directory and visualizer
-docs/        Protocol encoding and operational assumptions
-scripts/     ABI consistency checks and local verification helpers
+scripts/     Agent registration, live MCP verification, ABI checks and verification helpers
 ```
 
 ## Local verification
@@ -83,12 +84,12 @@ pnpm build
 
 In Linux, macOS, or a Node-enabled WSL2 shell, run the indexer checks with `cd indexer && pnpm install --frozen-lockfile && pnpm codegen && pnpm typecheck && pnpm test`. The complete Linux/macOS verification sequence is in `scripts/verify.sh`.
 
-JavaScript and Rust dependencies have lockfiles; Solidity dependencies are pinned to commits by the installation scripts. Each component has an environment template. Read the [runbook](docs/runbook.md) for complete commands and each component's README for its API details. Secrets belong in ignored `.env` files, never frontend `NEXT_PUBLIC_*` variables.
+JavaScript and Rust dependencies have lockfiles; Solidity dependencies are pinned to commits by the installation scripts. Each component has an environment template and README with its commands and API details. Secrets belong in ignored `.env` files, never frontend `NEXT_PUBLIC_*` variables.
 
 ## Run the system
 
-1. Deploy the contracts using `contracts/script/Deploy.s.sol` and the contracts README. Save the four addresses and the earliest deployment block. This repository does not contain deployed addresses or a funded private key.
-2. Register an agent with an IPFS Agent Card. A card carries the ERC-8004 registration type, agent description, MCP service endpoint, and capabilities; the registry stores its URI.
+1. Use the existing Monad Testnet addresses and earliest block in [contracts/deployments/10143.json](contracts/deployments/10143.json). For a separate deployment, follow the contracts README and retain its receipts. Private keys are never committed.
+2. Agent #1 already identifies the live observer service. For another identity, follow the [registration commands](scripts/README.md): prepare its truthful IPFS Agent Card, verify the MCP endpoint, pin the card, and call `register(string)` with its URI.
 3. Authorize each daemon relayer for that agent with `AetherisRouter.setDelegate(agentId, relayer, expiresAt)`. The dashboard provides this action. Grant the batch sender the router's committer role if batch submission is enabled.
 4. Configure and start the daemon. It checks RPC chain identity and deployed router bytecode at startup. Task callers sign the domain-separated task authorization described in `daemon/README.md` and supply payment credentials for the configured payment mode.
 5. Set the same addresses and deployment block in the indexer, then run `pnpm codegen` and `pnpm dev`, or connect the project to Envio Cloud. Its local GraphQL service uses port 8081, leaving 8080 for the daemon.
@@ -114,6 +115,6 @@ Payment, persistence, retry, and reorganization behavior are documented in the d
 - [Dynamic documentation](https://www.dynamic.xyz/docs)
 - [x402 specification](https://github.com/coinbase/x402)
 
-See [protocol.md](docs/protocol.md) for the shared byte encoding.
+See the [daemon README](daemon/README.md) for task authorization and shared byte encoding.
 
-See [VERIFICATION.md](VERIFICATION.md) for the commands run and the limits of local validation.
+See [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) for live evidence and the limits of verification.

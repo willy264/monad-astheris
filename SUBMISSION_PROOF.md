@@ -1,0 +1,88 @@
+# Aetheris live verification
+
+Observed on **2026-10-04**, Monad Testnet, chain **10143**. Four contracts are deployed, the public MCP observer works, and its ERC-8004 identity is registered. A paid task and complete settlement/indexing demonstration remain outstanding.
+
+## Deployed contracts
+
+| Contract | Monad Testnet explorer |
+| --- | --- |
+| AgentRegistry | [0x754d7f2fd55a9841dbff248f9cb91d497116f231](https://testnet.monadscan.com/address/0x754d7f2fd55a9841dbff248f9cb91d497116f231) |
+| ReputationRegistry | [0x8f1fe9beef6df891189355129bf48f073d9ab322](https://testnet.monadscan.com/address/0x8f1fe9beef6df891189355129bf48f073d9ab322) |
+| ValidationRegistry | [0xcd0cf354acd2c79145caeac7d4f0639f8957308d](https://testnet.monadscan.com/address/0xcd0cf354acd2c79145caeac7d4f0639f8957308d) |
+| AetherisRouter | [0xac4a33521b32122c9f014eac8800144dd9aa5ebe](https://testnet.monadscan.com/address/0xac4a33521b32122c9f014eac8800144dd9aa5ebe) |
+
+The [deployment manifest](contracts/deployments/10143.json) records deployment transaction/block evidence, runtime/source hashes, compiler settings and verified router linkages. Earliest deployment block: **67972561**. Compiler: Solidity **0.8.24**, optimizer enabled with **200** runs, `viaIR: true`, EVM target `cancun`. Receipt/runtime verification does not imply explorer source verification or an external audit.
+
+The six project Solidity source files in the manifest match [revision `b19b976`](https://github.com/willy264/monad-astheris/tree/b19b9767606f92ee8abf71c6fa222c0ab1958a5b/contracts/src) byte-for-byte by Keccak hash. Use that revision to inspect the deployed implementation; it includes contract work retained on a separate feature branch. Publishing this evidence does not merge the remaining feature stack into `main`.
+
+## Registered agent
+
+| Field | Verified value |
+| --- | --- |
+| Name | Aetheris Monad Observer |
+| Agent ID | **1** |
+| Owner and agent wallet | `0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57` |
+| Registry | `0x754d7f2fd55a9841dbff248f9cb91d497116f231` |
+| Agent Card URI | `ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea` |
+| Registration transaction | [0xc9bbd6e8a390f4fb1788f3d305f241293ec919b49d35238c7aeda5c829f3a716](https://testnet.monadscan.com/tx/0xc9bbd6e8a390f4fb1788f3d305f241293ec919b49d35238c7aeda5c829f3a716) |
+| Registration block | **68105690** |
+| MCP service | `https://monad-astheris.vercel.app/api/mcp` |
+| Tool and arguments | `get_monad_block`, `{}` |
+| Declared capability | `monad-testnet-block-observation` |
+| Payment support | `x402Support: false`; this MCP read is free |
+
+The registration command waited for 12 confirmations and checked the `Registered` event, `ownerOf(1)`, `tokenURI(1)`, `getAgentWallet(1)` and canonical receipt block hash. It minted exactly one identity using `register(string)`.
+
+Public evidence:
+
+- [Registration manifest](contracts/deployments/10143.agent.json) and [complete transaction receipt](contracts/deployments/10143.agent-receipt.json).
+- [Exact Agent Card bytes](contracts/deployments/10143.agent-card.json), retrieved through [Pinata's public IPFS gateway](https://gateway.pinata.cloud/ipfs/bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea). The first gateway, `ipfs.io`, returned HTTP 429; the same CID was successfully verified through Pinata without uploading another card.
+- Card Keccak-256: `0x2bcfadcd0f5f2243257bf7ca9b0a454cd01047669e0c3eefec2dfa95dd14f356`. The committed file preserves LF bytes to reproduce that hash.
+- [Domain association](frontend/public/.well-known/agent-registration.json), served from `https://monad-astheris.vercel.app/.well-known/agent-registration.json` after deployment.
+
+Private keys, Pinata credentials and signed raw transaction journals are excluded from these artifacts.
+
+## Live MCP verification
+
+The official MCP SDK negotiated protocol **2025-11-25**, discovered the single read-only tool and invoked it against the production endpoint. The committed [verification report](contracts/deployments/10143.mcp.json) passed **11 checks**, including independent Monad RPC lookups by both block number and block hash.
+
+Actual observed output:
+
+```json
+{
+  "chainId": 10143,
+  "blockNumber": "68105485",
+  "blockHash": "0x06192e2cef3e705d92b729eb2554facf6624d73897313fb12cddf145af3810a7",
+  "timestamp": "1791113935",
+  "transactionCount": 1
+}
+```
+
+This is a point-in-time blockchain observation. It proves the tool returned matching block data; it does not prove AI inference, finalized output, task authorization or payment settlement. A browser GET to `/api/mcp` returns 405 because the MCP service accepts protocol requests through POST.
+
+Reproduce with Node 22+ and pnpm 10.32.1:
+
+```sh
+cd scripts
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm verify-mcp https://monad-astheris.vercel.app/api/mcp
+```
+
+The verifier needs no signing key or environment file. It saves observations under ignored `scripts/.artifacts/mcp/`. See the [MCP service guide](frontend/docs/mcp-agent.md) and [registration runbook](scripts/README.md).
+
+## Validation and remaining submission work
+
+The MCP feature passed **15 integration/security tests**, including malformed requests, wrong-chain responses, bounded inputs and batch-amplification rejection. The **6 existing RPC pagination tests**, frontend typecheck and MCP Vercel build also passed. Registration tooling typecheck and focused public-URL validation checks passed. The directory gateway fix passed **10 tests** covering transient fallback, operator gateway isolation, bounded responses and deadlines. Solidity and Rust were not changed for this service/registration feature; historical local results are recorded separately in the README and are not live-task evidence.
+
+Directory reliability fixes accompany registration: live RPC requests explicitly bypass Next.js's persistent data cache, and the default IPFS gateway can fall back to Pinata within one 12-second budget. Application-level agent caching still lasts up to 30 seconds. A separately configured gateway remains exclusive, and an unavailable card is reported as an error rather than substituted with invented metadata.
+
+These acceptance checks remain before claiming a complete submission:
+
+1. Complete an actual Dynamic passkey ceremony and verify expiring wallet-signed executor delegation. Enabling the provider and opening its modal do not establish these outcomes.
+2. Configure and fund the intended payment path, invoke this MCP tool from the task producer, sign the exact EIP-712 authorization, and submit it to the daemon. Capture confirmed `ShardCreated` and `TaskExecuted` receipts plus the actual payment settlement result. No paid-task hash or signed sample is claimed in this record.
+3. Run Envio code generation and generated-type checks in a supported environment, configure the deployed addresses/start block, and publish GraphQL output matching agent, shard and execution logs. No hosted GraphQL output is yet recorded here.
+4. Verify a committed Merkle root against canonical execution events; separately record any reputation feedback and validation/CRE/TEE results claimed in the submission. Registering this observer does not perform those workflows.
+5. Verify daemon persistence/recovery on its hosting plan, complete the demo video and submission form, and confirm organizer access requirements. A public repository is accessible for reading, but no email-specific access invitation is claimed.
+
+The deployed observer and its identity provide a real starting point for the task demonstration. They do not establish network-wide collision-free execution or a measured throughput/settlement guarantee.

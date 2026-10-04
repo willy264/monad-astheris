@@ -28,7 +28,8 @@ The [Monad Network Observer MCP service](docs/mcp-agent.md) exposes `get_monad_b
 - **State collisions saved** is unavailable because standard RPC does not reveal optimistic execution retries or a counterfactual collision count.
 - Shard tiles are real `ShardCreated` events, joined to `TaskExecuted` by address in the same window. The visualizer does not claim that scheduler execution was concurrent. An execution outside the window is not shown. Latest-block observations can change during a reorganization.
 - The directory paginates sequential token IDs (the supplied registry starts at 1 and has no burn). Quality scores use `getClients` and `getSummary(agentId, clients, 'quality', '')`. Feedback is uncurated and the mean is not a percentage, trust guarantee, or Sybil-resistant rating.
-- Agent Cards are untrusted. The server only fetches `ipfs://` metadata through `IPFS_GATEWAY`, rejects redirects and path traversal, applies a 6-second timeout and a 256 KiB cap, and renders strings as escaped React text. Service endpoints are displayed, never called automatically.
+- Agent Cards are untrusted. The server only fetches `ipfs://` metadata, rejects redirects and path traversal, applies a 12-second total deadline and a 256 KiB cap, and renders strings as escaped React text. When `IPFS_GATEWAY` is unset or `https://ipfs.io/ipfs/`, a transient failure falls back once to `https://gateway.pinata.cloud/ipfs/`; the first attempt gets at most two seconds. A custom HTTPS gateway remains exclusive. Service endpoints are displayed, never called automatically. Verify this behavior with `pnpm test:agent-card`.
+- Live server-side RPC requests explicitly use `cache: 'no-store'` to avoid Next.js persisting old chain reads. The application still caches overview results for eight seconds and agent pages for 30 seconds to bound upstream load.
 
 ## Dynamic passkeys and executor delegation
 

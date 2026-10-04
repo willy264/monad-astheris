@@ -1,0 +1,28 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Aetheris Monad Observer",
+  "description": "Publishes live Monad Testnet block metadata through a read-only MCP tool for agent workflows.",
+  "services": [
+    {
+      "name": "MCP",
+      "endpoint": "https://monad-astheris.vercel.app/api/mcp",
+      "version": "2025-11-25"
+    }
+  ],
+  "active": true,
+  "x402Support": false,
+  "supportedTrust": [
+    "reputation"
+  ],
+  "capabilities": [
+    "monad-testnet-block-observation"
+  ],
+  "wallets": [
+    {
+      "chainId": "eip155:10143",
+      "address": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+      "role": "owner"
+    }
+  ],
+  "image": "https://monad-astheris.vercel.app/brand/aetheris-logo.png"
+}

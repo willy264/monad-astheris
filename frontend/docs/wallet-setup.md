@@ -27,6 +27,8 @@ See Dynamic's [passkey authentication guide](https://www.dynamic.xyz/docs/react/
 
 The directory reads `totalSupply()` from the configured AgentRegistry. A successful response with zero identities means no agent has been registered there. Wallet sign-in alone does not mint an identity. Register a real Agent Card with its capabilities and working service endpoint to populate the directory; empty results are not replaced by invented agents.
 
+The deployed registry now contains **Aetheris Monad Observer, agent #1**. Its [registration record](../../contracts/deployments/10143.agent.json) and [MCP service guide](mcp-agent.md) identify the exact registry and endpoint. If a deployment still shows zero, compare its configured registry address with that record and refresh the directory.
+
 Executor authorization also requires an existing agent ID owned by the connected wallet and testnet MON for the transaction. Passkey authentication does not sponsor gas or create execution authority by itself.
 
 ## Codex documentation MCP

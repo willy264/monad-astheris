@@ -3,11 +3,12 @@ import { createPublicClient, formatUnits, http, type GetContractEventsReturnType
 import { contracts, identityAbi, monadTestnet, reputationAbi, routerAbi } from './contracts';
 import type { Agent, AgentPage, Shard, Snapshot } from './types';
 import { readEventWindow } from './rpc-events.mjs';
+import { agentCard } from './agent-card';
 
 type ShardCreatedEvent = GetContractEventsReturnType<typeof routerAbi, 'ShardCreated', true, bigint, bigint>[number];
 type TaskExecutedEvent = GetContractEventsReturnType<typeof routerAbi, 'TaskExecuted', true, bigint, bigint>[number];
 
-const rpc = createPublicClient({ chain: monadTestnet, transport: http(process.env.MONAD_RPC_URL || monadTestnet.rpcUrls.default.http[0], { timeout: 12000, retryCount: 1 }) });
+const rpc = createPublicClient({ chain: monadTestnet, transport: http(process.env.MONAD_RPC_URL || monadTestnet.rpcUrls.default.http[0], { timeout: 12000, retryCount: 1, fetchOptions: { cache: 'no-store' } }) });
 const configuredLookback = Number(process.env.EVENT_LOOKBACK_BLOCKS || 200);
 const lookback = BigInt(Number.isInteger(configuredLookback) ? Math.min(1000, Math.max(12, configuredLookback)) : 200);
 const deployment = /^\d+$/.test(process.env.DEPLOYMENT_BLOCK || '') ? BigInt(process.env.DEPLOYMENT_BLOCK!) : 0n;
@@ -77,37 +78,6 @@ async function loadSnapshot(): Promise<Snapshot> {
   };
 }
 
-// Agent Cards are untrusted. Fetch only immutable IPFS paths through an operator-selected gateway;
-// never make server requests to arbitrary URLs supplied by an NFT owner.
-async function agentCard(uri: string): Promise<{ name?: string; description?: string; services?: { name?: string; endpoint?: string; skills?: string[] }[]; capabilities?: string[] }> {
-  const match = /^ipfs:\/\/(?:ipfs\/)?([a-zA-Z0-9]+)(\/[a-zA-Z0-9_.\/-]*)?$/.exec(uri);
-  if (!match || (match[2] || '').split('/').some((segment) => segment === '..' || segment === '.')) throw new Error('Agent Card requires an ipfs:// URI.');
-  const gateway = process.env.IPFS_GATEWAY || 'https://ipfs.io/ipfs/';
-  const url = new URL(`${gateway.replace(/\/$/, '')}/${match[1]}${match[2] || ''}`);
-  if (url.protocol !== 'https:') throw new Error('IPFS gateway must use HTTPS.');
-  const response = await fetch(url, { signal: AbortSignal.timeout(6000), redirect: 'error', cache: 'no-store' });
-  if (!response.ok) throw new Error(`IPFS gateway returned ${response.status}.`);
-  const reader = response.body?.getReader();
-  if (!reader) throw new Error('Agent Card is empty.');
-  const chunks: Uint8Array[] = [];
-  let length = 0;
-  try {
-    for (;;) {
-      const chunk = await reader.read();
-      if (chunk.done) break;
-      length += chunk.value.length;
-      if (length > 256 * 1024) throw new Error('Agent Card exceeds 256 KiB.');
-      chunks.push(chunk.value);
-    }
-  } finally { await reader.cancel(); }
-  const body = new Uint8Array(length);
-  let offset = 0;
-  for (const chunk of chunks) { body.set(chunk, offset); offset += chunk.length; }
-  const value: unknown = JSON.parse(new TextDecoder().decode(body));
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Agent Card is not an object.');
-  return value;
-}
-
 export function getAgentPage(page: number): Promise<AgentPage> {
   const cached = agentCache.get(page);
   if (cached && cached.expires > Date.now()) return cached.promise;
@@ -151,7 +121,7 @@ async function loadAgentPage(page: number): Promise<AgentPage> {
       ]);
       const agent: Agent = { id: id.toString(), owner, uri, name: `Agent #${id}`, description: '', capabilities: [], endpoints: [], score: null, feedbackCount: null };
       const [card, reputation] = await Promise.allSettled([
-        agentCard(uri),
+        agentCard(uri, { gateway: process.env.IPFS_GATEWAY }),
         reputationAddress ? (async () => {
           const clients = await rpc.readContract({ address: reputationAddress!, abi: reputationAbi, functionName: 'getClients', args: [id], blockNumber });
           // Quality feedback is comparable within its own tag. Arbitrary task-specific metrics are not averaged together.

@@ -1,0 +1,102 @@
+{
+  "endpoint": "https://monad-astheris.vercel.app/api/mcp",
+  "independentRpc": "https://testnet-rpc.monad.xyz/",
+  "startedAt": "2026-10-04T11:38:50.861Z",
+  "scope": "Official MCP initialize/list/get_monad_block, then independent read-only chain and exact-block RPC checks. No environment files, credentials, payment, private keys or blockchain writes.",
+  "requests": [
+    {
+      "service": "mcp",
+      "httpMethod": "POST",
+      "rpcMethod": "initialize",
+      "status": 200
+    },
+    {
+      "service": "mcp",
+      "httpMethod": "POST",
+      "rpcMethod": "notifications/initialized",
+      "status": 202
+    },
+    {
+      "service": "mcp",
+      "httpMethod": "GET",
+      "status": 405
+    },
+    {
+      "service": "mcp",
+      "httpMethod": "POST",
+      "rpcMethod": "tools/list",
+      "status": 200
+    },
+    {
+      "service": "mcp",
+      "httpMethod": "POST",
+      "rpcMethod": "tools/call",
+      "status": 200
+    },
+    {
+      "service": "independent-rpc",
+      "method": "eth_chainId",
+      "status": 200
+    },
+    {
+      "service": "independent-rpc",
+      "method": "eth_getBlockByHash",
+      "status": 200
+    },
+    {
+      "service": "independent-rpc",
+      "method": "eth_getBlockByNumber",
+      "status": 200
+    }
+  ],
+  "checks": [
+    {
+      "description": "MCP negotiated protocol 2025-11-25",
+      "protocolVersion": "2025-11-25",
+      "server": {
+        "name": "aetheris-monad-observer",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "description": "Server declares MCP tools capability"
+    },
+    {
+      "description": "Exactly one intended public tool is listed"
+    },
+    {
+      "description": "Tool advertises read-only, non-destructive, idempotent behavior and external data access"
+    },
+    {
+      "description": "Tool accepts no configurable RPC or write arguments"
+    },
+    {
+      "description": "Real get_monad_block call returned structured output"
+    },
+    {
+      "description": "Output fields and chain conform to the published schema"
+    },
+    {
+      "description": "Text output and structured output describe the same block"
+    },
+    {
+      "description": "Independent RPC confirms Monad Testnet chain 10143"
+    },
+    {
+      "description": "Independent lookup by number matches number, hash, timestamp and transaction count"
+    },
+    {
+      "description": "Independent lookup by hash matches number, hash, timestamp and transaction count"
+    }
+  ],
+  "output": {
+    "chainId": 10143,
+    "blockNumber": "68105485",
+    "blockHash": "0x06192e2cef3e705d92b729eb2554facf6624d73897313fb12cddf145af3810a7",
+    "timestamp": "1791113935",
+    "transactionCount": 1
+  },
+  "outputJsonKeccak256": "0xcb656d8ea301858897f1fc3cbbca80f7dc611365271280cc4e8be1819be2c36a",
+  "passed": true,
+  "finishedAt": "2026-10-04T11:38:58.263Z"
+}
