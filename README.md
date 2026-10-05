@@ -111,6 +111,7 @@ The Rust task route is **`POST /v1/tasks`**; the singular `/v1/task` is not impl
 | [Architecture](docs/architecture.md) | Which component does what, and where does trust enter? |
 | [Protocol & daemon API](docs/protocol.md) | What exactly must a client sign and send? |
 | [Frontend guide](frontend/docs/README.md) | What should a judge click, and which numbers are real? |
+| [Vercel deployment](frontend/docs/vercel-deployment.md) | Which build settings and environment variables does the hosted dashboard need? |
 | [Logo and brand assets](frontend/docs/brand.md) | Where can I download the logo PNG, editable SVG and icons? |
 | [Operator runbook](docs/runbook.md) | How do I configure and run every component? |
 | [Submission checklist](docs/submission-readiness.md) | What remains before the project is ready to submit? |

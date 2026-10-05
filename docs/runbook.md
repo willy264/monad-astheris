@@ -321,6 +321,8 @@ Query the local GraphQL endpoint using your configured Hasura authentication. Th
 
 ### G. Configure and start the full dashboard
 
+For hosting, use the [Vercel deployment guide](../frontend/docs/vercel-deployment.md). The committed frontend configuration pins the same pnpm version as CI for both installation and builds.
+
 Set the frontend's router, identity and reputation addresses to the same deployment, and set its deployment block. Override the default Dynamic sandbox environment when using another project; enable EVM wallets, Monad Testnet, allowed origins, embedded-wallet/passkey authentication and recovery in that project. Use HTTPS for hosted WebAuthn; localhost is the development exception.
 
 From `frontend`, run `pnpm install --frozen-lockfile`, then either `pnpm dev` or `pnpm build` followed by `pnpm start`. The UI can now discover registered identities and observe router events. A Dynamic login does not itself grant agent authorization. Passkey enrollment and signing depend on the actual Dynamic environment and supported wallet; the application does not extract a P-256 key or deploy a raw P-256 verifier.

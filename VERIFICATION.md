@@ -69,10 +69,14 @@ The [committed live MCP report](contracts/deployments/10143.mcp.json) passed **1
 
 The observer is read-only and advertises no x402 payment for the MCP read. Registration and matching block metadata are not paid-task, AI inference, validation or settlement evidence.
 
-## Combined branch integration
+## Combined branch integration, 2026-10-05
 
 The integration brings the earlier task client, Envio path, Mera flow, judge demo and contract work together with the production Dynamic, RPC, MCP and IPFS fixes. Fresh local checks passed: **38 Foundry tests**, Solidity formatting, **61 shared ABI declarations**, Rust compilation/formatting/strict Clippy and **20 Rust tests**, plus scripts typechecking and **17 operation/client tests**. The combined frontend passed **52 tests**, typechecking and a frozen installation, including the security-patch regression checks. Solidity source bytes match the deployed revision; LF checkout rules preserve those hashes.
 
 The scripts and indexer dependency audits report zero advisories. The frontend upgrades Next.js to 15.5.27 and applies documented local mitigations for three transitive packages that remain reported by upstream-version audits; see [dependency security maintenance](frontend/docs/dependency-security.md). These checks do not constitute a security audit.
 
 Render health/config reads returned HTTP 200 after a cold start; chain/router and browser/CLI payment-policy validators agree. The live relayer is also the registered agent owner, so the paid task client requires a separately authorized signer rather than reusing that key concurrently. Hosted indexing, a paid-task receipt, settlement/recovery and actual passkey/CRE ceremonies remain unverified. Final Linux CI and production browser results are recorded with PR #33.
+
+At integration source `4a0fb937c5b1e05ed8e3b5f9c1c32ccee3d5822b`, [Linux frontend CI](https://github.com/willy264/monad-astheris/actions/runs/37372614023/job/111973244626) passed frozen installation, typechecking, all 52 tests and the Next.js production build. [Indexer CI](https://github.com/willy264/monad-astheris/actions/runs/37372613895) passed fresh Envio code generation, full generated-type checking and both Merkle tests. An isolated WSL/Linux run independently passed the same indexer checks.
+
+The remaining GitHub jobs were queued without assigned runners during GitHub's October 5 Actions incident. The Vercel preview for that source failed; its detailed logs require project access, so the cause has not been established. The subsequent `frontend/vercel.json` pins pnpm 10.32.1 to remove package-manager selection differences from CI; this configuration change alone is not evidence of a successful Vercel deployment. PR #33 retains the current check results. Production synchronization and browser verification must be confirmed separately before claiming the integrated release is live.
