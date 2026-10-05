@@ -11,6 +11,8 @@ overrides:
   uuid@<11.1.1: 11.1.1
   http-cache-semantics@<4.3.0: 4.3.0
 
+packageExtensionsChecksum: sha256-u/cDdHyd6CEL0BpAZiQwts7ugOn9oU6scpqVxIZtquc=
+
 patchedDependencies:
   bigint-buffer@1.1.5:
     hash: d21ed12880b57c8fa93a40aa82942c5dcbdefdccc81fe2cb5ac6dcfd90c72326
@@ -4073,6 +4075,7 @@ snapshots:
       bowser: 2.14.1
       buffer: 6.0.3
       cross-fetch: 4.1.0
+      debug: 4.4.3
       eciesjs: 0.4.17
       eventemitter3: 5.0.1
       pako: 2.2.0

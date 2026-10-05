@@ -55,6 +55,13 @@
       "uuid@<11.1.1": "11.1.1",
       "http-cache-semantics@<4.3.0": "4.3.0"
     },
+    "packageExtensions": {
+      "@metamask/connect-multichain@1.1.0": {
+        "dependencies": {
+          "debug": "4.4.3"
+        }
+      }
+    },
     "patchedDependencies": {
       "bigint-buffer@1.1.5": "patches/bigint-buffer@1.1.5.patch",
       "braces@3.0.3": "patches/braces@3.0.3.patch",
