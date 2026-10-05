@@ -134,15 +134,32 @@ async fn main() -> anyhow::Result<()> {
     let listener = tokio::net::TcpListener::bind(config.listen).await?;
     tracing::info!(address = %config.listen, chain_id = router::CHAIN_ID, "Aetheris daemon ready");
     axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown())
+        .with_graceful_shutdown(shutdown_signal()?)
         .await?;
     // Durable task records flag interrupted work for operator reconciliation on restart.
     Ok(())
 }
 
-async fn shutdown() {
-    let _ = tokio::signal::ctrl_c().await;
-    tracing::info!("Shutdown requested; new HTTP requests stopped");
+fn shutdown_signal() -> anyhow::Result<impl std::future::Future<Output = ()>> {
+    // Render and other Unix process managers send SIGTERM, not Ctrl+C.
+    // Register before serving so registration failures are startup errors.
+    #[cfg(unix)]
+    let mut terminate =
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .map_err(|_| anyhow::anyhow!("could not register the SIGTERM shutdown handler"))?;
+    Ok(async move {
+        #[cfg(unix)]
+        let termination = async {
+            terminate.recv().await;
+        };
+        #[cfg(not(unix))]
+        let termination = std::future::pending::<()>();
+        tokio::select! {
+            _ = tokio::signal::ctrl_c() => {},
+            _ = termination => {},
+        }
+        tracing::info!("Shutdown requested; HTTP listener draining active requests");
+    })
 }
 
 async fn health(State(state): State<AppState>) -> ApiResult {

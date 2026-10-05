@@ -8,6 +8,11 @@
                            "internalType":  "address"
                        },
                        {
+                           "name":  "validation",
+                           "type":  "address",
+                           "internalType":  "address"
+                       },
+                       {
                            "name":  "admin",
                            "type":  "address",
                            "internalType":  "address"
@@ -457,6 +462,21 @@
 
                     ],
         "stateMutability":  "nonpayable"
+    },
+    {
+        "type":  "function",
+        "name":  "validationRegistry",
+        "inputs":  [
+
+                   ],
+        "outputs":  [
+                        {
+                            "name":  "",
+                            "type":  "address",
+                            "internalType":  "contract ValidationRegistry"
+                        }
+                    ],
+        "stateMutability":  "view"
     },
     {
         "type":  "event",

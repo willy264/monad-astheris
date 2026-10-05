@@ -1,0 +1,119 @@
+name: Component verification
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    name: Contracts and shared ABIs
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.8.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Restore pinned Solidity dependencies
+        run: bash contracts/script/install-deps.sh
+      - name: Check Solidity formatting
+        working-directory: contracts
+        run: forge fmt --check
+      - name: Run contract and fuzz tests
+        working-directory: contracts
+        run: forge test
+      - name: Check consumer declarations against compiled ABIs
+        run: node scripts/check-interfaces.mjs
+
+  daemon:
+    name: Rust daemon
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: daemon
+    env:
+      CARGO_TERM_COLOR: always
+      CARGO_BUILD_JOBS: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.94.0
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: daemon
+      - name: Check Rust formatting
+        run: cargo fmt --all -- --check
+      - name: Check Rust compilation
+        run: cargo check --locked --all-targets
+      - name: Check Clippy warnings
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Run daemon tests
+        run: cargo test --locked
+
+  scripts:
+    name: Task and operation scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  frontend:
+    name: Frontend tests and production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    # Build without deployment credentials or paid-demo configuration.
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_ROUTER_ADDRESS: ''
+      NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS: ''
+      NEXT_PUBLIC_REPUTATION_REGISTRY_ADDRESS: ''
+      NEXT_PUBLIC_MERA_ENABLED: 'false'
+      ENVIO_GRAPHQL_URL: ''
+      DEMO_ENABLED: 'false'
+      DAEMON_URL: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build

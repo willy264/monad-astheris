@@ -24,7 +24,11 @@ On Linux/macOS use `bash script/install-deps.sh` to restore the same pinned depe
 
 Reputation and validation are fully initialized in their constructors; their standard `initialize` entry points reject a second initialization. Administrative changes use two-step ownership transfers.
 
+`ValidationRegistry` also exposes a Chainlink CRE receiver with an exact workflow allowlist, trusted forwarder, request/output binding, one-hour freshness limits, and replay protection. It starts disabled. See [CRE.md](CRE.md) for the ABI, configuration, provider prerequisites, and the distinction between local receiver tests and live CRE delivery. No Monad CRE forwarder or deployed workflow is assumed.
+
 ## Isolated execution
+
+The router constructor is `AetherisRouter(identityRegistry, validationRegistry, admin)`. Both registry addresses are immutable, and construction rejects a validation registry linked to a different identity registry. `validationRegistry()` exposes the binding. Task execution and batch commitments remain separate from explicit validation requests and responses.
 
 `createShard(agentId, taskId, sequenceNonce, executor, inputHash)` deploys `EphemeralShard` using:
 
@@ -63,6 +67,8 @@ forge script script/Deploy.s.sol:Deploy --rpc-url monad_testnet
 forge script script/Deploy.s.sol:Deploy --rpc-url monad_testnet --broadcast
 ```
 
-The script writes `deployments/<chainId>.json`. Copy addresses into the daemon, indexer and frontend environment settings, and set the indexer start block to the deployment block. If `ADMIN_ADDRESS` differs from the signer, that administrator must call `acceptOwnership()` on the router, reputation registry and validation registry. A distinct `COMMITTER_ADDRESS` receives batch permissions and the deployer's batch permission is revoked. No deployment or attestor trust is configured automatically by tests.
+The script writes `deployments/<chainId>.candidate.json` during both simulation and broadcast. A candidate contains predicted addresses and expected compiler settings; it is **not proof of deployment**. The [deployment finalizer](../scripts/finalize-deployment.ts) checks actual broadcast receipts, deployed bytecode, constructor inputs, registry linkages and compiler artifacts before writing the verified deployment manifest. Run it from the repository root with `pnpm --dir scripts finalize-deployment`; the root deployment helper invokes it after a successful broadcast.
+
+Use only finalized addresses in daemon, indexer and frontend settings, and set the indexer start block to the deployment block. If `ADMIN_ADDRESS` differs from the signer, that administrator must call `acceptOwnership()` on the router, reputation registry and validation registry. A distinct `COMMITTER_ADDRESS` receives batch permissions and the deployer's batch permission is revoked. No deployment, attestor trust, or CRE forwarder is configured automatically by tests.
 
 This code has executable authorization, isolation and replay tests; it has not received an independent security audit.

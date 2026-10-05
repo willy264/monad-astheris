@@ -1,0 +1,11 @@
+diff --git a/filters/FilterBase.js b/filters/FilterBase.js
+--- a/filters/FilterBase.js
++++ b/filters/FilterBase.js
+@@ -55,6 +55,7 @@
+   }
+ 
+   _check(chunk, _, callback) {
++    if (this._stack.length > 256) return callback(new RangeError('JSON filter nesting exceeds the safe depth limit.'));
+     // update the last stack key
+     switch (chunk.name) {
+       case 'startObject':

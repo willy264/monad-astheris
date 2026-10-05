@@ -14,5 +14,19 @@
   },
   "dependencies": { "envio": "3.12.1", "viem": "2.47.6" },
   "devDependencies": { "@types/node": "22.19.15", "typescript": "5.9.3", "tsx": "4.21.0" },
-  "pnpm": { "onlyBuiltDependencies": ["envio", "esbuild", "@envio-dev/hypersync-client"] }
+  "pnpm": {
+    "onlyBuiltDependencies": ["envio", "esbuild", "@envio-dev/hypersync-client"],
+    "overrides": {
+      "express@<4.22.1": "4.22.1",
+      "body-parser@<1.20.6": "1.20.6",
+      "qs@<6.16.0": "6.16.0",
+      "ws@>=8.0.0 <8.21.0": "8.21.0",
+      "path-to-regexp@<0.1.13": "0.1.13",
+      "cookie@<0.7.2": "0.7.2",
+      "send@<0.19.2": "0.19.2",
+      "serve-static@<1.16.2": "1.16.2",
+      "esbuild@<0.28.1": "0.28.1",
+      "react-dom": "19.2.5"
+    }
+  }
 }

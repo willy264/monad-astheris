@@ -1,120 +1,119 @@
+<img src="frontend/public/brand/aetheris-icon-512.png" width="88" height="88" alt="Aetheris logo">
+
 # Aetheris
 
-An ERC-8004 agent registry, isolated task-result storage, and asynchronous settlement engine for Monad Testnet (chain **10143**).
+**Express checkout lanes for AI-agent tasks on Monad.**
 
-Aetheris gives an AI agent a discoverable on-chain identity, gives each task its own result-storage contract, and records task outcomes that other applications can inspect. A Rust service routes signed, paid requests to those contracts. An indexer reconstructs the event history, while a developer dashboard shows agents, recent tasks, and observed network activity.
+## 1. Executive summary & the problem — a 30-second read
 
-The problem it addresses is shared mutable state: if every agent updates the same result storage, otherwise independent tasks can contend for the same state. Aetheris uses deterministic CREATE2 deployments to give each task its own storage address. The implemented guarantee is storage isolation for task completion; the project does not establish a network-wide guarantee of collision-free or single-pass execution.
+AI agents need to identify themselves, pay for services and leave a record of their work. When many tasks update the same blockchain records, they can compete for shared state: a **blockchain traffic jam**.
 
-The supplied project brief targets **Monad Metropolis, Track 04: Trust, Identity & AI Infrastructure**. This is the intended submission context; organizer requirements and deadlines have not been supplied or verified.
+Aetheris gives every task its own **Express Checkout Lane**: a separate contract that stores that task's result. Agent identities make the work discoverable, signed requests control who can act, and compact receipts make recorded results easy to inspect.
 
-## Documentation
+The goal is to support many agents working concurrently on Monad. Today, tests demonstrate isolated task storage; they do not establish thousands of simultaneous agents or zero speed bottlenecks. Shared accounts, deployment and payment infrastructure still matter.
 
-| Read this | For |
-| --- | --- |
-| This README | Project purpose, implemented features, current status, and where to start. |
-| [Live verification and remaining work](SUBMISSION_PROOF.md) | Actual testnet contracts, registered agent, MCP checks, and the remaining submission gaps. |
-| [Agent registration](scripts/README.md) | Prepare an Agent Card, verify its MCP service, pin it to IPFS, and register its identity. |
-| [Contracts](contracts/README.md) / [Daemon](daemon/README.md) | On-chain components, deployment, task authorization, payment, and service configuration. |
-| [Frontend](frontend/README.md) / [Indexer](indexer/README.md) | Dashboard startup, wallet configuration, indexing, and component checks. |
-| [MCP observer](frontend/docs/mcp-agent.md) | The deployed read-only Monad block tool, its input/output, and verification commands. |
+**Live status, October 4, 2026:** all four core contracts are deployed and receipt-verified on Monad Testnet. **Aetheris Monad Observer, agent #1**, has a registered IPFS profile and a working public MCP service. Paid task execution, settlement and hosted indexing still need their own live evidence. See the [deployment manifest](contracts/deployments/10143.json), [agent registration](contracts/deployments/10143.agent.json), [verification record](VERIFICATION.md) and [submission evidence](SUBMISSION_PROOF.md). Intended track: Monad Metropolis Track 04, Trust, Identity & AI Infrastructure.
 
-## What is implemented
+## 2. Plain-English glossary
 
-| Capability | Implementation |
-| --- | --- |
-| Agent identity and discovery | ERC-721 agent IDs linked to IPFS Agent Cards with capabilities and MCP service endpoints. |
-| Task authorization | Agent ownership and expiring router delegation, plus signed daemon requests bound to the chain, router, task, inputs, and outputs. |
-| Isolated task results | A CREATE2 shard per task attempt, immutable inputs, and a write-once output/proof commitment. |
-| Payment handling | HTTP 402 challenges, x402 facilitator integration, and Graph Tally receipt verification with an external settlement adapter. |
-| Durable routing | Concurrent relayers, per-signer nonce coordination, persistent replay protection, and conservative handling of ambiguous broadcasts. |
-| Batch commitments | Canonically ordered task logs combined into Merkle roots and committed to the router by an authorized publisher. |
-| Reputation and validation | Feedback, completion records, output-hash checks, and signed statements from explicitly trusted attestation verifiers. These are separate workflows. |
-| Indexing | Envio entities for identities, shards, executions, and batches, with independently calculated roots and commitment comparisons. |
-| Dashboard | Overview, agent directory, execution visualizer, Dynamic authentication, and delegation/revocation controls. |
+| Technical term | Judge-friendly shorthand | What it means in Aetheris |
+| --- | --- | --- |
+| ERC-8004 | **“Verified AI Passport”** | A registered identity linking an owner and an agent profile. Ownership is checkable; registration alone does not verify the agent's résumé or output quality. |
+| Ephemeral Shard | **“Private Express Checkout Lane”** | A separate result-storage contract for one task. “Private” means dedicated to that task; its blockchain data remains public. The record persists after completion. |
+| State Contention | **“Blockchain Traffic Jam”** | Transactions depend on shared changing state, so some work must wait or be repeated. |
+| Merkle Batch | **“Compressed Digital Receipt”** | A root hash representing a group of task records. Batch size varies; matching the receipt establishes data consistency, not whether the research is correct. |
+| Passkey Delegation | **“1-Tap Face ID Sign-In”** | A supported device passkey opens wallet access. Granting an executor permission is a separate, expiring on-chain action; signing and gas requirements still apply. |
 
-The daemon accepts authorized output hashes; it does not run an AI model or invoke MCP tools to produce those outputs. A real agent/client must supply that computation. The frontend currently reads contracts and logs through its own Next.js API and Monad RPC. It does not yet use Envio GraphQL or provide a signed, paid task-submission interface.
+[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) is a draft standard for identity, reputation and validation. Aetheris adds task isolation and paid routing around those registries.
 
-The deployed [Monad Observer MCP service](frontend/docs/mcp-agent.md) supplies real block metadata to agent workflows. Its `get_monad_block` tool is read-only; it performs no AI inference or paid settlement.
+## 3. How it works — a three-step story
 
-## Example lifecycle
+Imagine a research agent checking **ten documents** for a client. Ten is an example workload, not a recorded performance result.
 
-1. An owner publishes an Agent Card to IPFS, registers an identity, and delegates routing access to a funded executor.
-2. An agent or client performs work off chain and signs the task request, including input, output, and proof commitments.
-3. The daemon verifies authorization and payment credentials, reserves the request in its journal, creates a shard, and records the result on chain.
-4. The daemon waits for receipts and settles the payment through the configured provider. Its optional batch worker later commits a root for finalized task logs.
-5. Envio independently indexes the events and checks batch commitments. The dashboard displays recent on-chain activity through RPC.
-6. Clients and validators can separately submit reputation feedback or validate an output. Task completion alone does not automatically invoke those registries.
+1. **Sign in and choose the spend.** The owner accesses a supported wallet with Face ID or Touch ID and grants an executor time-limited permission. The client checks a per-task price ceiling and approves each payment. Login, delegation and payment approval are separate actions; an autonomous cumulative micro-budget is a future product feature.
+2. **Give each task its own lane.** The agent computes its answers off chain. The client submits signed requests, and the daemon creates separate storage contracts for their input/output fingerprints. Requests can arrive concurrently; completing one task does not write another task's result storage. This removes that shared-result dependency while preserving the network's transaction ordering.
+3. **Collect receipts and review the work.** The background worker groups completed task logs into Merkle receipts, one per nonempty finalized block. Payments settle through the configured provider. The MCP client then records completion and can publish an independent client's explicit assessment; it never turns execution success into an automatic positive review. A single daily update is not the current batching schedule.
 
-## Current status
+**Try the story:** the [dashboard guide](frontend/docs/README.md) explains the labeled visual preview. Its configured live mode submits **five browser checksum tasks**. For real research or other agent work, the [MCP client](scripts/README.md) calls an actual service before signing a task. The daemon records authorized commitments; it does not run the AI model.
 
-As recorded on **2026-10-02**, the project has implemented components and passing local checks: **22 Solidity tests, 13 Rust tests, 2 indexer Merkle tests, 27 matching interface declarations, and a passing frontend typecheck, production build, and desktop/mobile browser smoke check**.
+The deployed [Monad Observer MCP service](frontend/docs/mcp-agent.md) exposes `get_monad_block` at `https://monad-astheris.vercel.app/api/mcp`. It returns actual Monad Testnet block metadata. This read-only service performs no AI inference or paid settlement; its registration and MCP verification are recorded in [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md).
 
-On **2026-10-04**, all four contracts have receipt-verified Monad Testnet deployments in the [live manifest](contracts/deployments/10143.json). **Aetheris Monad Observer, agent #1**, is registered with an IPFS card and a working public MCP service. The [registration evidence](contracts/deployments/10143.agent.json) records its owner, URI, confirmed transaction and block; [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the public evidence.
+## 4. Market impact & why Monad?
 
-The full paid-task demonstration remains outstanding: working delegation, an EIP-712 signed paid request, a confirmed shard result, payment settlement, and matching indexed batch evidence. Hosted Envio output and trusted TEE/CRE verification have not been demonstrated. Dynamic passkeys are enabled, but an actual device authentication and wallet-signed delegation still require verification. See the remaining work in [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md).
+Monad's developer documentation describes an EVM-compatible network with parallel execution. Its execution engine checks dependencies and re-executes transactions when earlier writes invalidate their inputs. Applications can make better use of that design by keeping independent work independent. [Monad overview](https://docs.monad.xyz/introduction/monad-for-developers), [parallel execution](https://docs.monad.xyz/monad-arch/execution/parallel-execution).
 
-## Repository layout
+Aetheris applies that idea to task-result storage while keeping Solidity, Ethereum wallets and familiar transaction tools. That architecture motivates this design; it is not an Aetheris benchmark or a guaranteed task completion time.
 
+| Intended market | Example job | What Aetheris contributes |
+| --- | --- | --- |
+| Multi-agent micropayments | One agent buys a small service from another. | Signed work requests, payment-provider integration and checkable execution receipts. |
+| Autonomous data collection | Agents collect and summarize permitted public data. | Discoverable service identities and separate records for each task's result. |
+| Automated financial research | Agents compare documents, prices or reports for a human reviewer. | Traceable input/output commitments and a separate feedback/validation trail. |
+
+These are target use cases. Customer adoption, market size and commercial performance have not been measured in this repository. The immediate milestone is a reproducible paid testnet workflow with matching on-chain, indexer and dashboard evidence.
+
+## 5. Technical installation & testnet explorer links
+
+### Start the dashboard
+
+Use **Node 24+** and **pnpm 10.32.1**. Each component has its own package/configuration; there is no root pnpm workspace installation.
+
+```sh
+# From the repository root
+cd frontend
+pnpm install --frozen-lockfile
+pnpm dev
 ```
-contracts/   Solidity 0.8.24, OpenZeppelin, Foundry tests and deployment
-daemon/      Rust / Tokio / Axum, signed task routing, HTTP 402, batch commits
-indexer/     Envio HyperIndex, GraphQL entities, per-block Merkle commitments
-frontend/    Next.js 14, Dynamic wallet authentication, agent directory and visualizer
-scripts/     Agent registration, live MCP verification, ABI checks and verification helpers
-```
 
-## Local verification
+Open `http://localhost:3000`. The guided preview requires no wallet. Read-only network data uses the configured RPC; sample metric cards and simulated lanes are explicitly labeled. Copy `frontend/.env.example` to `.env.local` and follow the [frontend setup guide](frontend/README.md) to enable actual contract reads, Envio and paid tasks.
 
-Prerequisites: Foundry, Rust 1.94 or newer, Node.js 22 or newer, pnpm 10. Envio 3.12.1 requires Linux/macOS (use WSL2 on Windows); its local database stack also requires Docker. On this Windows workspace a checksum-verified Foundry installation is available in `.tools/foundry/`.
+### Run local checks
 
-```powershell
-# From aetheris/; omit this line if forge is already on PATH.
-$env:Path = "$PWD\.tools\foundry;$env:Path"
+Install Foundry and a Rust toolchain; Rust 1.94 was used for the recorded checks. On a fresh checkout, first restore pinned Solidity dependencies from `contracts` with `bash script/install-deps.sh` on Linux/macOS or `./script/install-deps.ps1` in PowerShell.
+
+```sh
+# From the repository root
 cd contracts
 forge test
 cd ../daemon
-cargo check
-cargo test
+cargo check --locked
+cargo test --locked
 cd ../frontend
 pnpm install --frozen-lockfile
 pnpm typecheck
+pnpm test
 pnpm build
 ```
 
-In Linux, macOS, or a Node-enabled WSL2 shell, run the indexer checks with `cd indexer && pnpm install --frozen-lockfile && pnpm codegen && pnpm typecheck && pnpm test`. The complete Linux/macOS verification sequence is in `scripts/verify.sh`.
+Historical feature checks include **38 Solidity tests**, **17 Rust tests**, **17 scripts tests**, **18 frontend feature tests**, and **61 ABI declarations**. Linux Envio generation/typechecking and **2 Merkle tests** passed. The subsequent live-service changes added **15 MCP tests**, **6 RPC pagination tests** and **10 IPFS card tests**. These belong to the dated revisions in [VERIFICATION.md](VERIFICATION.md); they are not a claim that all checks have already passed together on the final integration commit. Browser and deployment evidence is recorded separately from tests.
 
-JavaScript and Rust dependencies have lockfiles; Solidity dependencies are pinned to commits by the installation scripts. Each component has an environment template and README with its commands and API details. Secrets belong in ignored `.env` files, never frontend `NEXT_PUBLIC_*` variables.
+### Deployment manifest and explorer
 
-## Run the system
+Target network: **Monad Testnet — chain ID `10143`**. [Network information](https://docs.monad.xyz/developer-essentials/testnet) · [Monadscan testnet explorer](https://testnet.monadscan.com).
 
-1. Use the existing Monad Testnet addresses and earliest block in [contracts/deployments/10143.json](contracts/deployments/10143.json). For a separate deployment, follow the contracts README and retain its receipts. Private keys are never committed.
-2. Agent #1 already identifies the live observer service. For another identity, follow the [registration commands](scripts/README.md): prepare its truthful IPFS Agent Card, verify the MCP endpoint, pin the card, and call `register(string)` with its URI.
-3. Authorize each daemon relayer for that agent with `AetherisRouter.setDelegate(agentId, relayer, expiresAt)`. The dashboard provides this action. Grant the batch sender the router's committer role if batch submission is enabled.
-4. Configure and start the daemon. It checks RPC chain identity and deployed router bytecode at startup. Task callers sign the domain-separated task authorization described in `daemon/README.md` and supply payment credentials for the configured payment mode.
-5. Set the same addresses and deployment block in the indexer, then run `pnpm codegen` and `pnpm dev`, or connect the project to Envio Cloud. Its local GraphQL service uses port 8081, leaving 8080 for the daemon.
-6. Configure the frontend's contract addresses and Dynamic environment ID, enable passkeys in the Dynamic project, and run `pnpm dev`. The dashboard reports unavailable data until the corresponding service/deployment is configured.
+**Four contracts are deployed and receipt-verified.** The [live manifest](contracts/deployments/10143.json) was verified on October 4, 2026 and records earliest deployment block **67,972,561**. The links below identify the actual contracts and their deployment transactions. Agent #1 is registered; a paid task is still outstanding.
 
-## Guarantees and trust boundaries
+| Contract | What a reviewer will inspect | Live address / explorer receipt |
+| --- | --- | --- |
+| [AgentRegistry](contracts/src/AgentRegistry.sol) | Agent ownership and the IPFS profile URI. | [0x754d7f2fd55a9841dbff248f9cb91d497116f231](https://testnet.monadscan.com/address/0x754d7f2fd55a9841dbff248f9cb91d497116f231) · [deployment](https://testnet.monadscan.com/tx/0x9a30b9b3d8ce9efc2854c6015faf322adcbfb6befdb3a40a9633248c20c55924) |
+| [ReputationRegistry](contracts/src/ReputationRegistry.sol) | Completion records and client feedback. | [0x8f1fe9beef6df891189355129bf48f073d9ab322](https://testnet.monadscan.com/address/0x8f1fe9beef6df891189355129bf48f073d9ab322) · [deployment](https://testnet.monadscan.com/tx/0xd33a1d00bbcff1a71520478a03843aa718e80f90fccf9855527e5ed4441992d3) |
+| [ValidationRegistry](contracts/src/ValidationRegistry.sol) | Explicit validation requests and authenticated responses. | [0xcd0cf354acd2c79145caeac7d4f0639f8957308d](https://testnet.monadscan.com/address/0xcd0cf354acd2c79145caeac7d4f0639f8957308d) · [deployment](https://testnet.monadscan.com/tx/0x4e57487e9c8e249f83dc9ea294fa29c4d13de0b98177654d125900706c8b02d0) |
+| [AetherisRouter](contracts/src/AetherisRouter.sol) | Registry links, permissions, CREATE2 shards and batch commitments. | [0xac4a33521b32122c9f014eac8800144dd9aa5ebe](https://testnet.monadscan.com/address/0xac4a33521b32122c9f014eac8800144dd9aa5ebe) · [deployment](https://testnet.monadscan.com/tx/0xabc10b999bf0114783274620a1f3bdb03cdc8d828d56c078ac9403780863a69a) |
 
-Each task gets a deterministic CREATE2 contract containing immutable inputs and a write-once result. Executing a task modifies its shard, without updating shared router counters. Tests demonstrate distinct task addresses, non-overlapping storage writes, rejection of repeated execution, and authorization rules. They do **not** measure Monad's scheduler or prove zero transaction re-executions. Factory deployment, signer nonces, and other shared account accesses can still contend.
+The [deployment finalizer](scripts/finalize-deployment.ts) checked successful canonical receipts, deployed code, constructor inputs, registry/router links and configured roles before writing the live manifest. It contains addresses, deployment transactions, earliest block and compiler settings. These checks are distinct from explorer source-code verification. Preserve the existing deployment and its receipts; do not redeploy to resume setup. The [live workflow](docs/live-submission.md) explains how to reuse this deployment and the registered observer for paid-task and indexing verification. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) preserves the actual registration transaction, IPFS card and live MCP output alongside the remaining gaps.
 
-"Ephemeral" describes the task's active lifetime. Shards remain available as an audit trail; no SELFDESTRUCT-based cleanup is claimed. `TaskExecuted` records an authorized output commitment, not evidence that arbitrary agent computation was correct. Validation is a separate registry workflow.
+Agent #1 uses `ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea`; its [registration transaction](https://testnet.monadscan.com/tx/0xc9bbd6e8a390f4fb1788f3d305f241293ec919b49d35238c7aeda5c829f3a716) is confirmed at block **68105690**. Reuse that identity for its advertised observer capability. Register another identity only when you intend to create a distinct agent. The [scripts guide](scripts/README.md) covers registration, MCP verification and paid task submission.
 
-TEE verification authenticates signed statements from explicitly trusted attestation verifiers and approved measurements. Vendor-specific Intel/AMD/Nitro quote and certificate-chain validation belongs to those verifiers. Merkle committers attest that a root represents canonical logs; the indexer independently recomputes and compares it. A committed root is not a consensus-verified execution proof.
+The Rust task route is **`POST /v1/tasks`**; the singular `/v1/task` is not implemented. See the [protocol and API reference](docs/protocol.md) for JSON examples, field descriptions, signatures, payment headers and recovery behavior.
 
-Dynamic provides wallet/passkey authentication through project configuration. Router delegation is a separate, expiring on-chain permission; it does not export the user's passkey or delegate ERC-721 transfers. Category Labs threshold encryption and a Privy fallback are not integrated: the supplied specification provides no encryption gateway/key protocol, and the primary requested authentication stack is Dynamic. No fabricated encryption or fallback endpoint is shipped.
+| Next document | Reader's question |
+| --- | --- |
+| [Architecture](docs/architecture.md) | Which component does what, and where does trust enter? |
+| [Protocol & daemon API](docs/protocol.md) | What exactly must a client sign and send? |
+| [Frontend guide](frontend/docs/README.md) | What should a judge click, and which numbers are real? |
+| [Vercel deployment](frontend/docs/vercel-deployment.md) | Which build settings and environment variables does the hosted dashboard need? |
+| [Logo and brand assets](frontend/docs/brand.md) | Where can I download the logo PNG, editable SVG and icons? |
+| [Operator runbook](docs/runbook.md) | How do I configure and run every component? |
+| [Submission checklist](docs/submission-readiness.md) | What remains before the project is ready to submit? |
 
-Payment, persistence, retry, and reorganization behavior are documented in the daemon README. These components require configured providers and security review before handling real funds. Build success is not a security audit or a live-network performance result.
-
-## Protocol sources
-
-- [ERC-8004 registry specification](https://eips.ethereum.org/EIPS/eip-8004)
-- [Monad Testnet network information](https://docs.monad.xyz/developer-essentials/testnet)
-- [Envio event handlers](https://docs.envio.dev/docs/HyperIndex/event-handlers)
-- [Dynamic documentation](https://www.dynamic.xyz/docs)
-- [x402 specification](https://github.com/coinbase/x402)
-
-See the [daemon README](daemon/README.md) for task authorization and shared byte encoding.
-
-See [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) for live evidence and the limits of verification.
+The integration combines the feature stack with the deployed observer and production reliability fixes. Point reviewers at the exact reviewed commit and its verification record. The next live milestone is an authorized paid MCP task, confirmed shard and token-payment receipts, a matching indexed Merkle batch, and dashboard evidence. Actual device authentication, wallet-signed delegation and any advertised CRE/TEE result need their own checks. Confirm the organizer's deadline, access and submission requirements before publishing the final package.

@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {AgentRegistry} from "./AgentRegistry.sol";
+import {ValidationRegistry} from "./ValidationRegistry.sol";
 import {EphemeralShard} from "./EphemeralShard.sol";
 
 /// @notice Isolates task result writes. Deployment, gas-payer nonces and shared reads can still contend.
@@ -21,6 +22,7 @@ contract AetherisRouter is Ownable2Step {
         uint256 toBlock;
     }
     AgentRegistry public immutable identityRegistry;
+    ValidationRegistry public immutable validationRegistry;
     mapping(uint256 => mapping(address => Delegation)) public delegates;
     mapping(bytes32 => address) public shardsBySalt;
     mapping(address => bool) public isShard;
@@ -53,9 +55,11 @@ contract AetherisRouter is Ownable2Step {
         bytes32 indexed batchId, bytes32 root, uint256 leafCount, uint256 fromBlock, uint256 toBlock
     );
 
-    constructor(address registry, address admin) Ownable(admin) {
-        if (registry.code.length == 0) revert InvalidArgument();
+    constructor(address registry, address validation, address admin) Ownable(admin) {
+        if (registry.code.length == 0 || validation.code.length == 0) revert InvalidArgument();
+        if (ValidationRegistry(validation).getIdentityRegistry() != registry) revert InvalidArgument();
         identityRegistry = AgentRegistry(registry);
+        validationRegistry = ValidationRegistry(validation);
         committers[admin] = true;
         emit CommitterSet(admin, true);
     }

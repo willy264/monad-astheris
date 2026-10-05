@@ -40,10 +40,15 @@ function checkDeclaration(declaration, source) {
   checked++;
 }
 
-const frontend = "frontend/lib/contracts.ts";
-for (const match of read(frontend).matchAll(/['"]((?:function|event)\s+[^'"\r\n]+)['"]/g)) checkDeclaration(match[1], frontend);
+const typedDeclarations = [
+  "frontend/lib/contracts.ts", "scripts/lib/abi.ts", "scripts/agent-card.ts",
+  "scripts/finalize-deployment.ts", "scripts/submission-proof.ts",
+];
+for (const source of typedDeclarations) {
+  for (const match of read(source).matchAll(/['"]((?:function|event)\s+[^'"\r\n]+)['"]/g)) checkDeclaration(match[1], source);
+}
 const daemon = "daemon/src/router.rs";
 for (const match of read(daemon).matchAll(/\b((?:function|event)\s+\w+\s*\([^;]*?);/g)) checkDeclaration(match[1], daemon);
 const indexer = "indexer/config.yaml";
 for (const match of read(indexer).matchAll(/event:\s*"([^"]+)"/g)) checkDeclaration(`event ${match[1]}`, indexer);
-console.log(`Verified ${checked} frontend, Rust and indexer ABI declarations against compiled Solidity artifacts.`);
+console.log(`Verified ${checked} frontend, Rust, indexer and operation-script ABI declarations against compiled Solidity artifacts.`);

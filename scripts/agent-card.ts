@@ -59,7 +59,7 @@ main(async () => {
         save(pinPath, { uri: `ipfs://${cid}`, cid, contentHash, pinnedAt: new Date().toISOString(), gatewayVerified: false });
       }
       const pin = json(pinPath);
-      const gateway = safeUrl(process.env.IPFS_GATEWAY || 'https://ipfs.io/ipfs/', 'IPFS gateway');
+      const gateway = safeUrl(process.env.IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/', 'IPFS gateway');
       const response = await fetch(new URL(pin.cid, gateway.href.endsWith('/') ? gateway : `${gateway.href}/`), { redirect: 'error', signal: AbortSignal.timeout(30_000) });
       const retrieved = await boundedResponse(response, 256 * 1024);
       if (keccak256(Buffer.from(retrieved)) !== contentHash) throw new Error('Retrieved IPFS bytes do not match the pinned card');
