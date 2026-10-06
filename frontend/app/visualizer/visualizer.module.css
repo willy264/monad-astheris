@@ -1,9 +1,10 @@
-.liveHeading { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0 25px; }
-.liveHeading h2 { font-family: var(--font-display), sans-serif; font-size: clamp(26px, 2.5vw, 34px); font-weight: 700; letter-spacing: -.035em; line-height: 1.25; margin-top: 12px; color: #fff; }
+.liveHeading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; min-width: 0; padding: 24px; margin: 16px 0 12px; border: 1px solid #ffffff0c; border-radius: 26px; background: #11131f; }
+.liveHeading > div { min-width: 0; flex: 1 1 340px; }
+.liveHeading h2 { font-family: var(--font-display), sans-serif; font-size: clamp(26px, 2.5vw, 34px); font-weight: 700; letter-spacing: -.035em; line-height: 1.25; margin-top: 12px; color: #fff; overflow-wrap: anywhere; }
 .liveHeading p { font-size: 14px; line-height: 1.8; margin-top: 10px; color: #a1a1b3; }
 
 @media (max-width: 720px) {
-  .liveHeading { align-items: flex-start; flex-direction: column; gap: 16px; padding-top: 12px; }
+  .liveHeading { align-items: flex-start; gap: 16px; padding: 22px 18px; }
   .liveHeading h2 { font-size: 26px; }
   .liveHeading p { font-size: 14px; }
 }

@@ -10,7 +10,7 @@ The dashboard explains this idea and shows available blockchain evidence. It doe
 2. **Agent Directory (`/agents`):** inspect the featured Aetheris Monad Observer, token #1, its IPFS card, published MCP endpoint, reputation and recent task history. **Delegate task authority** opens wallet access. **Trigger paid x402 task** becomes available when the real payment service is configured.
 3. **Shard Visualizer (`/visualizer`):** switch between the red shared-storage example and five green isolated lanes. Below the illustration, the actual topology and ledger show recorded task events. Select a real shard to inspect its commitments.
 
-The global header provides **Connect / Sign in with Passkey** on all three pages. One Dynamic wallet session is shared across navigation and both paid workflows. The connected-wallet button opens the access dialog for passkey registration and expiring delegation. Its Monad Testnet badge reports the latest RPC reading's status, not network finality.
+The global sidebar provides **Passkey sign-in** on all three pages. One Dynamic wallet session is shared across navigation and both paid workflows. The connected-wallet button opens the access dialog for passkey registration and expiring delegation. Its Monad Testnet badge reports the latest RPC reading's status, not network finality.
 
 The comparison supports keyboard controls and a pause button. Explanations open by hover, keyboard focus or touch; Escape closes them. Animations respect reduced-motion preferences, and layouts work on mobile.
 
@@ -25,7 +25,7 @@ The comparison supports keyboard controls and a pause button. Explanations open 
 | **Live data** | A reading from the configured source within the displayed observation window. Zero is a valid live reading. |
 | **Last observed** | Previously fetched data retained after a refresh failed. It is not a newly confirmed reading. |
 | **This browser session** on micropayments | Payments verified in the homepage's five-task demo, rather than a network-wide total. The preview and directory task do not increment this card. |
-| **RPC Active** in the header | A recent overview sample reports Monad Testnet chain `10143` and a nonzero block. Failed or stale readings change the status; this is not a `300ms` finality measurement. |
+| **RPC Active** in the sidebar | A recent overview sample reports Monad Testnet chain `10143` and a nonzero block. Failed or stale readings change the status; this is not a `300ms` finality measurement. |
 | **RPC fallback** | Direct contract/event reads are being used because Envio is not configured. |
 | **Root matched** | The indexed task-log batch agrees with its indexed on-chain commitment. This checks recorded hashes, not whether an AI answer is correct. |
 | A green **Verified on Monad** demo lane | Matching task and payment receipts were checked on-chain with two confirmations. The link opens the real execution transaction. |

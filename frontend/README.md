@@ -69,7 +69,7 @@ Start with **Guided preview** on the homepage, then switch execution modes on `/
 | `app/page.tsx`, `app/agents/page.tsx`, `app/visualizer/page.tsx` | Overview, directory and execution view. |
 | `components/ExecutionComparison.tsx`, `InteractiveDemo.tsx` | Illustrated comparison and guided/live demonstration. |
 | `components/Tooltip.tsx`, `AnimatedCounter.tsx` | Accessible explanations and counters. |
-| `components/Header.tsx`, `WalletSession.tsx`, `PasskeyAuth.tsx` | Global navigation, one shared Dynamic session, live RPC status and passkey/access controls. |
+| `components/Sidebar.tsx`, `WalletSession.tsx`, `PasskeyAuth.tsx` | Global navigation, one shared Dynamic session, live RPC status and passkey/access controls. |
 | `components/WalletAccess.tsx`, `MeraAccess.tsx` | Wallet access and expiring executor delegation; Mera is an optional separate flow. |
 | `components/FeaturedAgent.tsx`, `AgentTaskAction.tsx`, `AgentTaskWallet.tsx` | Agent #1's public identity and a signed single-task MCP observation, gated by the existing paid-service configuration. |
 | `lib/server.ts`, `lib/indexer.ts`, `lib/indexer-protocol.ts` | Bounded RPC/GraphQL reads and validation. |

@@ -69,7 +69,7 @@ Without `ENVIO_GRAPHQL_URL`, the API explicitly uses **RPC fallback**. A configu
 | **Quality score** | Uncurated mean of `quality`-tagged feedback from `getClients` and `getSummary(agentId, clients, 'quality', '')`. It is not a percentage, a Sybil-resistant score or guaranteed trustworthiness. |
 | **Merkle batches** | Up to 12 recent indexed batches, with separate indexed commitments checked for the expected canonical batch ID, root, leaf count and block range. |
 | **Verified batch roots** | Count of returned indexed batches whose roots match their separate on-chain commitments. Unavailable in RPC fallback; it is not a lifetime batch count. |
-| **RPC Active** in the global header | The latest overview sample identifies chain `10143`, a nonzero block, and a recent sample time. A failed refresh or a sample older than one minute changes the status. This badge does not measure finality or assert that every optional data source is available. |
+| **RPC Active** in the global sidebar | The latest overview sample identifies chain `10143`, a nonzero block, and a recent sample time. A failed refresh or a sample older than one minute changes the status. This badge does not measure finality or assert that every optional data source is available. |
 
 In Envio mode, the activity window ends at the indexed block; in RPC fallback, it ends at the observed network head. Both honor the configured deployment start. Indexed registration totals are not limited to the task-activity window. Shard and execution counts can differ because a shard may be created in one window and executed in another.
 

@@ -30,7 +30,7 @@ When the frontend is running, the separate PNG is available at **`/brand/aetheri
 
 Keep the square proportions and the separation between all three shapes. The SVG includes built-in clear space; do not crop tightly around the strokes or close the gaps. The transparent mark is intended primarily for dark backgrounds. Use the dark tile when the surrounding surface is unknown, including browser tabs. Do not add a glow or shadow to the small favicon frames.
 
-The word **AETHERIS** remains real interface text next to the mark. The image is decorative within the navigation link, whose accessible name remains **Aetheris home**. [Header.tsx](../components/Header.tsx) loads the shared SVG through Next.js Image, and [Header.module.css](../components/Header.module.css) controls its desktop and mobile sizes. [Shell.tsx](../components/Shell.tsx) includes this global navigation on every page.
+The word **AETHERIS** appears next to the mark in the expanded sidebar. Compact and mobile rails retain the mark and accessible home-link name. The image is decorative within the navigation link, whose accessible name remains **Aetheris home**. [Sidebar.tsx](../components/Sidebar.tsx) loads the shared SVG through Next.js Image, and [Sidebar.module.css](../components/Sidebar.module.css) controls its desktop and mobile sizes. [Shell.tsx](../components/Shell.tsx) includes this global navigation on every page.
 
 ## Favicon integration and verification
 
