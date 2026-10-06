@@ -1,6 +1,6 @@
 # Connect a wallet and enable passkeys
 
-Aetheris uses one Dynamic session across the overview, agent directory and visualizer. The global header's **Connect / Sign in with Passkey** button opens sign-in on every page. The connected wallet signs Monad Testnet transactions; signing in does not register an AI agent or grant an executor permission automatically.
+Aetheris uses one Dynamic session across the overview, agent directory and visualizer. The global sidebar's **Passkey sign-in** button opens sign-in on every page. The connected wallet signs Monad Testnet transactions; signing in does not register an AI agent or grant an executor permission automatically.
 
 ## Public environment configuration
 
@@ -17,7 +17,7 @@ The default lives in `lib/dynamic-config.ts`. To use a different Dynamic project
 1. Select the same sandbox environment in Dynamic.
 2. Under **Log in & User Profile**, enable **Passkey** authentication. Keep an initial sign-in method such as email enabled so new users can create an account before registering a passkey.
 3. Under **Security**, allow the origin `https://monad-astheris.vercel.app`. For local development, allow `http://localhost:3000` separately. Origins do not include a path. Allow preview origins only if you intend to test authentication there.
-4. Open the deployed dashboard and select **Connect / Sign in with Passkey** in the header. First-time users sign in through the enabled onboarding method and connect an EVM wallet.
+4. Open the deployed dashboard and select **Passkey sign-in** in the header. First-time users sign in through the enabled onboarding method and connect an EVM wallet.
 5. Select the connected-wallet button, **Try passkey delegation** on the homepage, or **Delegate task authority** in the directory. In **Passkeys & task authority**, choose **Register a passkey** and complete your device's prompt on that domain. Later, use **Sign in with passkey** on the same site.
 
 The app reads Dynamic's public project settings and disables passkey sign-in while that provider is disabled. Wallet passkey security and passkey login are separate settings. SDK network configuration selects Monad Testnet, chain **10143**. A completed device authentication and a wallet-signed delegation transaction still require the user's participation; loading the modal does not verify those steps.

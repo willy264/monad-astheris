@@ -61,7 +61,7 @@ The browser computes a small deterministic document/checksum result for each tas
 
 1. Open `/agents#agent-1` on the same origin published in Agent #1's MCP endpoint. Inspect its IPFS card, token ID, owner and reputation. The endpoint is read from the card; the UI does not substitute an invented Render URL.
 2. Configure the prerequisites above for `DEMO_AGENT_ID=1`. The task action remains disabled with **Setup pending** while configuration is missing or incompatible. A preview on another hostname cannot dispatch the registered service's task.
-3. Connect an authorized EVM wallet using the global header. If needed, the agent owner uses **Delegate task authority** to grant this signer an expiry. The signer must differ from the daemon's relayer accounts and hold the configured payment token.
+3. Connect an authorized EVM wallet using the global sidebar. If needed, the agent owner uses **Delegate task authority** to grant this signer an expiry. The signer must differ from the daemon's relayer accounts and hold the configured payment token.
 4. Select **Trigger paid x402 task**. The client calls the same-origin `/api/mcp` endpoint using the MCP SDK and `get_monad_block`, validates the response, and derives the input/output hashes. This observation is read-only; no payment has been submitted yet.
 5. Approve one EIP-712 task authorization and one EIP-3009 payment authorization. After saving its public journal, the client submits once and follows task and payment receipts.
 6. Wait for **Verified on Monad Testnet**, then open the execution transaction. Use **Recover saved status** after an interrupted or unresolved request.
@@ -97,7 +97,7 @@ Wallet rejection and ordinary preflight errors can be corrected and retried when
 
 ## Dynamic sign-in and expiring delegation
 
-The global **Connect / Sign in with Passkey** button uses one Dynamic session shared by the overview, directory and visualizer. After connecting, select the wallet button to open **Passkeys & task authority**. The homepage's **Try passkey delegation** and directory's **Delegate task authority** open the same dialog. Configure Dynamic's EVM wallets, allowed origin, embedded-wallet/passkey authentication and recovery, then set `NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID` if using a project other than the default Aetheris sandbox. SDK 5.9.2 provides authentication and explicit passkey sign-in/registration actions. Available choices depend on the environment and wallet provider.
+The global **Passkey sign-in** button uses one Dynamic session shared by the overview, directory and visualizer. After connecting, select the wallet button to open **Passkeys & task authority**. The homepage's **Try passkey delegation** and directory's **Delegate task authority** open the same dialog. Configure Dynamic's EVM wallets, allowed origin, embedded-wallet/passkey authentication and recovery, then set `NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID` if using a project other than the default Aetheris sandbox. SDK 5.9.2 provides authentication and explicit passkey sign-in/registration actions. Available choices depend on the environment and wallet provider.
 
 Dynamic handles WebAuthn challenges, origins and credentials. This application does not extract a P-256 private key or claim to verify raw P-256 signatures on-chain; credential algorithms are selected by the provider. A Dynamic account session alone grants no router permission.
 

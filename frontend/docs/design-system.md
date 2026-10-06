@@ -1,6 +1,6 @@
 # Aetheris interface design system
 
-The dashboard pairs a simple express-lane story with inspectable blockchain records. Large headings explain the product; compact tables, identity cards and receipt links provide the evidence. The same header and wallet session serve the overview, agent directory and visualizer.
+The dashboard pairs a simple express-lane story with inspectable blockchain records. Large headings explain the product; compact tables, identity cards and receipt links provide the evidence. The same sidebar and wallet session serve the overview, agent directory and visualizer.
 
 ## Typography
 
@@ -26,16 +26,17 @@ Use CSS variables `--font-display`, `--font-sans` and `--font-mono`, or the matc
 | Conflicts | `#EF4444` | Illustrative shared-storage contention and error accents. |
 | Main / secondary text | `#FFFFFF` / `#A1A1AA` | High-contrast headings and quieter supporting copy. |
 
-Shared rules live in [`globals.css`](../app/globals.css); page and component CSS modules own their specific layouts. Cards use subtle borders and restrained hover highlights. Soft glass is limited to the sticky header and featured cards. Status meaning is expressed in text as well as color.
+Shared rules live in [`globals.css`](../app/globals.css); page and component CSS modules own their specific layouts. Cards use 26px rounded corners, subtle borders and restrained hover highlights. An inset application frame surrounds a curved navigation rail and the dark content canvas. Status meaning is expressed in text as well as color.
 
 ## Interaction and layout
 
-- The sticky header keeps passkey access available on every route. Mobile navigation remains visible without a hidden menu; the compact button reads “Passkey sign-in.”
+- The sidebar replaces the horizontal topbar. Its active item has a circular violet icon and concave cutout. On desktop, the keyboard-accessible toggle switches between a 228px labeled rail and an 88px icon rail. Mobile uses a 64px rail with named links and controls. RPC status and shared passkey access remain at the bottom of the rail.
+- The overview uses an asymmetric card grid: a large introduction beside network readings, then network activity, delegation and receipt cards. Columns respond to the available content width and stack on mobile.
 - The delegation card explains three steps: sign in, choose an executor, then set an expiry. Signing in does not itself submit a delegation transaction.
 - The comparison retains keyboard controls, tooltips and animation pause. Reduced-motion preferences suppress decorative animation and transitions.
 - Execution and Merkle tables have named, focusable scroll regions, column headers and sticky headings. Rows highlight on hover; long values scroll inside the ledger rather than widening the page.
 - Directory pagination derives its page count from the actual registry total and page size. Search filters the current page; “Showing” changes with that filter while “registered” remains the source's total.
-- Layouts adapt through desktop, 390px and 320px widths. Interactive controls retain visible focus indicators. Fonts are checked after loading, so screenshots do not silently validate a fallback font.
+- Layouts adapt through desktop, 390px and 320px widths, including the reduced content area beside the mobile icon rail. Interactive controls retain visible focus indicators. Fonts are checked after loading, so screenshots do not silently validate a fallback font.
 
 ## Evidence boundaries
 
