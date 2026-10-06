@@ -1,0 +1,21 @@
+.header{position:relative;z-index:20;border-bottom:1px solid #ffffff12;background:#0e1119ee}
+.inner{max-width:1504px;min-height:88px;margin:auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;gap:25px}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0;color:#f5f1ff;font-size:18px;font-weight:600;letter-spacing:.13em;text-decoration:none}
+.brand img{filter:drop-shadow(0 0 12px #836ef922)}
+.brand small{display:block;font-size:7px;font-weight:400;letter-spacing:.22em;color:#8f94ad;margin-top:5px}
+.nav{display:flex;align-items:center;gap:6px}
+.nav a{padding:10px 13px;border-radius:8px;white-space:nowrap;font-size:12px;color:#a1a7bb;text-decoration:none}
+.nav a:hover{background:#ffffff06;color:#fff}
+.nav a[aria-current=page]{color:#d5caff;background:#836ef91a}
+.actions{display:flex;align-items:center;gap:20px}
+.network{display:flex;gap:8px;align-items:center;text-align:left;background:none;border:0;color:#bec4d4;font-size:10px;cursor:pointer;padding:6px 0;white-space:nowrap}
+.network b{font-size:9px;color:#9b90d0;font-weight:400}
+.network small{display:block;font-size:9px;color:#99a3ba;margin-top:4px}
+.dot{width:6px;height:6px;border-radius:50%;background:#e5b671;flex:none}
+.network[data-state=active] .dot{background:#78e7bd;box-shadow:0 0 9px #78e7bd55}
+.network[data-state=active] small{color:#89dabc}
+.network[data-state=offline] .dot{background:#ec848f}
+.header a:focus-visible,.network:focus-visible{outline:2px solid #b5a1ff;outline-offset:4px}
+@media(max-width:1160px){.inner{flex-wrap:wrap;gap:12px 20px;padding:15px 28px}.nav{order:3;justify-content:center;width:100%;border-top:1px solid #ffffff0a;padding-top:10px}.actions{margin-left:auto}.brand small{font-size:7px}}
+@media(max-width:640px){.inner{padding:14px 18px;gap:14px 8px}.brand{font-size:15px;gap:8px}.brand img{width:32px;height:32px}.brand small{font-size:6px;letter-spacing:.13em}.actions{display:contents}.actions>button:last-child{order:3;width:100%}.network{margin-left:auto;font-size:9px;gap:6px}.network b{display:none}.network small{font-size:8px}.nav{order:4;gap:0;padding-top:9px}.nav a{font-size:11px;padding:9px 14px}}
+@media(prefers-reduced-motion:reduce){.header *{transition:none}}
