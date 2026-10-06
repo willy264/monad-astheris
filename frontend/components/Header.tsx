@@ -19,7 +19,7 @@ export default function Header() {
     <div className={styles.inner}>
       <Link href="/" className={styles.brand} aria-label="Aetheris home"><Image src="/brand/aetheris-logo.svg" alt="" width={39} height={39} priority /><span>AETHERIS<small>THE AGENT EXPRESS LANE</small></span></Link>
       <nav className={styles.nav} aria-label="Main navigation">{navigation.map(item => <Link key={item.href} href={item.href} aria-current={pathname === item.href ? 'page' : undefined}>{item.label}</Link>)}</nav>
-      <div className={styles.actions}><button type="button" className={styles.network} data-state={network.state} onClick={() => void snapshot.refetch()} title="Refresh Monad Testnet connection" aria-label={`Monad Testnet 10143, ${network.label}. Refresh connection.`}><span className={styles.dot} /><span>Monad Testnet <b>10143</b><small>{network.label}</small></span></button><PasskeyAuth variant="header" /></div>
+      <div className={styles.actions}><button type="button" className={styles.network} data-state={network.state} onClick={() => void snapshot.refetch()} title="Refresh Monad Testnet connection" aria-label={`Monad Testnet 10143, ${network.label}. Refresh connection.`}><span className={styles.dot} /><span className={styles.networkText}><span>Monad Testnet <b>10143</b></span><small>{network.label}</small></span></button><PasskeyAuth variant="header" /></div>
     </div>
   </header>;
 }

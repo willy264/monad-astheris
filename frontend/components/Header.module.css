@@ -1,21 +1,62 @@
-.header{position:relative;z-index:20;border-bottom:1px solid #ffffff12;background:#0e1119ee}
-.inner{max-width:1504px;min-height:88px;margin:auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;gap:25px}
-.brand{display:flex;align-items:center;gap:11px;flex-shrink:0;color:#f5f1ff;font-size:18px;font-weight:600;letter-spacing:.13em;text-decoration:none}
-.brand img{filter:drop-shadow(0 0 12px #836ef922)}
-.brand small{display:block;font-size:7px;font-weight:400;letter-spacing:.22em;color:#8f94ad;margin-top:5px}
-.nav{display:flex;align-items:center;gap:6px}
-.nav a{padding:10px 13px;border-radius:8px;white-space:nowrap;font-size:12px;color:#a1a7bb;text-decoration:none}
-.nav a:hover{background:#ffffff06;color:#fff}
-.nav a[aria-current=page]{color:#d5caff;background:#836ef91a}
-.actions{display:flex;align-items:center;gap:20px}
-.network{display:flex;gap:8px;align-items:center;text-align:left;background:none;border:0;color:#bec4d4;font-size:10px;cursor:pointer;padding:6px 0;white-space:nowrap}
-.network b{font-size:9px;color:#9b90d0;font-weight:400}
-.network small{display:block;font-size:9px;color:#99a3ba;margin-top:4px}
-.dot{width:6px;height:6px;border-radius:50%;background:#e5b671;flex:none}
-.network[data-state=active] .dot{background:#78e7bd;box-shadow:0 0 9px #78e7bd55}
-.network[data-state=active] small{color:#89dabc}
-.network[data-state=offline] .dot{background:#ec848f}
-.header a:focus-visible,.network:focus-visible{outline:2px solid #b5a1ff;outline-offset:4px}
-@media(max-width:1160px){.inner{flex-wrap:wrap;gap:12px 20px;padding:15px 28px}.nav{order:3;justify-content:center;width:100%;border-top:1px solid #ffffff0a;padding-top:10px}.actions{margin-left:auto}.brand small{font-size:7px}}
-@media(max-width:640px){.inner{padding:14px 18px;gap:14px 8px}.brand{font-size:15px;gap:8px}.brand img{width:32px;height:32px}.brand small{font-size:6px;letter-spacing:.13em}.actions{display:contents}.actions>button:last-child{order:3;width:100%}.network{margin-left:auto;font-size:9px;gap:6px}.network b{display:none}.network small{font-size:8px}.nav{order:4;gap:0;padding-top:9px}.nav a{font-size:11px;padding:9px 14px}}
-@media(prefers-reduced-motion:reduce){.header *{transition:none}}
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid #ffffff12;
+  background: #08090eee;
+  backdrop-filter: blur(18px);
+}
+.inner {
+  max-width: 1504px;
+  min-height: 92px;
+  margin: auto;
+  padding: 18px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.brand { display: flex; align-items: center; gap: 11px; flex-shrink: 0; color: #fff; font-family: var(--font-display), sans-serif; font-size: 22px; font-weight: 700; letter-spacing: .08em; text-decoration: none; }
+.brand img { width: 39px; height: 39px; }
+.brand small { display: block; margin-top: 4px; color: #9a9bad; font-family: var(--font-sans), sans-serif; font-size: 9px; font-weight: 600; letter-spacing: .12em; }
+.nav { display: flex; align-items: center; gap: 4px; }
+.nav a { padding: 11px 13px; border: 1px solid transparent; border-radius: 9px; white-space: nowrap; font-size: 13px; font-weight: 600; color: #a1a1aa; text-decoration: none; transition: background .2s, color .2s, border-color .2s; }
+.nav a:hover { background: #ffffff06; color: #fff; }
+.nav a[aria-current=page] { color: #d4caff; background: #836ef917; border-color: #836ef929; }
+.actions { display: flex; align-items: center; gap: 20px; }
+.network { display: flex; gap: 9px; align-items: center; text-align: left; background: none; border: 0; color: #c7c7d3; font: inherit; font-size: 12px; cursor: pointer; padding: 6px 0; white-space: nowrap; }
+.network b { margin-left: 3px; color: #aaa0d0; font-family: var(--font-mono), monospace; font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.network small { display: block; font-size: 11px; color: #a1a1aa; margin-top: 3px; }
+.dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #e7b761; flex: none; }
+.network[data-state=active] .dot { background: #10b981; }
+.network[data-state=active] .dot::after { content: ''; position: absolute; inset: -4px; border: 1px solid #10b98180; border-radius: 50%; animation: signal 2.8s ease-out infinite; }
+.network[data-state=active] small { color: #6ee7b7; }
+.network[data-state=offline] .dot { background: #ef4444; }
+.header a:focus-visible, .network:focus-visible { outline: 2px solid #a084dc; outline-offset: 4px; }
+@keyframes signal { 0%, 100% { transform: scale(.75); opacity: .4; } 50% { transform: scale(1.2); opacity: .9; } }
+@media (max-width: 1220px) {
+  .inner { flex-wrap: wrap; gap: 12px 20px; padding: 16px 28px; }
+  .nav { order: 3; justify-content: center; width: 100%; padding-top: 10px; border-top: 1px solid #ffffff0a; }
+  .actions { margin-left: auto; }
+}
+@media (max-width: 720px) {
+  .inner { display: grid; grid-template-columns: auto minmax(0, 1fr); padding: 13px 20px 10px; gap: 10px 12px; }
+  .brand { font-size: 19px; gap: 8px; letter-spacing: .04em; }
+  .brand img { width: 32px; height: 32px; }
+  .brand small { display: none; }
+  .actions { display: contents; }
+  .actions > button:last-child { grid-column: 2; grid-row: 1; justify-self: end; }
+  .nav { grid-column: 1 / -1; grid-row: 2; padding-top: 0; border-top: 0; justify-content: space-between; gap: 4px; }
+  .nav a { flex: 1; text-align: center; font-size: 12px; padding: 9px 8px; }
+  .network { grid-column: 1 / -1; grid-row: 3; justify-self: center; font-size: 11px; gap: 8px; padding: 2px 0; }
+  .networkText { display: flex; align-items: center; gap: 10px; }
+  .network b { font-size: 11px; }
+  .network small { margin-top: 0; padding-left: 10px; border-left: 1px solid #ffffff22; font-size: 11px; }
+}
+@media (max-width: 360px) {
+  .inner { padding-right: 14px; padding-left: 14px; gap: 9px 8px; }
+  .brand { font-size: 17px; gap: 5px; }
+  .brand img { width: 28px; height: 28px; }
+  .nav a { padding-right: 4px; padding-left: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { .header * { transition: none; } .network[data-state=active] .dot::after { animation: none; } }
