@@ -5,11 +5,17 @@ import { DynamicContextProvider, useDynamicContext } from '@dynamic-labs/sdk-rea
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import { dynamicEnvironmentId } from '@/lib/dynamic-config';
 import { monadTestnet } from '@/lib/contracts';
-import { AccessContext } from './AccessContext';
+import { AccessContext, type AccessSession } from './AccessContext';
 import styles from './PasskeyAuth.module.css';
 
 const WalletAccess = dynamic(() => import('./WalletAccess'), { ssr: false, loading: () => <p>Loading wallet access…</p> });
 const MeraAccess = dynamic(() => import('./MeraAccess'), { ssr: false });
+const initializingSession: AccessSession = {
+  ready: false,
+  openSignIn: () => {},
+  openAccess: () => {},
+  withWalletPrompt: async () => { throw new Error('Wallet access is still loading.'); },
+};
 
 function AccessController({ children }: { children: ReactNode }) {
   const { primaryWallet, sdkHasLoaded, setShowAuthFlow, showAuthFlow, showDynamicUserProfile } = useDynamicContext();
@@ -61,5 +67,10 @@ function AccessController({ children }: { children: ReactNode }) {
 }
 
 export function WalletSession({ children }: { children: ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  // Preserve server-rendered page content without initializing browser storage in Node.
+  // Node 25 exposes localStorage, which this SDK mistakes for a browser environment.
+  if (!mounted) return <AccessContext.Provider value={initializingSession}>{children}</AccessContext.Provider>;
   return <DynamicContextProvider theme="dark" settings={{ environmentId: dynamicEnvironmentId, walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><AccessController>{children}</AccessController></DynamicContextProvider>;
 }
