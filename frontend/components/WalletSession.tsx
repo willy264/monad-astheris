@@ -22,7 +22,7 @@ function AccessController({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [openedOnce, setOpenedOnce] = useState(false);
   const [agentId, setAgentId] = useState('1');
-  const [walletPrompts, setWalletPrompts] = useState(0);
+  const [walletPrompts, setWalletPrompts] = useState({ pending: 0 });
   const dialog = useRef<HTMLDialogElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const opener = useRef<HTMLElement>();
@@ -35,17 +35,18 @@ function AccessController({ children }: { children: ReactNode }) {
     requestAnimationFrame(() => opener.current?.focus());
   }, []);
   const withWalletPrompt = useCallback(async <T,>(action: () => Promise<T>): Promise<T> => {
-    setWalletPrompts(count => count + 1);
+    setWalletPrompts(state => ({ pending: state.pending + 1 }));
     // Let the native dialog leave the top layer before a wallet opens its own portal.
     dialog.current?.close();
     try { return await action(); }
-    finally { setWalletPrompts(count => count - 1); }
+    // A fresh object also restores the dialog when React batches a fast +1/-1 to zero.
+    finally { setWalletPrompts(state => ({ pending: state.pending - 1 })); }
   }, []);
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
     // SDK portals live outside this dialog. Suspend its top layer while those portals are open.
-    if (open && !showAuthFlow && !showDynamicUserProfile && walletPrompts === 0) {
+    if (open && !showAuthFlow && !showDynamicUserProfile && walletPrompts.pending === 0) {
       if (!element.open) { element.showModal(); heading.current?.focus(); }
     } else if (element.open) element.close();
   }, [open, showAuthFlow, showDynamicUserProfile, walletPrompts]);
