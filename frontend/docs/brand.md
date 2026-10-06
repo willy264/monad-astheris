@@ -1,5 +1,7 @@
 # Aetheris visual identity
 
+For typography, interface colors, tables and component styling, see the [interface design system](design-system.md). The logo assets below remain shared across the dashboard and favicon.
+
 The Aetheris mark refines the dashboard's original Λ into an open **A**. Two separated diagonal strokes suggest independent task lanes; the floating crossbar suggests a recorded result. The gaps remain visible when the mark is reduced to a browser tab icon.
 
 This is an original code-native vector design. The editable SVG uses three geometric paths, without a font, stock illustration or external image-generation service. PNG and ICO exports were rendered deterministically from the same coordinates with Pillow and 4× supersampling. No frontend runtime dependency was added to generate or display the assets.
