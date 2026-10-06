@@ -47,6 +47,7 @@ Keep private keys, active signatures, payment credentials, `.env` files and jour
 | Validation | A real output-bound validation request and authenticated response. Matching an output hash establishes byte integrity, not correctness of a research conclusion. |
 | Chainlink CRE | Confirm supported network and official forwarder, deploy/configure the actual workflow and retain a delivery receipt. The receiver exists; keep it disabled until those trust settings are established. |
 | Graph Tally | Implement and operate the custom adapter against real escrow/aggregation infrastructure, then demonstrate verification and durable settlement/acceptance. This external adapter is not included, and the supplied task clients use x402 EIP-3009. |
+| Privy | No Privy integration is included. Implement and demonstrate it before selecting that sponsor bounty. |
 | TEE hardware verification | Integrate a verifier for genuine manufacturer evidence, freshness and measurement policy. The existing trusted-verifier signature adapter alone does not prove hardware attestation. |
 | Autonomous spending budget | Implement and test cumulative budget enforcement if promised. Current delegation is time-limited and clients pin a per-task price ceiling; those are not a total spending cap. |
 | Daily aggregated settlement | Implement that schedule if promised. Current Merkle batching is per nonempty finalized block, and payment settlement follows the provider's flow. A Merkle commitment is not a token payout. |
