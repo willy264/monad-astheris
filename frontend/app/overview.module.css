@@ -1,0 +1,101 @@
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, .9fr);
+  align-items: center;
+  gap: clamp(26px, 4vw, 66px);
+  padding: 22px 0 32px;
+}
+.hero::before { content: ''; position: absolute; pointer-events: none; z-index: -1; inset: -50px -20px 0; background: radial-gradient(ellipse at 83% 43%, #836ef916, transparent 53%); }
+.heroCopy { min-width: 0; }
+.kicker { display: flex; align-items: center; gap: 9px; color: #b6a5ff; font-size: 9px; font-weight: 600; letter-spacing: 1.8px; margin-bottom: 23px; }
+.hero h1 { font-size: clamp(35px, 3.4vw, 57px); line-height: 1.1; font-weight: 650; letter-spacing: -2.4px; max-width: 750px; text-wrap: balance; }
+.hero h1 span { color: #b7a7ff; }
+.lead { margin-top: 24px; font-size: 18px; line-height: 1.4; font-weight: 500; letter-spacing: -.4px; color: #e3ddf5; }
+.description { font-size: 14px; line-height: 1.85; max-width: 570px; margin-top: 11px; color: #aaa3bb; }
+.technical { color: #8f86a4; font-size: 10px; line-height: 1.8; max-width: 560px; margin-top: 17px; }
+.technical > span { white-space: nowrap; }
+.heroLinks { display: flex; align-items: center; gap: 18px; margin-top: 24px; flex-wrap: wrap; }
+.agentLink { display: inline-flex; gap: 8px; align-items: center; color: #cbbff5; font-size: 11px; }
+.agentLink:hover { color: #fff; }
+.trustLine { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 17px; margin-top: 26px; color: #9488aa; font-size: 9px; }
+.trustLine > span { display: inline-flex; gap: 6px; align-items: center; }
+.trustLine svg { color: #a694d3; }
+.heroActions { min-width: 0; display: grid; gap: 13px; }
+.observer { display: flex; align-items: center; gap: 12px; padding: 18px; border: 1px solid #3d334f; border-radius: 14px; background: linear-gradient(115deg, #20192e, #15121f); }
+.observer:hover { border-color: #7b64a2; background: #241c35; }
+.observer > svg { color: #9c89bd; margin-left: auto; }
+.observerAvatar { width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; background: #836ef91c; border: 1px solid #66528766; border-radius: 12px; color: #bcaaff; }
+.observerInfo { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.observerEyebrow { font-size: 8px; letter-spacing: 1px; color: #9adac0; line-height: 1.5; }
+.observerInfo strong { font-size: 13px; font-weight: 500; color: #e9e2f7; line-height: 1.5; }
+.observerInfo > span:last-child { font-size: 9px; line-height: 1.65; color: #9c91ae; }
+.heroNote { color: #8e819f; font-size: 10px; text-align: center; padding: 2px 0; }
+.metricsHeading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 5px 0 14px; }
+.metricsHeading > span { display: flex; align-items: center; gap: 7px; color: #b0a4c3; font-size: 8px; letter-spacing: 1.5px; }
+.metricsHeading > button { margin-top: 0; }
+.liveMetrics { margin-bottom: 27px; }
+.liveMetrics > div { min-height: 177px; }
+.comparisonAnchor { scroll-margin-top: 105px; }
+.story { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; padding: 5px 1px 34px; }
+.story > div { display: flex; gap: 13px; align-items: flex-start; }
+.stepNumber { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px; background: #251e36; border: 1px solid #453354; font-size: 9px; font-family: monospace; color: #b19adf; }
+.story h2 { font-size: 12px; font-weight: 500; color: #d1c7e3; line-height: 1.7; }
+.story p { margin-top: 7px; font-size: 11px; line-height: 1.8; color: #9a8eab; max-width: 340px; }
+.activityHeading { margin-top: 35px; }
+.throughput { margin-bottom: 21px; }
+@media (max-width: 1200px) {
+  .hero { grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr); gap: 26px; }
+  .hero h1 { font-size: 40px; letter-spacing: -1.65px; }
+  .description { font-size: 12px; }
+  .lead { font-size: 16px; }
+  .kicker { font-size: 8px; letter-spacing: 1.2px; }
+  .heroLinks { gap: 16px; }
+  .story { gap: 17px; }
+  .story > div { gap: 9px; }
+  .story h2 { font-size: 11px; }
+  .story p { font-size: 10px; }
+}
+@media (max-width: 980px) {
+  .hero { grid-template-columns: 1fr; gap: 28px; padding-top: 7px; }
+  .hero h1 { font-size: clamp(37px, 6vw, 52px); max-width: 650px; }
+  .description { font-size: 14px; max-width: 630px; }
+  .heroActions { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; }
+  .heroActions > :first-child { grid-row: span 2; }
+  .observer { align-self: stretch; flex-wrap: wrap; padding: 19px; }
+  .observerInfo { flex-basis: 100%; order: 1; }
+  .heroNote { font-size: 9px; line-height: 1.7; }
+  .story { grid-template-columns: 1fr; padding-bottom: 26px; gap: 19px; }
+  .story h2 { font-size: 13px; }
+  .story p { font-size: 12px; max-width: none; margin-top: 4px; }
+  .story > div { gap: 12px; }
+}
+@media (max-width: 600px) {
+  .hero { gap: 25px; padding: 4px 0 27px; }
+  .kicker { font-size: 7px; letter-spacing: 1.4px; margin-bottom: 18px; }
+  .hero h1 { font-size: clamp(32px, 8.8vw, 46px); line-height: 1.11; letter-spacing: -1.5px; }
+  .lead { font-size: 16px; margin-top: 21px; }
+  .description { font-size: 12px; }
+  .technical { font-size: 9px; line-height: 1.9; }
+  .heroLinks { gap: 19px; margin-top: 22px; }
+  .heroLinks > a:first-child { font-size: 11px; }
+  .agentLink { font-size: 10px; }
+  .trustLine { font-size: 8px; gap: 8px 13px; margin-top: 21px; }
+  .heroActions { grid-template-columns: 1fr; }
+  .heroActions > :first-child { grid-row: auto; }
+  .observer { flex-wrap: nowrap; padding: 16px; }
+  .observerInfo { flex-basis: auto; order: 0; }
+  .heroNote { display: none; }
+  .metricsHeading { flex-wrap: wrap; gap: 12px; }
+  .metricsHeading > span { font-size: 7px; letter-spacing: 1px; }
+  .metricsHeading > button { font-size: 8px; padding: 7px 9px; }
+  .liveMetrics > div { min-height: 182px; }
+}
+@media (max-width: 360px) {
+  .kicker { letter-spacing: .7px; }
+  .hero h1 { font-size: 31px; }
+  .observer { padding: 14px 12px; gap: 10px; }
+  .observerAvatar { width: 34px; height: 38px; }
+  .observerInfo strong { font-size: 11px; }
+  .observerEyebrow { font-size: 7px; }
+}
