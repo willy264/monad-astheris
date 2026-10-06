@@ -1,5 +1,5 @@
 /* The walkthrough shares the live dashboard's type and color system. */
-.demo { padding: 30px; border-color: #836ef940; background: radial-gradient(ellipse at 0 0, #836ef910, transparent 65%), #11131f; }
+.demo { container: demo / inline-size; border-radius: var(--card-radius); padding: 30px; border-color: #836ef940; background: radial-gradient(ellipse at 0 0, #836ef910, transparent 65%), #11131f; }
 .heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
 .heading h2 { font-family: var(--font-display), sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -.04em; margin: 8px 0 12px; }
 .heading p { margin: 0; color: #a1a1aa; font-size: 14px; line-height: 1.8; }
@@ -46,7 +46,7 @@
   .streamStep { grid-column: 1 / -1; }
   .stream { grid-template-columns: 1fr 1fr; gap: 20px; }
   .heading { align-items: flex-start; }
-  .demo { padding: 24px; }
+  .demo { container: demo / inline-size; border-radius: var(--card-radius); padding: 24px; }
 }
 @media (max-width: 620px) {
   .heading { flex-direction: column; gap: 18px; }
@@ -56,9 +56,30 @@
   .streamStep { grid-column: auto; }
   .stream { grid-template-columns: 1fr; }
   .step { padding: 20px 18px; }
-  .demo { padding: 22px 18px; }
+  .demo { container: demo / inline-size; border-radius: var(--card-radius); padding: 22px 18px; }
   .heading h2 { font-size: 27px; }
   .heading p { font-size: 13px; }
   .taskHeading { font-size: 11px; }
+}
+@container demo (max-width: 620px) {
+  .heading { flex-direction: column; align-items: stretch; gap: 18px; }
+  .modeToggle { align-self: stretch; }
+  .modeToggle button { flex: 1; }
+  .steps, .stream { grid-template-columns: 1fr; }
+  .streamStep { grid-column: auto; }
+}
+@container demo (max-width: 360px) {
+  .heading { gap: 15px; }
+  .heading h2 { font-size: 24px; }
+  .modeToggle { display: grid; grid-template-columns: 1fr; width: 100%; border-radius: 16px; }
+  .modeToggle button { min-width: 0; border-radius: 12px; }
+  .step { padding: 18px 13px; }
+  .step h3 { font-size: 19px; }
+  .step p { font-size: 12px; }
+  .taskHeading { flex-wrap: wrap; gap: 4px; }
+  .taskHeading > span:last-child { margin-left: auto; }
+  .primaryButton, .secondaryButton { font-size: 11px; padding-inline: 11px; }
+  .unavailable { padding: 20px 14px; }
+  .unavailable button { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .track > span { transition: none; } }
