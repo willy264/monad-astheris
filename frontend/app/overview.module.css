@@ -6,7 +6,7 @@
   gap: clamp(26px, 4vw, 66px);
   padding: 22px 0 32px;
 }
-.hero::before { content: ''; position: absolute; pointer-events: none; z-index: -1; inset: -50px -20px 0; background: radial-gradient(ellipse at 83% 43%, #836ef916, transparent 53%); }
+.hero::before { content: ''; position: absolute; pointer-events: none; z-index: -1; inset: -50px 0 0; background: radial-gradient(ellipse at 83% 43%, #836ef916, transparent 53%); }
 .heroCopy { min-width: 0; }
 .kicker { display: flex; align-items: center; gap: 9px; color: #b6a5ff; font-size: 9px; font-weight: 600; letter-spacing: 1.8px; margin-bottom: 23px; }
 .hero h1 { font-size: clamp(35px, 3.4vw, 57px); line-height: 1.1; font-weight: 650; letter-spacing: -2.4px; max-width: 750px; text-wrap: balance; }
