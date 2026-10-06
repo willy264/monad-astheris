@@ -88,9 +88,9 @@
   .featureTop { margin-bottom: 22px; }
   .eyebrow { letter-spacing: .08em; }
   .metrics { grid-template-columns: 1fr; gap: 0; padding-block: 4px; }
-  .metrics > div { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; border-right: 0; border-bottom: 1px solid #ffffff0d; padding: 15px 0; }
+  .metrics > div { flex-direction: column; align-items: flex-start; gap: 8px; border-right: 0; border-bottom: 1px solid #ffffff0d; padding: 15px 0; }
   .metrics > div > span { min-width: 0; }
-  .metrics strong { max-width: 50%; text-align: right; font-size: 20px; }
+  .metrics strong { width: 100%; max-width: 100%; text-align: left; font-size: 20px; overflow-wrap: anywhere; }
   .details dt { flex-wrap: wrap; }
   .execution { padding: 20px 14px; }
   .taskButton { font-size: 12px; gap: 7px; padding-inline: 10px; }
