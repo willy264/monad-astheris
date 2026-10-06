@@ -1,23 +1,26 @@
 'use client';
-import { useState, type FormEvent } from 'react';
-import { DynamicContextProvider, DynamicWidget, useDynamicContext, useProjectSettings, useRegisterPasskey, useSignInWithPasskey } from '@dynamic-labs/sdk-react-core';
-import { EthereumWalletConnectors, isEthereumWallet } from '@dynamic-labs/ethereum';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { DynamicWidget, useDynamicContext, useProjectSettings, useRegisterPasskey, useSignInWithPasskey } from '@dynamic-labs/sdk-react-core';
+import { isEthereumWallet } from '@dynamic-labs/ethereum';
 import { isAddress, type Hash } from 'viem';
 import { contracts, explorerTx, identityAbi, monadTestnet, routerAbi, walletPublicClient } from '@/lib/contracts';
 import { Notice } from './Shared';
-import { dynamicEnvironmentId } from '@/lib/dynamic-config';
 import { verifyDelegationReceipt } from '@/lib/delegation';
+import { useAccessSession } from './AccessContext';
 
-function Delegation() {
+export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?: string }) {
+  const { withWalletPrompt } = useAccessSession();
   const { primaryWallet, user } = useDynamicContext();
   const projectSettings = useProjectSettings();
   const passkeyLoginEnabled = projectSettings?.providers?.some(provider => provider.provider === 'passkey' && Boolean(provider.enabledAt)) ?? false;
   const signInWithPasskey = useSignInWithPasskey();
   const registerPasskey = useRegisterPasskey();
-  const [agentId, setAgentId] = useState('');
+  const [agentId, setAgentId] = useState(initialAgentId);
   const [delegate, setDelegate] = useState('');
   const [hours, setHours] = useState('1');
   const [busy, setBusy] = useState(false);
+  const appliedAgentId = useRef(initialAgentId);
+  useEffect(() => { if (!busy && appliedAgentId.current !== initialAgentId) { setAgentId(initialAgentId); appliedAgentId.current = initialAgentId; } }, [initialAgentId, busy]);
   const [error, setError] = useState('');
   const [hash, setHash] = useState<Hash>();
   const [confirmed, setConfirmed] = useState(false);
@@ -29,8 +32,8 @@ function Delegation() {
     if (!window.isSecureContext || !window.PublicKeyCredential) { setError('Passkeys require a supported browser on HTTPS or localhost.'); return; }
     setPasskeyBusy(true);
     try {
-      if (user) { await registerPasskey(); setPasskeyMessage('Passkey registered for this account.'); }
-      else { await signInWithPasskey(); setPasskeyMessage('Passkey sign-in completed.'); }
+      if (user) { await withWalletPrompt(() => registerPasskey()); setPasskeyMessage('Passkey registered for this account.'); }
+      else { await withWalletPrompt(() => signInWithPasskey()); setPasskeyMessage('Passkey sign-in completed.'); }
     } catch (cause) { setError(cause instanceof Error ? cause.message.slice(0, 300) : 'The passkey request could not be completed.'); }
     finally { setPasskeyBusy(false); }
   }
@@ -42,8 +45,11 @@ function Delegation() {
     if (!['0', '1', '6', '24', '168'].includes(hours)) { setError('Choose a supported authorization duration.'); return; }
     setBusy(true);
     try {
-      const client = await primaryWallet.getWalletClient();
-      if (await client.getChainId() !== monadTestnet.id) await client.switchChain({ id: monadTestnet.id });
+      const client = await withWalletPrompt(async () => {
+        const wallet = await primaryWallet.getWalletClient();
+        if (await wallet.getChainId() !== monadTestnet.id) await wallet.switchChain({ id: monadTestnet.id });
+        return wallet;
+      });
       const [owner, routerIdentity] = await Promise.all([
         walletPublicClient.readContract({ address: contracts.identity, abi: identityAbi, functionName: 'ownerOf', args: [BigInt(agentId)] }),
         walletPublicClient.readContract({ address: contracts.router, abi: routerAbi, functionName: 'identityRegistry' }),
@@ -52,7 +58,7 @@ function Delegation() {
       if (owner.toLowerCase() !== primaryWallet.address.toLowerCase()) throw new Error('Only the current agent identity owner can manage this delegation.');
       const expiresAt = hours === '0' ? 0n : BigInt(Math.floor(Date.now() / 1000) + Number(hours) * 3600);
       const { request } = await walletPublicClient.simulateContract({ address: contracts.router, abi: routerAbi, functionName: 'setDelegate', args: [BigInt(agentId), delegate, expiresAt], account: client.account });
-      const transaction = await client.writeContract({ ...request, chain: monadTestnet });
+      const transaction = await withWalletPrompt(() => client.writeContract({ ...request, chain: monadTestnet }));
       setHash(transaction);
       const receipt = await walletPublicClient.waitForTransactionReceipt({ hash: transaction, confirmations: 1, timeout: 120000 });
       verifyDelegationReceipt(receipt, transaction, contracts.router, owner);
@@ -65,8 +71,4 @@ function Delegation() {
     <p className="form-note">The executor may create and execute tasks for this agent until expiry. This permission does not transfer the agent identity or grant access to wallet funds.</p>
     {error && <Notice error>{error}</Notice>}{passkeyMessage && <Notice>{passkeyMessage}</Notice>}{hash && <Notice>{confirmed ? 'Delegation confirmed.' : 'Transaction submitted; awaiting confirmation.'} <a href={explorerTx(hash)} target="_blank" rel="noreferrer" className="text-link">View transaction ↗</a></Notice>}
   </div>;
-}
-
-export default function WalletAccess() {
-  return <DynamicContextProvider settings={{ environmentId: dynamicEnvironmentId, walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><Delegation /></DynamicContextProvider>;
 }

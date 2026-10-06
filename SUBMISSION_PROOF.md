@@ -1,5 +1,17 @@
 # Aetheris live verification
 
+## Readiness preflight, 2026-10-06
+
+The public Render daemon returned HTTP 200 for `/health` and `/v1/config` after a cold start. It reports chain `10143`, the deployed router above, one relayer (the registered agent owner), and batching disabled. Its advertised x402 v2 exact policy charges **1,000 base units (0.001 USDC)** per task, using token `0x534b2f3a21130d7a60830c2df862319e593943a3`, signing-domain name `USDC`, version `2`. Read-only contract calls confirmed deployed token code, those domain fields and six decimals. Advertising this policy is not evidence that the facilitator has settled a payment.
+
+At this check the owner/relayer held approximately **13.93 testnet MON and zero of that payment token**. A paid CLI run remains blocked by missing configuration for a separate authorized task signer, agent/executor/payment settings and a valid MCP argument file; the local CLI daemon URL also still targets localhost. Do not reuse the live relayer key in the task producer. Configure the documented public daemon endpoint and fund the intended payer before collecting real receipts.
+
+The production browser task configuration returned **503, `enabled:false`**. No hosted Envio URL is configured. Render journal durability and recovery are not observable through its public health endpoints and remain unverified. The GitHub repository is public. This preflight made no wallet signatures, payments, registrations or chain transactions.
+
+The redesigned dashboard adds a global Dynamic session and a single Observer MCP task action, gated by the existing paid-service configuration. UI availability does not establish a completed device passkey ceremony, delegated execution or paid-task receipt. The dated deployment and registration evidence below remains unchanged.
+
+## Deployment evidence, 2026-10-04
+
 Observed on **2026-10-04**, Monad Testnet, chain **10143**. Four contracts are deployed, the public MCP observer works, and its ERC-8004 identity is registered. A paid task and complete settlement/indexing demonstration remain outstanding.
 
 ## Deployed contracts

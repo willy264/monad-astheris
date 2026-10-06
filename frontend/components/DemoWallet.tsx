@@ -1,19 +1,20 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { DynamicContextProvider, useDynamicContext, useSignInWithPasskey } from '@dynamic-labs/sdk-react-core';
-import { EthereumWalletConnectors, isEthereumWallet } from '@dynamic-labs/ethereum';
+import { useDynamicContext, useSignInWithPasskey } from '@dynamic-labs/sdk-react-core';
+import { isEthereumWallet } from '@dynamic-labs/ethereum';
 import type { Hex } from 'viem';
-import { explorerTx, monadTestnet, truncate } from '@/lib/contracts';
+import { explorerTx, truncate } from '@/lib/contracts';
 import { address, type DemoConfig, type DemoJournal, type DemoRecord } from '@/lib/demo-protocol';
 import { postDemo, readDemo, recoverDemo, saveDemo, signDemo } from '@/lib/demo-client';
 import styles from './InteractiveDemo.module.css';
-import { dynamicEnvironmentId } from '@/lib/dynamic-config';
+import { useAccessSession } from './AccessContext';
 
 const taskNames = ['Research agent', 'Market analyst', 'Data curator', 'Risk observer', 'Report writer'];
 const stageLabels: Record<DemoRecord['stage'], string> = { submitted: 'Submitted', accepted: 'On its own lane', verifying: 'Checking receipts', verified: 'Verified on Monad', unresolved: 'Check saved status' };
 const stageProgress: Record<DemoRecord['stage'], number> = { submitted: 25, accepted: 55, verifying: 80, verified: 100, unresolved: 25 };
 
 function LiveDemo({ config, onSettledCount }: { config: DemoConfig; onSettledCount?: (count: number) => void }) {
+  const { withWalletPrompt } = useAccessSession();
   const { primaryWallet, setShowAuthFlow, user } = useDynamicContext(); const signInWithPasskey = useSignInWithPasskey();
   const [journal, setJournal] = useState<DemoJournal>(); const current = useRef<DemoJournal>();
   const [busy, setBusy] = useState(false); const [authBusy, setAuthBusy] = useState(false); const [message, setMessage] = useState(''); const [error, setError] = useState('');
@@ -57,8 +58,10 @@ function LiveDemo({ config, onSettledCount }: { config: DemoConfig; onSettledCou
       if (!resume) {
         if (!primaryWallet || !isEthereumWallet(primaryWallet)) throw new Error('Connect an EVM wallet to run the live demo.');
         if (active && active.records.some(record => record.stage !== 'verified')) throw new Error('Recover the previous five requests before starting another paid run.');
-        const wallet = await primaryWallet.getWalletClient();
-        const prepared = await signDemo(config, wallet, address(primaryWallet.address), (index, kind) => { if (mounted.current) setMessage(`Task ${index + 1} of 5: approve ${kind}. All tasks will dispatch together after signing.`); }, abort.signal);
+        const prepared = await withWalletPrompt(async () => {
+          const wallet = await primaryWallet.getWalletClient();
+          return signDemo(config, wallet, address(primaryWallet.address), (index, kind) => { if (mounted.current) setMessage(`Task ${index + 1} of 5: approve ${kind}. All tasks will dispatch together after signing.`); }, abort.signal);
+        });
         active = prepared.journal; submissions = prepared.signed;
         if (!mounted.current || abort.signal.aborted) throw new Error('Signing was interrupted. No requests were submitted; the saved status must be reconciled.');
         current.current = active; setJournal(active);
@@ -91,5 +94,5 @@ function LiveDemo({ config, onSettledCount }: { config: DemoConfig; onSettledCou
 }
 
 export default function DemoWallet(props: { config: DemoConfig; onSettledCount?: (count: number) => void }) {
-  return <DynamicContextProvider settings={{ environmentId: dynamicEnvironmentId, walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><LiveDemo {...props} /></DynamicContextProvider>;
+  return <LiveDemo {...props} />;
 }

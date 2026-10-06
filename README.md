@@ -85,7 +85,9 @@ pnpm test
 pnpm build
 ```
 
-Historical feature checks include **38 Solidity tests**, **17 Rust tests**, **17 scripts tests**, **18 frontend feature tests**, and **61 ABI declarations**. Linux Envio generation/typechecking and **2 Merkle tests** passed. The subsequent live-service changes added **15 MCP tests**, **6 RPC pagination tests** and **10 IPFS card tests**. These belong to the dated revisions in [VERIFICATION.md](VERIFICATION.md); they are not a claim that all checks have already passed together on the final integration commit. Browser and deployment evidence is recorded separately from tests.
+The integrated baseline at `80570af` passed **38 Solidity tests**, **20 Rust tests**, **17 scripts tests**, **52 frontend tests**, and **61 ABI declarations** in component CI. Linux Envio generation/typechecking and **2 Merkle tests** also passed. [VERIFICATION.md](VERIFICATION.md) records the dated results and subsequent UI checks. Browser checks and real task/payment receipts are separate evidence.
+
+The dashboard shares one Dynamic wallet session across all pages. Start with the header sign-in or homepage delegation card, compare shared storage with express lanes, then inspect Agent #1 in the directory. Its single-task action calls the real MCP observer and requests a task signature and payment authorization when the operator enables paid execution. The five-task guided demo remains a separately labeled checksum workload. See the [judge walkthrough](frontend/docs/README.md).
 
 ### Deployment manifest and explorer
 
