@@ -2,22 +2,23 @@
 .button:hover:not(:disabled) { background: #6a50d5; border-color: #bdb0ff; box-shadow: 0 5px 24px -10px #836ef980; transform: translateY(-1px); }
 .button:disabled { opacity: .6; cursor: wait; }
 .button:focus-visible, .close:focus-visible { outline: 2px solid #cbbfff; outline-offset: 4px; }
-.headerButton { white-space: nowrap; min-height: 44px; padding: 10px 16px; font-size: 12px; }
-.mobileLabel { display: none; }
 .walletAddress { font-family: var(--font-mono), monospace; font-variant-numeric: tabular-nums; }
-.hero { display: grid; gap: 22px; padding: 28px; border: 1px solid #836ef95c; border-radius: 18px; background: linear-gradient(135deg, #836ef916, transparent 70%), #11131fe8; backdrop-filter: blur(12px); transition: border-color .2s, box-shadow .2s; }
+.sidebarButton { width: 100%; padding: 12px 10px; min-height: 46px; border-radius: 13px; font-size: 12px; }
+.sidebarButton[data-collapsed=true] { width: 46px; height: 46px; padding: 0; border-radius: 15px; }
+.sidebarButton[data-collapsed=true] .sidebarLabel { display: none; }
+.hero { container: access-card / inline-size; display: grid; gap: 18px; padding: 22px; border: 1px solid #836ef94d; border-radius: var(--card-radius, 26px); background: linear-gradient(135deg, #836ef914, transparent 70%), #11131fe8; backdrop-filter: blur(12px); transition: border-color .2s, box-shadow .2s; }
 .hero:hover { border-color: #836ef980; box-shadow: 0 12px 42px -32px #836ef970; }
 .heroTop { display: flex; align-items: center; gap: 12px; }
 .heroIcon { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 1px solid #a084dc40; border-radius: 13px; color: #c5b7ff; background: #836ef91a; }
 .eyebrow { color: #c0b3ee; font-size: 11px; font-weight: 700; line-height: 1.5; letter-spacing: .1em; }
 .provider { margin-left: auto; padding: 5px 7px; border: 1px solid #ffffff13; border-radius: 5px; color: #b6b1c8; font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .05em; }
-.hero h2 { margin: 0 0 12px; color: #fff; font-family: var(--font-display), sans-serif; font-size: clamp(25px, 2.4vw, 31px); font-weight: 700; line-height: 1.15; letter-spacing: -.035em; }
+.hero h2 { margin: 0 0 12px; color: #fff; font-family: var(--font-display), sans-serif; font-size: 26px; font-weight: 700; line-height: 1.15; letter-spacing: -.035em; }
 .hero p { margin: 0; color: #b2b0c1; font-size: 14px; line-height: 1.8; }
 .steps { display: grid; grid-template-columns: .8fr 1.35fr 1fr; gap: 10px; padding: 18px 0; margin: 0; border-top: 1px solid #ffffff10; border-bottom: 1px solid #ffffff10; list-style: none; }
 .steps li { display: flex; flex-direction: column; gap: 8px; color: #dedbea; font-size: 12px; font-weight: 600; line-height: 1.5; }
 .steps li + li { padding-left: 12px; border-left: 1px solid #ffffff12; }
 .steps span { color: #a89bff; font-family: var(--font-mono), monospace; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
-.hero .button { width: 100%; min-height: 50px; font-size: 14px; }
+.hero .button { width: 100%; min-height: 50px; padding-right: 12px; padding-left: 12px; font-size: 13px; }
 .actionArrow { margin-left: auto; font-size: 19px; font-weight: 500; }
 .hero .note { color: #9694a8; font-size: 12px; line-height: 1.7; }
 .dialog { width: min(760px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); margin: auto; padding: 0; overflow: auto; border: 1px solid #836ef95c; border-radius: 20px; background: #11131f; color: #fff; box-shadow: 0 30px 100px #0009; }
@@ -27,14 +28,14 @@
 .dialogHeader p { margin: 0; color: #b0aec0; font-size: 14px; line-height: 1.7; }
 .close { display: grid; place-items: center; flex: none; width: 38px; height: 38px; padding: 0; border: 1px solid #ffffff1a; border-radius: 9px; background: #ffffff06; color: #fff; font-size: 25px; cursor: pointer; }
 .close:hover { background: #ffffff0e; }
-@media (max-width: 720px) { .headerButton { padding: 9px 12px; min-height: 40px; font-size: 12px; gap: 7px; } .headerLabel { display: none; } .mobileLabel { display: inline; } }
+@media (max-width: 700px) { .sidebarButton, .sidebarButton[data-collapsed=true] { width: 42px; height: 42px; min-height: 42px; padding: 0; border-radius: 14px; } .sidebarLabel { display: none; } }
 @media (max-width: 600px) {
-  .hero { padding: 23px 20px; gap: 20px; }
+  .hero { padding: 20px 17px; gap: 18px; }
   .heroTop { gap: 10px; }
   .heroTop .eyebrow { font-size: 11px; letter-spacing: .07em; }
   .heroIcon { width: 38px; height: 38px; }
   .provider { display: none; }
-  .hero h2 { font-size: 27px; }
+  .hero h2 { font-size: 25px; }
   .hero p { font-size: 13px; }
   .hero .note { font-size: 12px; }
   .steps { gap: 7px; }
@@ -44,5 +45,17 @@
   .dialogHeader h2 { font-size: 25px; }
   .dialogHeader p { font-size: 13px; }
 }
-@media (max-width: 360px) { .headerButton { padding: 9px; font-size: 11px; gap: 6px; } .hero { padding: 20px 17px; } .heroTop .provider { display: none; } }
+@media (max-width: 360px) { .hero { padding: 20px 17px; } .heroTop .provider { display: none; } }
+@container access-card (max-width: 360px) { .heroTop .provider { display: none; } .heroTop .eyebrow { font-size: 10px; } .heroIcon { width: 38px; height: 38px; } }
+@container access-card (max-width: 260px) {
+  .hero h2 { font-size: 24px; }
+  .hero p { font-size: 12px; }
+  .hero .note { font-size: 11px; }
+  .steps { gap: 5px; }
+  .steps li { font-size: 10px; }
+  .steps li + li { padding-left: 6px; }
+  .hero .button { font-size: 12px; gap: 7px; }
+  .hero .button > svg { display: none; }
+  .actionArrow { margin-left: 0; }
+}
 @media (prefers-reduced-motion: reduce) { .button, .hero { transition: none; } .button:hover:not(:disabled) { transform: none; } }
