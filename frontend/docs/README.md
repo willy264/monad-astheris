@@ -6,9 +6,11 @@ The dashboard explains this idea and shows available blockchain evidence. It doe
 
 ## A short tour
 
-1. **Overview (`/`):** read the express-lane introduction and try the three-step guided preview. Check the source badge on each number before treating it as evidence.
-2. **Agent Directory (`/agents`):** inspect registered identities, declared capabilities and client feedback. When a deployment is connected, the cards describe actual registered agents. The passkey section lets an owner grant or revoke an executor's permission.
+1. **Overview (`/`):** start with “Express Checkout Lanes for Autonomous AI Agents on Monad,” the passkey delegation card, and Agent #1. The registry count shows registered identities; it does not imply those agents have completed tasks. Switch the comparison directly on this page, then try the three-step guided preview.
+2. **Agent Directory (`/agents`):** inspect the featured Aetheris Monad Observer, token #1, its IPFS card, published MCP endpoint, reputation and recent task history. **Delegate task authority** opens wallet access. **Trigger paid x402 task** becomes available when the real payment service is configured.
 3. **Shard Visualizer (`/visualizer`):** switch between the red shared-storage example and five green isolated lanes. Below the illustration, the actual topology and ledger show recorded task events. Select a real shard to inspect its commitments.
+
+The global header provides **Connect / Sign in with Passkey** on all three pages. One Dynamic wallet session is shared across navigation and both paid workflows. The connected-wallet button opens the access dialog for passkey registration and expiring delegation. Its Monad Testnet badge reports the latest RPC reading's status, not network finality.
 
 The comparison supports keyboard controls and a pause button. Explanations open by hover, keyboard focus or touch; Escape closes them. Animations respect reduced-motion preferences, and layouts work on mobile.
 
@@ -17,11 +19,13 @@ The comparison supports keyboard controls and a pause button. Explanations open 
 | Label or view | What it means |
 | --- | --- |
 | **Guided preview** | Simulated sign-in and animated task progress. No wallet, payment or blockchain transaction is involved. |
-| **Illustrative comparison** | An explanation of shared versus separate storage. The `+1,200ms`, `100%` and `300ms Single-Slot` figures are scenario values, not measurements or network guarantees. |
-| **Sample data** | An example number used while that metric's live source is unavailable. It does not populate the event ledger. |
+| **Illustrative comparison** | An explanation of shared versus separate task storage. The `12` retries, `+1,200ms`, `100%` and `300ms` figures are scenario values, not measurements or finality guarantees. Shared router state can still contend. |
+| **Unavailable**, **Connecting**, or **—** | The metric has no current usable reading. Dashboard metric cards do not fill missing measurements with sample numbers. |
+| **Live registry** | The registered-identity count returned by the configured registry or indexer. Agent #1 is featured when its identity is returned. |
 | **Live data** | A reading from the configured source within the displayed observation window. Zero is a valid live reading. |
 | **Last observed** | Previously fetched data retained after a refresh failed. It is not a newly confirmed reading. |
-| **This demo** on micropayments | Payments verified for the current browser demo, rather than a network-wide total. The preview never increments it. |
+| **This browser session** on micropayments | Payments verified in the homepage's five-task demo, rather than a network-wide total. The preview and directory task do not increment this card. |
+| **RPC Active** in the header | A recent overview sample reports Monad Testnet chain `10143` and a nonzero block. Failed or stale readings change the status; this is not a `300ms` finality measurement. |
 | **RPC fallback** | Direct contract/event reads are being used because Envio is not configured. |
 | **Root matched** | The indexed task-log batch agrees with its indexed on-chain commitment. This checks recorded hashes, not whether an AI answer is correct. |
 | A green **Verified on Monad** demo lane | Matching task and payment receipts were checked on-chain with two confirmations. The link opens the real execution transaction. |
@@ -43,6 +47,8 @@ Client feedback is uncurated. The displayed quality score is a mean of feedback 
 
 For a quick explanation, follow the [guided preview steps](demo-guide.md#run-the-guided-preview). For actual testnet receipts, follow the [live walkthrough](demo-guide.md#run-five-real-testnet-tasks) after the operator configures the deployment, wallets, daemon and payment service.
 
-The live browser demonstration performs deterministic checksum calculations. It demonstrates authorization, task isolation and paid settlement; it does not invoke an external AI model. Actual MCP invocation is available through the [task client](../../scripts/README.md).
+The homepage's five-task live demonstration computes deterministic checksums in the browser. The directory's [single observer task](demo-guide.md#run-one-observer-mcp-task) invokes the real `get_monad_block` MCP tool and commits that observation's input/output hashes. Both require real authorization and payment; neither invokes an external AI model or produces hardware attestation. The [task client](../../scripts/README.md) provides the separate command-line workflow.
+
+The deployed identity and MCP service are recorded in the submission proof. A functioning sign-in button or enabled task action is not proof of an actual device ceremony, delegation, paid execution or settlement; those operations need their own verified evidence.
 
 Use the repository's [submission proof](../../SUBMISSION_PROOF.md) to distinguish completed live evidence from remaining work. The [verification record](../../VERIFICATION.md) records local checks. More detail is available in the [architecture](../../docs/architecture.md), [protocol](../../docs/protocol.md), and [data/API reference](data-and-api.md).

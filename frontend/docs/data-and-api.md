@@ -1,6 +1,6 @@
 # Dashboard data, configuration and API
 
-The frontend reads actual contract/indexer data through Next.js routes. The browser's illustrated comparison, preview and fallback cards are separate from those records. See the [judge guide](README.md) for the visual tour and the [demo guide](demo-guide.md) for paid tasks.
+The frontend reads actual contract/indexer data through Next.js routes. Dashboard metrics use those readings, keep real zeroes, and show missing values as unavailable. The browser's illustrated comparison and guided preview are separate from those records. See the [judge guide](README.md) for the visual tour and the [demo guide](demo-guide.md) for paid tasks.
 
 ## Configuration
 
@@ -27,11 +27,11 @@ Copy [`.env.example`](../.env.example) to ignored `.env.local`. Public variables
 | `ENVIO_GRAPHQL_TOKEN` | Empty | Optional server-side bearer token. |
 | `DEMO_ENABLED` | `false` | Set `true` only after live task/payment setup. |
 | `DAEMON_URL` | `http://127.0.0.1:8080` | Configured task-service origin; HTTPS is required outside localhost. |
-| `DEMO_AGENT_ID` | Empty | Registered identity used by the paid browser demo. |
+| `DEMO_AGENT_ID` | Empty | Registered identity used by the paid browser workflows. Must be `1` for the directory's observer task. |
 | `DEMO_TASK_RESOURCE` | Empty | Exact task resource URL advertised by the daemon's x402 configuration. |
 | `DEMO_PAYMENT_ASSET` | Empty | Expected EIP-3009 payment-token address. |
 | `DEMO_PAYMENT_RECEIVER` | Empty | Expected settlement recipient. |
-| `DEMO_PAYMENT_MAX_AMOUNT` | Empty | Maximum amount per task in token base units; five tasks are submitted. |
+| `DEMO_PAYMENT_MAX_AMOUNT` | Empty | Maximum amount per task in token base units: five tasks in the homepage demo, one in the directory. |
 | `DEMO_PAYMENT_ASSET_NAME` | Empty | Expected token EIP-712 domain name. |
 | `DEMO_PAYMENT_ASSET_VERSION` | Empty | Expected token EIP-712 domain version. |
 
@@ -60,14 +60,16 @@ Without `ENVIO_GRAPHQL_URL`, the API explicitly uses **RPC fallback**. A configu
 
 | Metric or record | Scope and interpretation |
 | --- | --- |
-| **Active agents** | Distinct agent IDs with completed task events in the displayed observation window. Envio uses an aggregate; RPC fallback counts distinct `TaskExecuted` agent IDs. This is not registration supply. |
-| **Registered identities** | Envio counts indexed identities for the configured registry; RPC fallback reads `AgentRegistry.totalSupply()`. |
+| **Active agents** in the API | Distinct agent IDs with completed task events in the displayed observation window. Envio uses an aggregate; RPC fallback counts distinct `TaskExecuted` agent IDs. This is not registration supply and is not the homepage's registered-agent counter. |
+| **Registered agents** | The homepage shows Envio's indexed identity count for the configured registry, or `AgentRegistry.totalSupply()` in RPC fallback. It can use the directory's returned total when the overview has no registration reading. Registered supply does not imply active task execution. |
 | **Executions** | Task-execution count for the displayed window. Envio uses an aggregate rather than the truncated shard list. |
-| **Parallel shards created** | Number of returned shards created in the window. Envio returns at most 200 recent shards and sets a capped-results indicator; a `+` does not claim a lifetime total. The visualizer displays up to 60 tiles, while its ledger retains the returned records. |
-| **Total micropayments settled** | Payments independently verified for the current browser demo. It is not a chain-wide or cumulative account total. Preview activity does not increment it. |
+| **Parallel task lanes** / **Created task lanes** | Number of returned shards created in the window. Envio returns at most 200 recent shards and sets a capped-results indicator; a `+` does not claim a lifetime total. The visualizer displays up to 60 tiles, while its ledger retains the returned records. |
+| **Micropayments settled** | Payments independently verified for the homepage's five-task browser demo. It is not a chain-wide or cumulative account total. Preview activity and directory task payments do not increment this card. |
 | **Observed Monad TPS** | Transactions in the newer 11 of 12 consecutive sampled blocks divided by the oldest-to-newest timestamp difference. Fewer blocks can be sampled near chain genesis. This is observed short-window traffic, not maximum throughput. |
 | **Quality score** | Uncurated mean of `quality`-tagged feedback from `getClients` and `getSummary(agentId, clients, 'quality', '')`. It is not a percentage, a Sybil-resistant score or guaranteed trustworthiness. |
 | **Merkle batches** | Up to 12 recent indexed batches, with separate indexed commitments checked for the expected canonical batch ID, root, leaf count and block range. |
+| **Verified batch roots** | Count of returned indexed batches whose roots match their separate on-chain commitments. Unavailable in RPC fallback; it is not a lifetime batch count. |
+| **RPC Active** in the global header | The latest overview sample identifies chain `10143`, a nonzero block, and a recent sample time. A failed refresh or a sample older than one minute changes the status. This badge does not measure finality or assert that every optional data source is available. |
 
 In Envio mode, the activity window ends at the indexed block; in RPC fallback, it ends at the observed network head. Both honor the configured deployment start. Indexed registration totals are not limited to the task-activity window. Shard and execution counts can differ because a shard may be created in one window and executed in another.
 
@@ -75,7 +77,7 @@ In RPC fallback, `ShardCreated` and `TaskExecuted` are joined within the same ev
 
 **Root matched** is an indexer consistency check: the calculated batch agrees with a separate `BatchCommitment` marked verified. It is not proof that the work was correct, nor an independent trustless verification of the indexer. RPC fallback returns no independently indexed batch verification.
 
-Cards preserve real zeroes. A failed refresh can retain a prior reading under **Last observed**; a missing source uses explicit **Sample data**. Samples never flow into agent entities, task tables, receipt links or GraphQL. Standard RPC does not expose scheduler concurrency, optimistic retries or a counterfactual collision count; the visual comparison is not a benchmark.
+Cards preserve real zeroes. A failed refresh can retain a prior reading under **Last observed**; a missing source shows a dash with an availability label. Missing measurements are not replaced by sample numbers. The separate comparison's `100%` efficiency, `300ms` timing, conflict counts and delays are explicitly illustrative. Standard RPC does not expose scheduler concurrency, optimistic retries or a counterfactual collision count, and isolated task storage does not remove every shared router write.
 
 ## Read API
 
@@ -107,6 +109,16 @@ React Query polls the overview every 12 seconds and uses an 8-second stale inter
 The task body contains decimal strings `agentId` and `sequenceNonce`; bytes32 `taskId`, `inputHash`, `outputHash`, `proofHash`; address `executor`; numeric `deadline`; and the task's `authorization` signature. Its exact EIP-712 domain is `AetherisTask`, version `1`, chain `10143`, verifying contract equal to the configured router. The request ID is the typed-data digest. The payment header carries base64 x402 v2 `exact` EIP-3009 authorization.
 
 Use the provided browser workflow to construct these messages; do not reuse expired or ambiguous paid requests. The [protocol source](../lib/demo-protocol.ts) contains the shared types and validators, and the [demo guide](demo-guide.md#recover-an-interrupted-run) explains the public journal, Web Locks and status-only recovery. The daemon independently enforces current delegation, signature validity, replay protection and settlement. The frontend proxy has no signing key and is not a general-purpose upstream proxy.
+
+Both browser workflows use these same paid-task routes and shared Dynamic wallet session. The homepage submits five disclosed checksum workloads. The directory submits one Agent #1 MCP observation, using an independent `agent-task` journal and Web Lock. Payment signing and receipt verification are unchanged between workloads; one successful observation does not automatically count as five tasks or update the homepage's demo payment metric.
+
+## Directory observer MCP request
+
+The featured card displays the registered MCP URL from IPFS metadata. A paid observer task is enabled only when that URL equals `/api/mcp` on the current frontend origin and the validated service configuration selects Agent #1. This prevents a preview deployment from silently selecting another endpoint. The published service currently uses the frontend's Vercel origin; the Render daemon is the downstream paid-task service.
+
+Before any paid submission, [observer-task.ts](../lib/observer-task.ts) initializes an MCP SDK client, verifies the server name `aetheris-monad-observer`, and calls `get_monad_block` with empty arguments. It validates the structured Monad Testnet observation, then hashes a normalized JSON input and output using keccak256. The input is `{"name":"get_monad_block","arguments":{}}`; output fields are `chainId`, `blockNumber`, `blockHash`, `timestamp` and `transactionCount`. The signed task commits those hashes. A read failure aborts before payment submission.
+
+This path makes a bounded, read-only MCP call to a fixed same-origin URL. The browser does not execute arbitrary endpoints from Agent Card text. The observation is a mined-block snapshot, not a finality claim, external AI computation or hardware attestation. The [MCP service guide](mcp-agent.md) describes the public tool itself.
 
 ## Boundaries around external data
 

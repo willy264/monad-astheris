@@ -6,14 +6,14 @@ This is an engineering checklist for the intended Monad Metropolis Track 04 subm
 
 ## What is already implemented and checked?
 
-The counts below describe dated component/feature checks, including checks performed before branch integration. [VERIFICATION.md](../VERIFICATION.md) records their scope; a final integration run must be recorded separately.
+The integrated baseline `80570af` passed component CI and production smoke checks. [VERIFICATION.md](../VERIFICATION.md) records their scope and subsequent UI work. Local checks do not replace real task, payment and indexer receipts.
 
 | Area | Implemented behavior | Observed verification | Remaining live work |
 | --- | --- | --- | --- |
 | Contracts | Agent identities, delegation, isolated task results, reputation, validation and batch commitments | 38 Foundry tests, including two 256-case fuzz tests; four live deployments with verified receipts, code, links and roles | Agent #1 is registered; exercise task, reputation and validation operations as claimed. |
-| Daemon | Signed paid requests, relayer routing, durable job journal and finalized-block batching | Rust compilation and 17 tests, including startup-configuration checks | Exercise the funded provider, relayers, payment and recovery path. |
+| Daemon | Signed paid requests, relayer routing, durable job journal and finalized-block batching | Rust compilation, strict Clippy and 20 tests at the integrated baseline | Exercise the funded provider, relayers, payment and recovery path. |
 | Client and deployment tools | Actual MCP invocation, signed x402 tasks, receipt checks, registration and proof export | 17 scripts tests and typechecking | Reuse the verified observer and registration; configure the paid-task policy and collect task/payment receipts. |
-| Frontend | Overview, directory, comparison visualizer, labeled preview and five-task paid browser flow | 18 tests, typecheck/build; 40 judge-flow checks and 32 branding/browser checks | Production contract reads and the Dynamic widget work. Verify actual passkey/delegation and paid-task flows; connect hosted Envio. |
+| Frontend | Shared global wallet session, express-lane overview/comparison, featured Observer #1, single MCP-task action and separate five-task checksum demo | Baseline: 52 tests, typecheck/build and 101 production smoke checks. Subsequent UI checks are dated in the verification record. | Verify an actual passkey/delegation ceremony and paid task; enable the paid service only after its prerequisites pass; connect hosted Envio. |
 | Indexer | Agent/shard/execution entities, deployment-scoped GraphQL and independently calculated batch roots | Linux generation/typechecking and 2 Merkle tests | Run indexing against the deployed contracts and expose a reachable endpoint. |
 | Shared interfaces | Contract ABI exports and consumer declarations | 61 declarations matched | Verify that runtime configuration points to the deployed version. |
 
@@ -32,7 +32,9 @@ These results are recorded in [VERIFICATION.md](../VERIFICATION.md). The [deploy
 | 7. Connect and exercise the dashboard | Configure the same deployment, Envio and Dynamic environment. Enable the browser demo only with a working payment policy. | Real directory/shard/batch data; a passkey sign-in and delegation/revocation ceremony if claimed; five confirmed browser checksum tasks if presenting the live browser demo. |
 | 8. Export and rehearse | Run the proof collector to create `submission/LIVE_CHECKS.md`, review the results, update the curated root proof and rehearse from a fixed commit. | `SUBMISSION_PROOF.md` preserves the actual explorer links, registration/MCP evidence and any newly verified GraphQL output. No fabricated or missing evidence for the demonstrated scope. Capture the required video/screenshots after checking event rules. |
 
-The browser workload is a small deterministic checksum demonstration. The CLI invokes an actual MCP tool. Use the CLI path for external service work and explain what the tool really computed. The deployed observer reads blockchain metadata; calling it does not demonstrate AI inference.
+The five-task browser demo computes deterministic checksums. The directory's single-task action invokes the actual Observer MCP tool on its registered origin; the CLI also supports MCP tasks. Both paid flows require real task and payment signatures. The deployed observer reads blockchain metadata; calling it does not demonstrate AI inference.
+
+The October 6 read-only preflight found Render healthy after a cold start, with batching disabled. The owner/live relayer has testnet MON but no configured USDC balance. The CLI needs a distinct authorized signer, a public daemon URL, agent/executor/payment settings and a valid MCP arguments file. Production browser tasks remain disabled (`/api/demo/config` returns 503), and no hosted Envio URL is configured. See the dated [submission proof](../SUBMISSION_PROOF.md#readiness-preflight-2026-10-06) for scope; an advertised payment policy does not prove settlement or durable recovery.
 
 Keep private keys, active signatures, payment credentials, `.env` files and journals out of the submission. The proof tools can export an expired task signature after checking both local and chain time. They do not export reusable payment credentials.
 
@@ -54,8 +56,8 @@ An agent-registration form and arbitrary MCP-task form are possible product impr
 
 ## Package and access checklist
 
-- [ ] Point reviewers at the **final integrated commit** after its checks pass and all intended branches are synchronized. Preserve individual feature commits and their history; document the exact revision used for the demo.
-- [ ] Confirm repository visibility and the organizer's actual access requirement. The repository is public, so `metropolis@hackathon.monad.xyz` can read it without an invitation. If collaborator access is required, obtain the reviewer's GitHub username and required role; no invitation has been sent.
+- [x] Synchronize the prior feature branches at verified baseline `80570af` (PR #33). Preserve the separate feature history. Use the subsequently verified UI revision, rather than this historical baseline, when recording the final demo.
+- [x] Confirm public repository visibility. `metropolis@hackathon.monad.xyz` can read it without an invitation. If the organizer requires collaborator access, their GitHub username and required role still need confirmation; no invitation has been sent.
 - [x] Produce the [receipt-verified deployment manifest](../contracts/deployments/10143.json) for all four core contracts.
 - [x] Publish the [agent registration export](../contracts/deployments/10143.agent.json), actual receipt, exact card bytes and verified live MCP output.
 - [ ] Complete the paid-task and indexing proof with matching chain/contract/agent/task identifiers; registration alone does not complete those workflows.
