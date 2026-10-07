@@ -12,7 +12,7 @@ Aetheris gives every task its own **Express Checkout Lane**: a separate contract
 
 The goal is to support many agents working concurrently on Monad. Today, tests demonstrate isolated task storage; they do not establish thousands of simultaneous agents or zero speed bottlenecks. Shared accounts, deployment and payment infrastructure still matter.
 
-**Live status, October 4, 2026:** all four core contracts are deployed and receipt-verified on Monad Testnet. **Aetheris Monad Observer, agent #1**, has a registered IPFS profile and a working public MCP service. Paid task execution, settlement and hosted indexing still need their own live evidence. See the [deployment manifest](contracts/deployments/10143.json), [agent registration](contracts/deployments/10143.agent.json), [verification record](VERIFICATION.md) and [submission evidence](SUBMISSION_PROOF.md). Intended track: Monad Metropolis Track 04, Trust, Identity & AI Infrastructure.
+**Live status, October 7, 2026:** **Aetheris Monad Observer, agent #1**, completed an authorized MCP task with **0.001 testnet USDC** settled through x402. Its isolated result, reputation completion record, finalized Merkle commitment and project-controlled output-integrity validation have real transaction evidence. Hosted Envio returns the matching task and verified commitment. The production dashboard still needs the Envio environment setting; physical passkey enrollment and explicit delegation revocation remain unverified. See the [submission evidence](SUBMISSION_PROOF.md), [deployment manifest](contracts/deployments/10143.json) and [verification record](VERIFICATION.md). Intended track: Monad Metropolis Track 04, Trust, Identity & AI Infrastructure.
 
 ## 2. Plain-English glossary
 
@@ -50,7 +50,7 @@ Aetheris applies that idea to task-result storage while keeping Solidity, Ethere
 | Autonomous data collection | Agents collect and summarize permitted public data. | Discoverable service identities and separate records for each task's result. |
 | Automated financial research | Agents compare documents, prices or reports for a human reviewer. | Traceable input/output commitments and a separate feedback/validation trail. |
 
-These are target use cases. Customer adoption, market size and commercial performance have not been measured in this repository. The immediate milestone is a reproducible paid testnet workflow with matching on-chain, indexer and dashboard evidence.
+These are target use cases. Customer adoption, market size and commercial performance have not been measured in this repository. One paid testnet workflow now has matching chain and indexer evidence; connecting the production dashboard and completing the device-wallet walkthrough are the remaining demonstration steps.
 
 ## 5. Technical installation & testnet explorer links
 
@@ -85,7 +85,7 @@ pnpm test
 pnpm build
 ```
 
-The integrated baseline at `80570af` passed **38 Solidity tests**, **20 Rust tests**, **17 scripts tests**, **52 frontend tests**, and **61 ABI declarations** in component CI. Linux Envio generation/typechecking and **2 Merkle tests** also passed. [VERIFICATION.md](VERIFICATION.md) records the dated results and subsequent UI checks. Browser checks and real task/payment receipts are separate evidence.
+The finalized-block publisher merged in [PR #39](https://github.com/willy264/monad-astheris/pull/39) at `7569afb`, with **38 Solidity tests**, **27 Rust tests**, **17 scripts tests**, and **63 ABI declarations** passing. Linux Envio generation/typechecking and **2 Merkle tests** have also passed. The [passkey fix, PR #40](https://github.com/willy264/monad-astheris/pull/40), passed **61 frontend tests**, typechecking, production builds and component CI, then merged at `4d8222d`. A physical passkey ceremony still needs verification. [VERIFICATION.md](VERIFICATION.md) separates revisions, hosted checks and live receipts.
 
 The dashboard shares one Dynamic wallet session across all pages. Start with the header sign-in or homepage delegation card, compare shared storage with express lanes, then inspect Agent #1 in the directory. Its single-task action calls the real MCP observer and requests a task signature and payment authorization when the operator enables paid execution. The five-task guided demo remains a separately labeled checksum workload. See the [judge walkthrough](frontend/docs/README.md).
 
@@ -93,7 +93,7 @@ The dashboard shares one Dynamic wallet session across all pages. Start with the
 
 Target network: **Monad Testnet — chain ID `10143`**. [Network information](https://docs.monad.xyz/developer-essentials/testnet) · [Monadscan testnet explorer](https://testnet.monadscan.com).
 
-**Four contracts are deployed and receipt-verified.** The [live manifest](contracts/deployments/10143.json) was verified on October 4, 2026 and records earliest deployment block **67,972,561**. The links below identify the actual contracts and their deployment transactions. Agent #1 is registered; a paid task is still outstanding.
+**Four contracts are deployed and receipt-verified.** The [live manifest](contracts/deployments/10143.json) was verified on October 4, 2026 and records earliest deployment block **67,972,561**. The links below identify the actual contracts and their deployment transactions. Agent #1 is registered and its first evidenced paid task executed at block **69,066,769**.
 
 | Contract | What a reviewer will inspect | Live address / explorer receipt |
 | --- | --- | --- |
@@ -118,4 +118,6 @@ The Rust task route is **`POST /v1/tasks`**; the singular `/v1/task` is not impl
 | [Operator runbook](docs/runbook.md) | How do I configure and run every component? |
 | [Submission checklist](docs/submission-readiness.md) | What remains before the project is ready to submit? |
 
-The integration combines the feature stack with the deployed observer and production reliability fixes. Point reviewers at the exact reviewed commit and its verification record. The next live milestone is an authorized paid MCP task, confirmed shard and token-payment receipts, a matching indexed Merkle batch, and dashboard evidence. Actual device authentication, wallet-signed delegation and any advertised CRE/TEE result need their own checks. Confirm the organizer's deadline, access and submission requirements before publishing the final package.
+The [paid-task proof](submission/2026-10-07/task-proof.json), [Merkle publication](submission/2026-10-07/merkle-publication.json), [current Envio evidence](submission/2026-10-07/envio-settlement.json), and [output-integrity validation](submission/2026-10-07/output-validation.json) document the completed live path. The validator is a project-controlled wallet performing byte/RPC integrity checks; no independent quality rating, CRE delivery or hardware TEE result is claimed.
+
+Production browser paid flows are not enabled by these CLI receipts. Vercel still needs the current Envio and paid-service configuration; physical passkey enrollment and explicit revocation need verification. Render's free ephemeral journal is not production-durable storage. Point reviewers at the exact reviewed commit, and confirm the organizer's deadline, access and submission requirements before publishing the final package.

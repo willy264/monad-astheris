@@ -1,0 +1,103 @@
+{
+  "agentId": "1",
+  "chainId": 10143,
+  "createTransactionHash": "0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d",
+  "executionBlockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3",
+  "executionBlockNumber": "69066769",
+  "executionTransactionHash": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a",
+  "executor": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+  "feedback": {
+    "assessmentHash": null,
+    "reviewer": null,
+    "status": "not-configured",
+    "transactionHash": null
+  },
+  "identityRegistry": "0x754d7f2FD55a9841dbfF248F9Cb91D497116F231",
+  "inputHash": "0xcdf3188adf0519f15395b5812c9d57fda0615bdaed1997a39ea2c86e2978f03b",
+  "mcp": {
+    "canonicalization": "aetheris-sorted-json-v1",
+    "inputBytes": 129,
+    "outputBytes": 414,
+    "tool": "get_monad_block"
+  },
+  "outputHash": "0x123713719f129fd9b5de451cd4ab2d3187e75a27f2f2e7146d41cfe8e6ff5339",
+  "payment": {
+    "amount": "1000",
+    "asset": "0x534b2f3A21130d7a60830c2Df862319e593943A3",
+    "authorizationNonce": "0x612fd6333e9084710f940b15f56fcbee093f68662bb4702d596d8050efcd45a5",
+    "mode": "x402",
+    "receiver": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+    "transactionHash": "0xb3623f7b05b489fe647372c586a612463a60b6e9c9be87122ba57e1b5ad37db0"
+  },
+  "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "reputation": {
+    "alreadyRecorded": false,
+    "recordRevertedTransactionHash": null,
+    "recordTransactionHash": "0x5c3d91a10d4e7c0057bec30c94a8ccf43a367fdb85903e4caba4172a293246ab"
+  },
+  "reputationRegistry": "0x8f1FE9bEEF6DF891189355129bF48f073D9aB322",
+  "requestId": "0x07f7edd33120c5d94d8c47035cda16f4e5c7150feb0e45179849e8bcf5119753",
+  "router": "0xaC4a33521b32122c9f014eAC8800144dD9aa5Ebe",
+  "salt": "0x438758c566bc42542136bf76dc10713d0ac2dd0f1ec35ed2f3b3ff79626303b2",
+  "schemaVersion": 1,
+  "sequenceNonce": "0",
+  "shard": "0x465C5B7a951A3FBBF5a2A618FF4593C2a1FFeFE8",
+  "signer": "0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605",
+  "taskAuthorization": {
+    "domain": {
+      "chainId": 10143,
+      "name": "AetherisTask",
+      "verifyingContract": "0xaC4a33521b32122c9f014eAC8800144dD9aa5Ebe",
+      "version": "1"
+    },
+    "message": {
+      "agentId": "1",
+      "deadline": "1791405885",
+      "executor": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+      "inputHash": "0xcdf3188adf0519f15395b5812c9d57fda0615bdaed1997a39ea2c86e2978f03b",
+      "outputHash": "0x123713719f129fd9b5de451cd4ab2d3187e75a27f2f2e7146d41cfe8e6ff5339",
+      "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "sequenceNonce": "0",
+      "taskId": "0x1a55a675cb34c941a4de0b1e4269526a7335cb51ea177a235dba724aac244c28"
+    },
+    "primaryType": "TaskAuthorization",
+    "signature": "0xc807503b5064040e9070c3d7cc2c60c0f07c5ad9028faef04b7f66c0f41f752a68370c8a0f7274075536cc50a42b5ef1cdaff61967f0cb39c1a2244e40d4845d1c",
+    "types": {
+      "TaskAuthorization": [
+        {
+          "name": "agentId",
+          "type": "uint256"
+        },
+        {
+          "name": "taskId",
+          "type": "bytes32"
+        },
+        {
+          "name": "sequenceNonce",
+          "type": "uint256"
+        },
+        {
+          "name": "inputHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "outputHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "proofHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "executor",
+          "type": "address"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64"
+        }
+      ]
+    }
+  },
+  "taskId": "0x1a55a675cb34c941a4de0b1e4269526a7335cb51ea177a235dba724aac244c28"
+}

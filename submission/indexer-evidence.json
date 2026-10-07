@@ -1,0 +1,51 @@
+{
+  "observedAt": "2026-10-07T20:59:32.827Z",
+  "query": "query Evidence($chain: Int!, $router: String!, $tx: String!, $block: numeric!) {\n  TaskExecution(where: {chainId: {_eq: $chain}, router: {_eq: $router}, transactionHash: {_eq: $tx}}, limit: 2) {\n    agentId taskId inputHash outputHash proofHash leaf blockNumber blockHash transactionHash logIndex\n    shard { address } agent { registry agentId } batch { batchId root leafCount status blockHash }\n  }\n  BatchCommitment(where: {chainId: {_eq: $chain}, router: {_eq: $router}, fromBlock: {_eq: $block}, toBlock: {_eq: $block}, verified: {_eq: true}}, limit: 5) {\n    batchId root leafCount fromBlock toBlock verified transactionHash\n  }\n}",
+  "variables": {
+    "chain": 10143,
+    "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+    "tx": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a",
+    "block": "69066769"
+  },
+  "data": {
+    "TaskExecution": [
+      {
+        "agentId": "1",
+        "taskId": "0x1a55a675cb34c941a4de0b1e4269526a7335cb51ea177a235dba724aac244c28",
+        "inputHash": "0xcdf3188adf0519f15395b5812c9d57fda0615bdaed1997a39ea2c86e2978f03b",
+        "outputHash": "0x123713719f129fd9b5de451cd4ab2d3187e75a27f2f2e7146d41cfe8e6ff5339",
+        "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "leaf": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+        "blockNumber": "69066769",
+        "blockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3",
+        "transactionHash": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a",
+        "logIndex": 1,
+        "shard": {
+          "address": "0x465c5b7a951a3fbbf5a2a618ff4593c2a1ffefe8"
+        },
+        "agent": {
+          "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+          "agentId": "1"
+        },
+        "batch": {
+          "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+          "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+          "leafCount": "1",
+          "status": "committed",
+          "blockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3"
+        }
+      }
+    ],
+    "BatchCommitment": [
+      {
+        "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+        "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+        "leafCount": "1",
+        "fromBlock": "69066769",
+        "toBlock": "69066769",
+        "verified": true,
+        "transactionHash": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+      }
+    ]
+  }
+}

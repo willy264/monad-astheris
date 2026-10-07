@@ -1,0 +1,66 @@
+{
+  "observedAt": "2026-10-07T20:50:20.483Z",
+  "owner": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+  "latestNonce": 9,
+  "pendingNonce": 9,
+  "knownJob": {
+    "requestId": "0x07f7edd33120c5d94d8c47035cda16f4e5c7150feb0e45179849e8bcf5119753",
+    "status": "completed",
+    "result": {
+      "shard": "0x465c5b7a951a3fbbf5a2a618ff4593c2a1ffefe8",
+      "salt": "0x438758c566bc42542136bf76dc10713d0ac2dd0f1ec35ed2f3b3ff79626303b2",
+      "createTx": "0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d",
+      "executionTx": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a"
+    },
+    "payment": {
+      "network": "eip155:10143",
+      "payer": "0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605",
+      "success": true,
+      "transaction": "0xb3623f7b05b489fe647372c586a612463a60b6e9c9be87122ba57e1b5ad37db0"
+    },
+    "error": null
+  },
+  "receipts": [
+    {
+      "hash": "0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d",
+      "from": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+      "nonce": 7,
+      "status": "success",
+      "blockNumber": "69066755",
+      "blockHash": "0xd7565f469b100c8db63fac81599a2e34100d1b47ac0a33c4a004b34ab80eef5d"
+    },
+    {
+      "hash": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a",
+      "from": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+      "nonce": 8,
+      "status": "success",
+      "blockNumber": "69066769",
+      "blockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3"
+    },
+    {
+      "hash": "0xb3623f7b05b489fe647372c586a612463a60b6e9c9be87122ba57e1b5ad37db0",
+      "from": "0x7f6a2850669202519f0fe8aa912451238820db86",
+      "nonce": 21330,
+      "status": "success",
+      "blockNumber": "69066783",
+      "blockHash": "0x616486f9e3ebf4007a3f3324495fd0e0265e69d1075fbc134dbbc61260fa76ab"
+    },
+    {
+      "hash": "0x5c3d91a10d4e7c0057bec30c94a8ccf43a367fdb85903e4caba4172a293246ab",
+      "from": "0x44cd39dce9b074e27eff4d914ff9a3e182963605",
+      "nonce": 0,
+      "status": "success",
+      "blockNumber": "69066814",
+      "blockHash": "0xce4f9d99b57bf9fc0065feef056278a9a6266df2456e15cbd13bfe19f708f941"
+    },
+    {
+      "hash": "0xed2170affe40cff87744fb919280352b3c15db69fc19598513772af7ff083961",
+      "from": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+      "nonce": 6,
+      "status": "success",
+      "blockNumber": "69065249",
+      "blockHash": "0x398465a92ced973711d656ff2b05d0a1ab95594aba3ce7f5ebdcca93638128b1"
+    }
+  ],
+  "scope": "Reconciles all operations in this coordinated session. Render batch worker disabled. Pause Render before local owner signing; never use a fresh database to bypass unresolved broadcast intent."
+}
