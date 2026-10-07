@@ -2,6 +2,8 @@
 
 Aetheris uses one Dynamic session across the overview, agent directory and visualizer. The global sidebar's **Passkey sign-in** button opens sign-in on every page. The connected wallet signs Monad Testnet transactions; signing in does not register an AI agent or grant an executor permission automatically.
 
+**Current blocker, October 7, 2026:** user screenshots show MetaMask classifying the production domain as malicious. Pause wallet connection/signing on that domain; the setup instructions below are not a reason to bypass the warning. The [review record and prepared support request](../../submission/2026-10-07/wallet-security-review.md) distinguish the unresolved classification from a confirmed Dynamic display-name mismatch. Physical enrollment/sign-in remains unverified.
+
 ## Public environment configuration
 
 The app defaults to Aetheris's public Dynamic **sandbox** Environment ID:
@@ -15,6 +17,7 @@ The default lives in `lib/dynamic-config.ts`. To use a different Dynamic project
 ## Dynamic dashboard setup
 
 1. Select the same sandbox environment in Dynamic.
+   Under **Settings → General**, verify that **Display Name** is **Aetheris**. The October 7 public settings check returned `uiriamuzu`, which explains the unexpected sign-in text. Correcting that dashboard value is pending and does not clear MetaMask's website classification. See [Dynamic's general settings](https://docs.dynamic.xyz/developer-dashboard/general).
 2. Under **Log in & User Profile**, enable **Passkey** authentication. Keep an initial sign-in method such as email enabled so new users can create an account before registering a passkey.
 3. Under **Security**, allow the origin `https://monad-astheris.vercel.app`. For local development, allow `http://localhost:3000` separately. Origins do not include a path. Allow preview origins only if you intend to test authentication there.
 4. Open the deployed dashboard and select **Passkey sign-in** in the sidebar. First-time users sign in through the enabled onboarding method and connect an EVM wallet.
@@ -29,6 +32,8 @@ See Dynamic's [passkey authentication guide](https://www.dynamic.xyz/docs/react/
 ## When registering a passkey appears to do nothing
 
 Registration first checks whether Dynamic requires account reauthentication to add a credential. Complete that wallet-signature, OTP or MFA prompt before the browser asks to create the passkey. This is an authentication request; it is separate from the Monad delegation transaction. The app follows Dynamic's [credential-link step-up flow](https://www.dynamic.xyz/docs/react/authentication-methods/step-up-auth/overview).
+
+Dynamic 5.9.2 can report **Reauthentication flow closed** after a successful wallet signature: it closes the sign-in window before its step-up callback finishes. Aetheris handles only that exact lifecycle error by rechecking Dynamic's `credential:link` permission once. Enrollment proceeds only when Dynamic explicitly reports that verification is no longer required and the signed-in account is unchanged. The same check also runs after an ordinary prompt completion. Cancellation, missing permission and check failures stop enrollment; there is no automatic repeat signature. The fix does not clear MetaMask's separate website classification, and a successful wallet signature alone does not establish passkey enrollment.
 
 The access dialog stays visible while the native passkey prompt is pending, with progress and errors next to the button. On Windows, Windows Hello may request your PIN; another supported device or password manager may also be offered. Cancelled, blocked and duplicate-credential requests do not count as successful enrollment. A resolved SDK call without a verification response is shown as unconfirmed.
 

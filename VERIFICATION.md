@@ -2,10 +2,13 @@
 
 Updated **2026-10-07**. The registered observer has completed an authorized paid MCP task, actual x402 settlement, a reputation completion record, a finalized Merkle publication and project-controlled output-integrity validation. Hosted Envio returns the matching task and verified commitment. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the exact receipts. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
 
+**Subsequent wallet finding:** user screenshots show a malicious-site classification for the production domain. The [review record](submission/2026-10-07/wallet-security-review.md) documents the unresolved warning and separately confirmed Dynamic display-name mismatch. Automated source checks and earlier transaction receipts do not clear this classification. Website wallet interaction and the physical passkey demonstration remain paused pending investigation.
+
 ## Current source checks
 
 | Component / revision | Checks and observed outcome | Scope |
 | --- | --- | --- |
+| Passkey reauthentication-close recovery, this revision | **86 frontend tests**, including **29 passkey tests**, `pnpm typecheck` and local `pnpm build` passed. | Recovers only Dynamic 5.9.2's exact close error after a fresh credential-link permission check for the same account. Cancellation, failed checks and undefined registration results cannot become success. Physical WebAuthn enrollment and MetaMask domain clearance remain unverified. |
 | Contracts, PR #39 / merged `7569afb` | **38 Foundry tests** passed, including two 256-case fuzz tests. | Storage isolation, permissions, registries and CRE receiver behavior; no live CRE delivery or scheduler benchmark implied. |
 | Daemon publisher, `153b603`, merged in [PR #39](https://github.com/willy264/monad-astheris/pull/39) | `cargo fmt --check`, `cargo check --locked --offline --jobs 1`, `cargo test --locked --offline --jobs 1`, and `cargo clippy --locked --offline --all-targets --jobs 1 -- -D warnings` passed; **27 tests**. Component CI passed. | Includes one-block argument validation, canonical/finalized block and receipt checks, exact stored commitments, private-error redaction, cursor preservation and worker recovery of existing commitments. |
 | Shared interfaces, PR #39 | `node scripts/check-interfaces.mjs`: **63 declarations** match compiled Solidity ABIs. | Includes committer and Merkle state views used by the publisher. |
@@ -15,7 +18,7 @@ Updated **2026-10-07**. The registered observer has completed an authorized paid
 
 Rust **1.94**, Foundry **1.8.4** and Solidity **0.8.24** are the recorded native toolchain versions. Whole-stack setup recommends Node **24+** and pnpm **10.32.1**. A standalone daemon was built with `cargo build --locked --offline --jobs 1 --profile test`; `--help` succeeded without environment/network initialization. The later controlled publication command submitted the Merkle transaction.
 
-This documentation update did not rerun engine builds or live transactions. Results belong to the named revisions and execution records.
+The passkey recovery change reran the frontend checks above; engine builds and live transactions were not repeated for that change. Other results belong to the named revisions and execution records.
 
 ## Live checks, October 7
 

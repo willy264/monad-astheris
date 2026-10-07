@@ -1,0 +1,12 @@
+{
+  "observedAt": "2026-10-07T22:08:12.757553+00:00",
+  "request": "GET https://dapp-scanning.api.cx.metamask.io/v2/scan?url=monad-astheris.vercel.app",
+  "httpStatus": 200,
+  "response": {
+    "hostname": "monad-astheris.vercel.app",
+    "recommendedAction": "BLOCK"
+  },
+  "requestSource": "https://github.com/MetaMask/core/blob/main/packages/phishing-controller/src/PhishingController.ts",
+  "method": "Single read-only public domain-scanning request; no wallet connection or signature",
+  "limitation": "The response establishes the recommendation at observation time but does not identify the detection rule, cause, or underlying threat provider. No support review or clearance is claimed."
+}

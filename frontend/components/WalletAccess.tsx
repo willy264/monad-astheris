@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { DynamicWidget, useDynamicContext, useProjectSettings, useRegisterPasskey, useSignInWithPasskey, useStepUpAuthentication } from '@dynamic-labs/sdk-react-core';
+import { DynamicWidget, useDynamicClient, useDynamicContext, useProjectSettings, useRegisterPasskey, useSignInWithPasskey, useStepUpAuthentication } from '@dynamic-labs/sdk-react-core';
 import { TokenScope } from '@dynamic-labs/sdk-api-core';
 import { isEthereumWallet } from '@dynamic-labs/ethereum';
 import { isAddress, type Hash } from 'viem';
@@ -13,6 +13,7 @@ import { passkeyErrorMessage, registerAccountPasskey, requirePasskeyVerification
 export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?: string }) {
   const { withWalletPrompt } = useAccessSession();
   const { primaryWallet, user, setShowDynamicUserProfile } = useDynamicContext();
+  const dynamicClient = useDynamicClient();
   const projectSettings = useProjectSettings();
   const passkeyLoginEnabled = projectSettings?.providers?.some(provider => provider.provider === 'passkey' && Boolean(provider.enabledAt)) ?? false;
   const signInWithPasskey = useSignInWithPasskey();
@@ -47,6 +48,7 @@ export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?
     try {
       if (user) {
         await registerAccountPasskey({
+          getAccountId: () => dynamicClient.user?.id,
           needsVerification: () => isStepUpRequired({ scope: TokenScope.Credentiallink }),
           verifyAccount: () => withWalletPrompt(() => promptStepUpAuth({ requestedScopes: [TokenScope.Credentiallink] })),
           // Native WebAuthn prompts work above the dialog. Keep progress visible;
