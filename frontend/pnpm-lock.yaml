@@ -34,6 +34,9 @@ importers:
       '@dynamic-labs/ethereum':
         specifier: 5.9.2
         version: 5.9.2(@dynamic-labs-wallet/primitives@1.1.18)(@types/node@22.20.5)(@types/react@18.3.31)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@6.0.6)(viem@2.57.2(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@4.3.6))(zod@4.3.6)
+      '@dynamic-labs/sdk-api-core':
+        specifier: 0.40.0
+        version: 0.40.0
       '@dynamic-labs/sdk-react-core':
         specifier: 5.9.2
         version: 5.9.2(@dynamic-labs-wallet/primitives@1.1.18)(@types/node@22.20.5)(@types/react@18.3.31)(bufferutil@4.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@6.0.6)

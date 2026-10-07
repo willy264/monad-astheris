@@ -17,7 +17,7 @@ The default lives in `lib/dynamic-config.ts`. To use a different Dynamic project
 1. Select the same sandbox environment in Dynamic.
 2. Under **Log in & User Profile**, enable **Passkey** authentication. Keep an initial sign-in method such as email enabled so new users can create an account before registering a passkey.
 3. Under **Security**, allow the origin `https://monad-astheris.vercel.app`. For local development, allow `http://localhost:3000` separately. Origins do not include a path. Allow preview origins only if you intend to test authentication there.
-4. Open the deployed dashboard and select **Passkey sign-in** in the header. First-time users sign in through the enabled onboarding method and connect an EVM wallet.
+4. Open the deployed dashboard and select **Passkey sign-in** in the sidebar. First-time users sign in through the enabled onboarding method and connect an EVM wallet.
 5. Select the connected-wallet button, **Try passkey delegation** on the homepage, or **Delegate task authority** in the directory. In **Passkeys & task authority**, choose **Register a passkey** and complete your device's prompt on that domain. Later, use **Sign in with passkey** on the same site.
 
 The app reads Dynamic's public project settings and disables passkey sign-in while that provider is disabled. Wallet passkey security and passkey login are separate settings. SDK network configuration selects Monad Testnet, chain **10143**. A completed device authentication and a wallet-signed delegation transaction still require the user's participation; loading the modal does not verify those steps.
@@ -25,6 +25,14 @@ The app reads Dynamic's public project settings and disables passkey sign-in whi
 The identity owner grants access by entering the agent ID, executor wallet and expiry in the access dialog. The app checks ownership and router/registry linkage before requesting approval. **Revoke access** sets that executor's expiry to zero. Closing the dialog or moving between pages does not itself revoke on-chain permission; use the revocation action or wait for expiry.
 
 See Dynamic's [passkey authentication guide](https://www.dynamic.xyz/docs/react/authentication-methods/passkey), [security settings](https://www.dynamic.xyz/docs/platform/dashboard/security), and Vercel's [environment variable documentation](https://vercel.com/docs/environment-variables).
+
+## When registering a passkey appears to do nothing
+
+Registration first checks whether Dynamic requires account reauthentication to add a credential. Complete that wallet-signature, OTP or MFA prompt before the browser asks to create the passkey. This is an authentication request; it is separate from the Monad delegation transaction. The app follows Dynamic's [credential-link step-up flow](https://www.dynamic.xyz/docs/react/authentication-methods/step-up-auth/overview).
+
+The access dialog stays visible while the native passkey prompt is pending, with progress and errors next to the button. On Windows, Windows Hello may request your PIN; another supported device or password manager may also be offered. Cancelled, blocked and duplicate-credential requests do not count as successful enrollment. A resolved SDK call without a verification response is shown as unconfirmed.
+
+Use **Open wallet profile**, then **Account & Security**, to inspect and manage registered passkeys through Dynamic's own UI. After registration, sign out through the wallet menu and use **Sign in with passkey** on the same origin to verify actual sign-in. Keep the Agent #1 owner wallet connected when managing that identity: passkey authentication does not make a new embedded wallet its owner. This device ceremony must be performed by the user and cannot be inferred from frontend tests.
 
 ## Why the directory can be empty
 
