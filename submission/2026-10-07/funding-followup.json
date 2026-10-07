@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-07T19:35:48.210Z",
+  "address": "0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605",
+  "mon": "5",
+  "usdcBaseUnits": "0",
+  "authorized": false,
+  "scope": "Read-only balance and authorization checks following user-reported funding; no signatures or transactions."
+}
