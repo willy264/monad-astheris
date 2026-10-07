@@ -7,7 +7,7 @@ For the complete system setup and current submission gaps, see the [runbook](../
 ```sh
 pnpm install --frozen-lockfile
 cp .env.example .env
-# Set both contract addresses, earliest deployment block and provider settings.
+# The verified Monad Testnet contracts/start block are defaults; configure provider settings as needed.
 pnpm codegen
 pnpm typecheck
 pnpm test
@@ -18,7 +18,19 @@ Use Node 22+ on Linux/macOS, or WSL2 on Windows, and Docker for local PostgreSQL
 
 For local storage, the template sets `HASURA_EXTERNAL_PORT=8081` and `HASURA_GRAPHQL_ENDPOINT=http://localhost:8081/v1/metadata`; `pnpm dev` uses these when launching its Docker services. Query GraphQL at `http://localhost:8081/v1/graphql`. The included Hasura secret is only for local development. Envio Cloud manages its own database and GraphQL service; do not apply the localhost Hasura variables there.
 
-The zero-address defaults in `config.yaml` allow offline code generation. `dev` and `start` reject missing or zero deployment addresses. Index from the earliest registry deployment block; starting after agent registration loses required relationships and is rejected rather than creating invented agents.
+The public defaults in `config.yaml` match the receipt-verified [Monad Testnet deployment manifest](../contracts/deployments/10143.json): identity registry `0x754d7f2fd55a9841dbff248f9cb91d497116f231`, router `0xac4a33521b32122c9f014eac8800144dd9aa5ebe`, and earliest deployment block `67972561` on chain `10143`. `ENVIO_*` values override these defaults. Index from the earliest registry deployment block; starting after agent registration loses required relationships and is rejected rather than creating invented agents.
+
+For the Envio Cloud project `willy264/monad-astheris`, use repository branch `main` and project root `indexer`. Contract addresses and the start block work without environment overrides, including through `pnpm dev` and `pnpm start`. Their configuration check reads the same defaults from `config.yaml` and rejects malformed, empty or zero-address overrides. If you configure these values explicitly, use:
+
+```dotenv
+ENVIO_MONAD_RPC_URL=https://testnet-rpc.monad.xyz
+ENVIO_AGENT_REGISTRY_ADDRESS=0x754d7f2fd55a9841dbff248f9cb91d497116f231
+ENVIO_ROUTER_ADDRESS=0xac4a33521b32122c9f014eac8800144dd9aa5ebe
+ENVIO_START_BLOCK=67972561
+ENVIO_HASURA_PUBLIC_AGGREGATE=["Agent","TaskExecution"]
+```
+
+A Cloud project showing **0 deployments** has no running indexer or GraphQL endpoint yet. After its first successful deployment, open that deployment's GraphQL endpoint and copy the actual URL into the server-only `ENVIO_GRAPHQL_URL` setting in Vercel and `scripts/.env`. Redeploy the frontend after changing its environment. A project page URL is not a GraphQL endpoint. Keep credentials server-only, and verify `Agent` and `TaskExecution` query results before claiming that hosted indexing works.
 
 `Agent`, `EphemeralShard`, `TaskExecution`, and `MerkleBatch` entities provide a GraphQL query layer. Set the frontend server's `ENVIO_GRAPHQL_URL` to connect the dashboard to this service. `SyncStatus` records the previous fully processed block and is keyed by chain, router and identity registry, so the dashboard can show progress and reject unrelated deployments. Every task execution stores its canonical double-hashed leaf. Each block's binary frontier is persisted as an entity: appending costs O(log n), no process-global mutable tree exists, and Envio can roll back entity writes on chain reorganizations. The next block marks the preceding block complete. Actual commitments are recorded separately as `BatchCommitment`, and equality of batch ID, root, range and leaf count is checked.
 
