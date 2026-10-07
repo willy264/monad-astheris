@@ -2,6 +2,8 @@
 
 Updated **2026-10-07**. The registered observer has completed an authorized paid MCP task, actual x402 settlement, a reputation completion record, a finalized Merkle publication and project-controlled output-integrity validation. Hosted Envio returns the matching task and verified commitment. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the exact receipts. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
 
+**Subsequent wallet finding:** user screenshots show a malicious-site classification for the production domain. The [review record](submission/2026-10-07/wallet-security-review.md) documents the unresolved warning and separately confirmed Dynamic display-name mismatch. Automated source checks and earlier transaction receipts do not clear this classification. Website wallet interaction and the physical passkey demonstration remain paused pending investigation.
+
 ## Current source checks
 
 | Component / revision | Checks and observed outcome | Scope |

@@ -4,6 +4,8 @@
 
 Remaining demonstration work is physical passkey enrollment, explicit grant revocation, the production dashboard's Envio configuration and the chosen browser paid flow. Durable hosting and additional integration claims need separate work. The organizer's deadline, rubric, eligibility and required assets have not been verified.
 
+**Wallet demonstration blocker:** user screenshots now show MetaMask marking the production website malicious. Its detection reason is unknown. Dynamic separately returns the unexpected display name `uiriamuzu`. Pause website wallet interactions pending investigation; correcting that name alone is not security clearance. The [review record](../submission/2026-10-07/wallet-security-review.md) includes a prepared, unsent support request. This takes precedence over the retry instructions below.
+
 The passkey fix is deployed. Its [production browser check](../submission/2026-10-07/passkey-production-smoke.json) verified the new assets and rendered dialogs, but Dynamic settings subsequently returned HTTP 429 and blocked fresh-session initialization. Wait for provider availability before retrying the physical ceremony; the partial check is not an authentication pass.
 
 ## Implemented and observed
