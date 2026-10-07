@@ -26,6 +26,8 @@ sol! {
         function executeTask(address shard, bytes32 outputHash, bytes32 proofHash) external;
         function predictShardAddress(uint256 agentId, bytes32 taskId, uint256 sequenceNonce, address executor, bytes32 inputHash) external view returns (address);
         function isAuthorized(uint256 agentId, address account) external view returns (bool);
+        function committers(address account) external view returns (bool);
+        function merkleBatches(bytes32 batchId) external view returns (bytes32 root, uint256 leafCount, uint256 fromBlock, uint256 toBlock);
         function commitMerkleBatch(bytes32 batchId, bytes32 root, uint256 leafCount, uint256 fromBlock, uint256 toBlock) external;
         event ShardCreated(address indexed shard, uint256 indexed agentId, bytes32 indexed taskId, uint256 sequenceNonce, address executor, bytes32 inputHash);
         event TaskExecuted(address indexed shard, uint256 indexed agentId, bytes32 indexed taskId, bytes32 inputHash, bytes32 outputHash, bytes32 proofHash);

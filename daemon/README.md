@@ -104,4 +104,21 @@ parent = keccak256(min(left,right) || max(left,right))
 
 Duplicate the last node at each odd level. A single leaf is its own root. Batch ID is `keccak256(abi.encodePacked(uint256(10143),address(router),uint256(blockNumber),bytes32(blockHash)))`. Each nonempty block becomes one authorized router commit. This commits verified canonical log data; it does not make those outputs truthful or establish TEE validity.
 
+### Publish one finalized block
+
+To publish a known execution block without scanning from deployment, stop every other daemon or wallet process using the first configured relayer, retain its existing `DATABASE_PATH`, and run:
+
+```sh
+# From daemon/, replace EXECUTION_BLOCK with the decimal TaskExecuted receipt block.
+cargo run --locked --release -- --commit-block EXECUTION_BLOCK
+```
+
+This command can spend testnet MON on one `commitMerkleBatch` transaction. The first `RELAYER_PRIVATE_KEYS` signer must have the router's committer permission; task delegation alone does not grant it. Use the normal core RPC/router/signer/database/deployment-block configuration. The CLI loads `.env` like the server but does not initialize the payment service, start HTTP listeners, mark task jobs interrupted, run the background worker, or read/advance its cursor. `BATCH_ENABLED` does not enable an additional worker in this mode. A database lock coordinates processes on the same journal; it cannot detect another host using the same key, so exclusive signer use remains an operator requirement.
+
+The command rejects blocks before deployment, unfinalized blocks, empty execution blocks, malformed/duplicate/foreign logs, and changed canonical hashes. It reconstructs all router `TaskExecuted` events in that block using the worker's hashing rules. Existing conflicting commitments fail. A matching existing commitment causes no new transaction. RPC log completeness is still trusted, as with the background publisher.
+
+New publication uses the existing nonce/broadcast journal and waits for a successful receipt, an exact `MerkleBatchCommitted` event, canonical finalized receipt and source blocks, and matching finalized contract state. The worker shares this publication and reconciliation path: a matching finalized commitment is recognized when it later catches up, including commitments whose transaction hash is absent from this journal. The command is bounded to five minutes after engine initialization. Errors report a safe failure category without provider URLs or response bodies. If an RPC/receipt timeout or process interruption occurs, preserve the journal: repeating the same command can inspect the known transaction, but an ambiguous broadcast remains blocked and requires reconciliation. Never select a fresh database to bypass a pending intent.
+
+Successful output is public JSON with `status`, `chainId`, `router`, `batchId`, `root`, `leafCount`, `block`, `blockHash`, `transaction`, and `receiptVerified`. A commitment already present in finalized storage but absent from this journal returns `status: "already_committed"`, `transaction: null`, and `receiptVerified: false`; this verifies stored batch fields without claiming to have located its historical receipt. `--help` prints usage without loading configuration or making network calls.
+
 Measure actual RPC latency with `python scripts/rpc_latency.py --rpc <RPC_URL> --samples 20`. The configurable 300 ms comparison is a latency budget, not a hardcoded claim about Monad's current block interval or achieved TPS. Tests cover payment/task signature binding, expiry, amount/receiver checks, persistent replay reservation and Merkle rules without requiring private keys or RPC access.
