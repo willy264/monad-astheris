@@ -1,0 +1,88 @@
+{
+  "observedAt": "2026-10-07T19:16:00.232Z",
+  "scope": "read-only audit; no transactions or service changes",
+  "chainId": 10143,
+  "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+  "identityRegistry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+  "deploymentBlock": "67972561",
+  "finalizedBlock": {
+    "number": "69051101",
+    "hash": "0x6868b652ff6c83cfbeb73a2e3a71dace2161ab53f74e55ab9e631f9b3a78aff2"
+  },
+  "committer": {
+    "address": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+    "authorized": true,
+    "isRouterOwner": true
+  },
+  "daemon": {
+    "url": "https://monad-astheris-daemon.onrender.com",
+    "healthHttpStatus": 200,
+    "status": "ok",
+    "batchWorker": "disabled",
+    "observedBlock": "69051357",
+    "relayers": [
+      "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+    ],
+    "note": "Initial PowerShell HTTP checks timed out; subsequent Node fetches succeeded."
+  },
+  "publicPaymentPolicy": {
+    "x402Version": 2,
+    "scheme": "exact",
+    "network": "eip155:10143",
+    "asset": "0x534b2f3a21130d7a60830c2df862319e593943a3",
+    "amount": "1000",
+    "name": "USDC",
+    "version": "2",
+    "maxTimeoutSeconds": 120,
+    "payTo": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+    "resource": "https://monad-astheris-daemon.onrender.com/v1/tasks"
+  },
+  "indexer": {
+    "configuredAddressesMatchManifest": true,
+    "startBlock": "67972561",
+    "hostedGraphqlConfigured": false,
+    "envioApiTokenConfigured": false,
+    "graphqlCredentialConfigured": false,
+    "wslUbuntuInstalled": true,
+    "dockerLinuxEngineRunning": false
+  },
+  "blockers": [
+    "No configured hosted GraphQL endpoint; no indexed query can be claimed.",
+    "Batch worker disabled; absent cursor would require sequential scan of more than one million blocks from deployment.",
+    "Paid task receipt is prerequisite for canonical task-block Merkle settlement."
+  ],
+  "localVerification": {
+    "completedAt": "2026-10-07T19:26:50.950179+00:00",
+    "sourceRevision": "ddb4a29d087cab4b9678616b76eb5bd9e18d2e1a",
+    "environment": "Ubuntu WSL, isolated tracked-source archive, native Linux Node 22.23.3, pnpm 10.32.1",
+    "isolatedDirectory": "/tmp/aetheris-indexer-final-20261007-W7z8r5/source/indexer",
+    "script": ".tools/verify-indexer-linux-2026-10-07.sh",
+    "nodeArchiveSha256": "df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de",
+    "commands": [
+      {
+        "command": "npm exec --yes --package=pnpm@10.32.1 -- pnpm install --frozen-lockfile",
+        "status": "passed",
+        "packages": 234
+      },
+      {
+        "command": "npm exec --yes --package=pnpm@10.32.1 -- pnpm codegen",
+        "status": "passed"
+      },
+      {
+        "command": "npm exec --yes --package=pnpm@10.32.1 -- pnpm typecheck",
+        "status": "passed"
+      },
+      {
+        "command": "npm exec --yes --package=pnpm@10.32.1 -- pnpm test",
+        "status": "passed",
+        "tests": 2,
+        "failed": 0
+      }
+    ],
+    "tests": [
+      "incremental persisted frontier matches full trees for odd and even widths",
+      "execution commitments separate chains, routers, inputs, outputs and proofs"
+    ],
+    "scope": "No Docker started, no Cloud publication, no hosted indexing verified, no tracked files modified."
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "observedAt": "2026-10-07T19:22:13.581Z",
+  "checks": {
+    "clientConfiguration": {
+      "ok": true,
+      "value": {
+        "missing": [
+          "ENVIO_GRAPHQL_URL",
+          "REVIEWER_PRIVATE_KEY",
+          "REVIEW_ASSESSMENT_FILE"
+        ],
+        "daemonTargetsLocalhost": false,
+        "mcpArgumentsFileExists": true,
+        "hostingCredentialsPresent": []
+      }
+    },
+    "unpaidChallenge": {
+      "ok": true,
+      "value": {
+        "status": 402,
+        "paymentRequired": {
+          "accepts": [
+            {
+              "amount": "1000",
+              "asset": "0x534b2f3a21130d7a60830c2df862319e593943a3",
+              "extra": {
+                "name": "USDC",
+                "version": "2"
+              },
+              "maxTimeoutSeconds": 120,
+              "network": "eip155:10143",
+              "payTo": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+              "scheme": "exact"
+            }
+          ],
+          "error": "payment proof required",
+          "resource": {
+            "description": "Create isolated agent shard and commit caller-supplied output hashes",
+            "mimeType": "application/json",
+            "url": "https://monad-astheris-daemon.onrender.com/v1/tasks"
+          },
+          "x402Version": 2
+        },
+        "signed": false,
+        "paid": false
+      }
+    },
+    "v1/config": {
+      "ok": true,
+      "value": {
+        "status": 200,
+        "body": {
+          "chainId": 10143,
+          "payment": {
+            "accepts": [
+              {
+                "amount": "1000",
+                "asset": "0x534b2f3a21130d7a60830c2df862319e593943a3",
+                "extra": {
+                  "name": "USDC",
+                  "version": "2"
+                },
+                "maxTimeoutSeconds": 120,
+                "network": "eip155:10143",
+                "payTo": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+                "scheme": "exact"
+              }
+            ],
+            "resource": {
+              "description": "Create isolated agent shard and commit caller-supplied output hashes",
+              "mimeType": "application/json",
+              "url": "https://monad-astheris-daemon.onrender.com/v1/tasks"
+            },
+            "x402Version": 2
+          },
+          "relayers": [
+            "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+          ],
+          "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+          "taskAuthorization": {
+            "name": "AetherisTask",
+            "version": "1"
+          }
+        }
+      }
+    },
+    "health": {
+      "ok": true,
+      "value": {
+        "status": 200,
+        "body": {
+          "batchWorker": "disabled",
+          "blockNumber": 69052355,
+          "chainId": 10143,
+          "relayers": [
+            "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+          ],
+          "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+          "status": "ok"
+        }
+      }
+    },
+    "facilitator": {
+      "ok": true,
+      "value": {
+        "status": 200,
+        "body": {
+          "extensions": [],
+          "kinds": [
+            {
+              "network": "eip155:10143",
+              "scheme": "batch-settlement",
+              "x402Version": 2
+            },
+            {
+              "network": "eip155:143",
+              "scheme": "batch-settlement",
+              "x402Version": 2
+            },
+            {
+              "extra": {
+                "facilitatorAddress": "0x7f6a2850669202519f0fe8aa912451238820db86"
+              },
+              "network": "eip155:10143",
+              "scheme": "upto",
+              "x402Version": 2
+            },
+            {
+              "extra": {},
+              "network": "eip155:10143",
+              "scheme": "exact",
+              "x402Version": 2
+            },
+            {
+              "extra": {},
+              "network": "eip155:143",
+              "scheme": "exact",
+              "x402Version": 2
+            },
+            {
+              "extra": {
+                "facilitatorAddress": "0x7f6a2850669202519f0fe8aa912451238820db86"
+              },
+              "network": "eip155:143",
+              "scheme": "upto",
+              "x402Version": 2
+            }
+          ],
+          "signers": {
+            "eip155:10143": [
+              "0x7f6a2850669202519f0FE8aa912451238820Db86"
+            ],
+            "eip155:143": [
+              "0x7f6a2850669202519f0FE8aa912451238820Db86"
+            ]
+          }
+        }
+      }
+    },
+    "wallets": {
+      "ok": true,
+      "value": [
+        {
+          "address": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+          "mon": "13.930561484989855863",
+          "usdcBaseUnits": "0",
+          "latestNonce": 6,
+          "pendingNonce": 6
+        },
+        {
+          "address": "0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605",
+          "mon": "0",
+          "usdcBaseUnits": "0",
+          "latestNonce": 0,
+          "pendingNonce": 0
+        }
+      ]
+    },
+    "chain": {
+      "ok": true,
+      "value": {
+        "chainId": 10143,
+        "blockNumber": "69052359"
+      }
+    },
+    "agentAndWorkflowState": {
+      "ok": true,
+      "value": {
+        "agentId": "1",
+        "owner": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+        "uri": "ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea",
+        "taskSigner": "0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605",
+        "signerAuthorized": false,
+        "executorAuthorized": true,
+        "committerAuthorized": true,
+        "completedTasks": "0",
+        "feedbackClients": [],
+        "validationRequests": [],
+        "creForwarder": "0x0000000000000000000000000000000000000000"
+      }
+    }
+  },
+  "sourceRevision": "ddb4a29d087cab4b9678616b76eb5bd9e18d2e1a",
+  "scope": "Read-only RPC and public HTTP checks, plus an unsigned HTTP 402 challenge. No payments or transactions.",
+  "taskClientAttempt": {
+    "command": "pnpm submit-task --run-dir .state/tasks/final-live-2026-10-07",
+    "exitCode": 1,
+    "error": "Task signer and executor must both be authorized for the agent",
+    "journalPhase": "new",
+    "mcpInvoked": false,
+    "taskSigned": false,
+    "paidSubmission": false,
+    "transactionHashes": []
+  }
+}
