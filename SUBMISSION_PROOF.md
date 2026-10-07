@@ -1,5 +1,39 @@
 # Aetheris live verification
 
+## Final execution attempt, 2026-10-07
+
+**Backend checks pass; live submission remains incomplete.** This run rechecked the four deployment receipts/runtime hashes, Agent #1 registration and public services. It did not produce a paid task, delegation, batch, feedback or validation transaction. See the regenerated [live checks](submission/LIVE_CHECKS.md), [public preflight observations](submission/2026-10-07/preflight.json) and [MCP verification](submission/2026-10-07/mcp.json).
+
+**Funding follow-up, 19:35 UTC:** after the user supplied testnet funds, the prepared task wallet held **5 MON**, **zero USDC**, and remained unauthorized for Agent #1. The [follow-up RPC record](submission/2026-10-07/funding-followup.json) supersedes the initial zero-MON observation below. The user requested that the physical passkey ceremony remain pending. Exact Render API key and Envio deployment setup steps are in [live service access](docs/live-service-access.md).
+
+| Requested step | Observed result | Remaining requirement |
+| --- | --- | --- |
+| Paid MCP task | Render `/health` and `/v1/config` returned 200. Unsigned `POST /v1/tasks` returned the expected 402 challenge. The actual submission client stopped with `Task signer and executor must both be authorized for the agent`, before calling MCP, signing or posting a paid request. | Fund the dedicated task wallet with testnet USDC and grant it expiring Agent #1 authority; 5 MON has arrived. Preserve the existing task journal and resume it. |
+| Passkey grant/revoke | Existing owner/executor is authorized; the new task wallet is not. No physical WebAuthn ceremony or delegation transaction was performed. | Device sign-in and owner wallet approval; verify grant, authorized execution, then revoke and verify denial. CLI signing does not establish passkey authentication. |
+| Envio and Merkle batch | No hosted GraphQL URL is configured. Render reports batching disabled. The owner/relayer already has committer permission and RPC supports finalized blocks. | A real task receipt, running Envio service and controlled batch-worker execution. There is no task block to publish yet. |
+| Reputation and validation | `completedTasks(1) = 0`, feedback clients `[]`, validation requests `[]`; CRE forwarder is unset. | Verified completed output, independently reviewed feedback and a named validator's actual response. No scores or validation results were manufactured. |
+
+The local task client now has the verified router, agent ID `1`, Render task URL, actual MCP tool/arguments and a maximum payment of **1,000 USDC base units (0.001 testnet USDC)**. A dedicated testnet task signer/payer was generated at **`0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605`**; Render's existing owner/relayer remains the on-chain executor. The new private key is held only in ignored `scripts/.env`; the environment and attempt directories have restricted Windows access. At the preflight the new wallet held zero MON and zero USDC. The existing owner/relayer held approximately 13.93 MON and zero USDC. These are dated balance observations, not funding guarantees.
+
+The registered MCP service is **`https://monad-astheris.vercel.app/api/mcp`** (`get_monad_block`, `{}`). Render hosts the paid task daemon at **`https://monad-astheris-daemon.onrender.com/v1/tasks`**. The independent MCP verifier passed all **11 checks** and matched block `69052210`, hash `0xea29b3d5617eac6882ea75ebc9a2cc437f13b2f30aac483992f702d8f3d519d2`, against public RPC. This free observation is separate from the blocked paid-task attempt.
+
+The public Monad facilitator's `/supported` response advertises x402 v2 `exact` for `eip155:10143`. Its advertised support and the daemon's 402 challenge do not prove payment settlement. Token, domain and faucet instructions agree with the [official Monad x402 guide](https://docs.monad.xyz/guides/x402): USDC `0x534b2f3a21130d7a60830c2df862319e593943a3`, domain `USDC`, version `2`.
+
+The owner is also Render's active relayer. Coordinate exclusive signer access before owner grant/revoke or validation-request transactions; the daemon's nonce lock only covers its own process. No Render management credential was available for this run. Keep its journal intact when coordinating a stop/restart, especially on the current free hosting plan where persistence remains unverified.
+
+The batch worker scans blocks sequentially. Without an existing cursor, the deployment start at `67972561` is roughly 1.08 million blocks behind the observed finalized head. A verified bounded publication path or efficient complete catch-up is needed; changing the start block or discarding the cursor would not demonstrate historical coverage. Envio configuration already points to the deployment, but no hosted query result is claimed.
+
+Resume the existing attempt only after funding and authorization are verified:
+
+```sh
+cd scripts
+pnpm submit-task --run-dir .state/tasks/final-live-2026-10-07 --resume
+```
+
+The saved phase is `new`; no MCP invocation or paid submission occurred within that attempt. After verified completion, set `TASK_PROOF_PATH` to its `client-proof.json`. To publish the requested sample task signature, wait until its deadline has passed on both the local clock and chain, then run `pnpm submit-task --run-dir .state/tasks/final-live-2026-10-07 --resume --export-proof`. Normal proof deliberately omits active signatures. Add the real `ENVIO_GRAPHQL_URL` and any required server-side credential, verify the batch and indexed logs, then rerun `pnpm submission-proof`. Feedback additionally requires `REVIEWER_PRIVATE_KEY` and `REVIEW_ASSESSMENT_FILE` for an eligible reviewer who has assessed the actual output. Preserve private task/payment journals outside source control.
+
+Fresh local verification on source `ddb4a29d087cab4b9678616b76eb5bd9e18d2e1a`: **38 Foundry tests** (including two 256-case fuzz tests), clean **`cargo check --locked`**, **20 Rust tests**, clean script typecheck and **17 script tests**. Ubuntu WSL also passed a frozen indexer install, code generation, full typecheck and **both Merkle tests**; details are in the [indexer audit](submission/2026-10-07/indexer-audit.json). These checks establish local behavior; the missing transaction hashes and GraphQL evidence above remain blockers.
+
 ## Readiness preflight, 2026-10-06
 
 The public Render daemon returned HTTP 200 for `/health` and `/v1/config` after a cold start. It reports chain `10143`, the deployed router above, one relayer (the registered agent owner), and batching disabled. Its advertised x402 v2 exact policy charges **1,000 base units (0.001 USDC)** per task, using token `0x534b2f3a21130d7a60830c2df862319e593943a3`, signing-domain name `USDC`, version `2`. Read-only contract calls confirmed deployed token code, those domain fields and six decimals. Advertising this policy is not evidence that the facilitator has settled a payment.

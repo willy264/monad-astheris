@@ -134,3 +134,26 @@ Screenshot review then corrected the narrow featured-agent metric layout: labels
 [PR #36](https://github.com/willy264/monad-astheris/pull/36) merged as `10c255048c98f492825a190ce91d102fef5859aa`. [Component CI](https://github.com/willy264/monad-astheris/actions/runs/37546224081) passed all four jobs on the merged revision. Vercel production deployment `Codz41bMWfwWGN615EgRaBHzomdh` (GitHub deployment `6897650950`) succeeded. The public [Aetheris site](https://monad-astheris.vercel.app) then passed **592 browser checks with 81 screenshots** across all three pages at 1440px, 768px, 390px and 320px, plus a 701px breakpoint and 768x390 landscape checks.
 
 The final run verified expanded/collapsed sidebar geometry and keyboard operation, active navigation, wallet-dialog access from the rail, responsive card geometry, actual font rendering, live directory/search, comparison modes and the guided preview. It also verified that the actual "Unrated" reputation value occupies one line at every tested width. There were **zero runtime exceptions, console errors or provider HTTP errors**. Desktop, collapsed-sidebar and mobile screenshots were visually inspected. The ignored report is `.tools/sidebar-ui-verification/2026-10-06T23-25-58-336Z/report.json`, with the exact application source in `artifactRevision`. This final documentation update does not change the verified frontend source. No paid execution or passkey device ceremony is implied by these UI checks.
+
+## Final backend and live execution attempt, 2026-10-07
+
+Fresh checks against source `ddb4a29d087cab4b9678616b76eb5bd9e18d2e1a` all passed:
+
+| Command | Observed outcome |
+| --- | --- |
+| `forge test` | 38 passing tests, including two fuzz tests with 256 cases each |
+| `cargo check --locked` | Successful, no warnings reported |
+| `cargo test --locked` | 20 passing tests |
+| Scripts `pnpm typecheck` | Successful |
+| Scripts `pnpm test` | 17 passing tests |
+| Indexer `pnpm codegen`, `pnpm typecheck`, `pnpm test` | Passed in isolated Ubuntu WSL source archive after frozen install; two Merkle tests passed, Node 22.23.3 / pnpm 10.32.1 |
+| Scripts `pnpm verify-mcp https://monad-astheris.vercel.app/api/mcp` | 11 passing public-service/RPC checks |
+| Scripts `pnpm submission-proof` | Reverified four deployment receipts/runtime hashes and Agent #1 registration; generated explicit blocked statuses for paid execution and indexed settlement |
+
+The live attempt used the actual Render task endpoint and verified payment policy. A distinct task signer was generated in ignored local configuration; no existing owner/relayer key was reused as the task client. `pnpm submit-task --run-dir .state/tasks/final-live-2026-10-07` exited with `Task signer and executor must both be authorized for the agent`. The attempt journal remains at phase `new`, before MCP invocation, signatures or paid submission. Read-only RPC confirmed the signer is unauthorized and unfunded; the executor is authorized. A separate unsigned task request returned the expected HTTP 402 challenge.
+
+No passkey device ceremony, delegation, payment, task, batch, feedback or validation transaction was produced by this run. The existing owner is also the active Render relayer; management access was unavailable to coordinate exclusive signer use. Batching remains disabled and no hosted Envio endpoint is configured. Reputation still reports zero recorded completions and no feedback clients; validation reports no requests. These are live configuration/workflow blockers, not passing-test claims.
+
+Public evidence: [generated checks](submission/LIVE_CHECKS.md), [preflight](submission/2026-10-07/preflight.json), [MCP report](submission/2026-10-07/mcp.json) and [indexer/batch audit](submission/2026-10-07/indexer-audit.json). The [submission proof](SUBMISSION_PROOF.md) records the prepared wallet, verified endpoints and exact resume command. Private keys and journals remain excluded from Git.
+
+Funding follow-up at 19:35 UTC: the user funded the task wallet with **5 testnet MON**. RPC still showed zero USDC and `isAuthorized(1, taskSigner) == false`; see the [dated follow-up](submission/2026-10-07/funding-followup.json). The user explicitly deferred the physical passkey ceremony. [Service setup instructions](docs/live-service-access.md) explain where to obtain Render management access and the Envio GraphQL URL.
