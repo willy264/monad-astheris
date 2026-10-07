@@ -46,6 +46,32 @@ struct CanonicalTask {
 }
 
 type ApiResult = Result<Response, ApiError>;
+
+#[derive(Debug, PartialEq, Eq)]
+enum Command {
+    Serve,
+    CommitBlock(u64),
+    Help,
+}
+
+fn command(args: impl Iterator<Item = String>) -> anyhow::Result<Command> {
+    let args: Vec<String> = args.collect();
+    match args.as_slice() {
+        [] => Ok(Command::Serve),
+        [flag] if flag == "--help" || flag == "-h" => Ok(Command::Help),
+        [flag, block] if flag == "--commit-block" => {
+            anyhow::ensure!(
+                !block.is_empty() && block.bytes().all(|value| value.is_ascii_digit()),
+                "--commit-block requires an unsigned decimal block number"
+            );
+            Ok(Command::CommitBlock(block.parse().map_err(|_| {
+                anyhow::anyhow!("--commit-block block number exceeds uint64")
+            })?))
+        }
+        _ => anyhow::bail!("usage: aetheris-daemon [--commit-block DECIMAL_BLOCK | --help]"),
+    }
+}
+
 pub struct ApiError(StatusCode, String);
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
@@ -55,6 +81,11 @@ impl IntoResponse for ApiError {
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> anyhow::Result<()> {
+    let command = command(std::env::args().skip(1))?;
+    if command == Command::Help {
+        println!("Usage: aetheris-daemon [--commit-block DECIMAL_BLOCK | --help]\nWithout arguments, serve the paid task API. --commit-block publishes one finalized nonempty task block using the first relayer and existing journal; stop every other process using that signer first. It does not start the server, contact payment services, or advance the worker cursor.");
+        return Ok(());
+    }
     rustls::crypto::ring::default_provider()
         .install_default()
         .map_err(|_| anyhow::anyhow!("TLS crypto provider was already configured"))?;
@@ -67,15 +98,31 @@ async fn main() -> anyhow::Result<()> {
         .init();
     let config = config::Config::from_env()?;
     let store = store::Store::open(&config.database)?;
-    let interrupted = store.mark_interrupted_jobs().await?;
-    if interrupted > 0 {
-        tracing::warn!(
-            interrupted,
-            "interrupted jobs require reconciliation; no automatic rebroadcast or repayment"
-        );
+    if command == Command::Serve {
+        let interrupted = store.mark_interrupted_jobs().await?;
+        if interrupted > 0 {
+            tracing::warn!(
+                interrupted,
+                "interrupted jobs require reconciliation; no automatic rebroadcast or repayment"
+            );
+        }
     }
     let engine = router::Engine::connect(&config, store.clone()).await
         .map_err(|_| anyhow::anyhow!("RPC/router/relayer initialization failed; verify configured network, deployment and signer keys"))?;
+    if let Command::CommitBlock(block) = command {
+        anyhow::ensure!(
+            block >= config.deployment_block,
+            "requested block precedes DEPLOYMENT_BLOCK"
+        );
+        let publication = tokio::time::timeout(
+            Duration::from_secs(300),
+            merkle::commit_block(engine, block),
+        ).await
+            .map_err(|_| anyhow::anyhow!("block publication timed out; preserve the journal and reconcile any recorded transaction before retrying"))?
+            .map_err(|error| anyhow::anyhow!(merkle::publication_error(&error)))?;
+        println!("{}", serde_json::to_string(&publication)?);
+        return Ok(());
+    }
     let payments = Arc::new(x402::Payments::from_env(engine.http.clone()).await
         .map_err(|_| anyhow::anyhow!("payment initialization failed; verify payment settings and facilitator support"))?);
     let state = AppState {
@@ -376,4 +423,36 @@ fn internal(_error: anyhow::Error) -> ApiError {
         StatusCode::INTERNAL_SERVER_ERROR,
         "storage unavailable".into(),
     )
+}
+
+#[cfg(test)]
+mod command_tests {
+    use super::*;
+
+    #[test]
+    fn commit_block_requires_one_decimal_number_and_preserves_server_default() {
+        let parse = |args: &[&str]| command(args.iter().map(|value| (*value).to_owned()));
+        assert_eq!(parse(&[]).unwrap(), Command::Serve);
+        assert_eq!(parse(&["--help"]).unwrap(), Command::Help);
+        assert_eq!(
+            parse(&["--commit-block", "68105690"]).unwrap(),
+            Command::CommitBlock(68105690)
+        );
+        for args in [
+            vec!["--commit-block"],
+            vec!["--commit-block", ""],
+            vec!["--commit-block", "-1"],
+            vec!["--commit-block", "+1"],
+            vec!["--commit-block", "0x2a"],
+            vec!["--commit-block", "42.0"],
+            vec!["--commit-block", "18446744073709551616"],
+            vec!["--commit-block", "42", "--commit-block", "43"],
+            vec!["--typo"],
+        ] {
+            assert!(
+                parse(&args).is_err(),
+                "invalid arguments must never start the server"
+            );
+        }
+    }
 }
