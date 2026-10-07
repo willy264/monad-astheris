@@ -16,10 +16,11 @@ contracts:
       - event: "MerkleBatchCommitted(bytes32 indexed batchId, bytes32 root, uint256 leafCount, uint256 fromBlock, uint256 toBlock)"
 chains:
   - id: 10143
-    start_block: ${ENVIO_START_BLOCK:-0}
+    # Public defaults match contracts/deployments/10143.json; ENVIO_* can override them.
+    start_block: ${ENVIO_START_BLOCK:-67972561}
     rpc: ${ENVIO_MONAD_RPC_URL:-https://testnet-rpc.monad.xyz}
     contracts:
       - name: AgentRegistry
-        address: "${ENVIO_AGENT_REGISTRY_ADDRESS:-0x0000000000000000000000000000000000000000}"
+        address: "${ENVIO_AGENT_REGISTRY_ADDRESS:-0x754d7f2fd55a9841dbff248f9cb91d497116f231}"
       - name: AetherisRouter
-        address: "${ENVIO_ROUTER_ADDRESS:-0x0000000000000000000000000000000000000000}"
+        address: "${ENVIO_ROUTER_ADDRESS:-0xac4a33521b32122c9f014eac8800144dd9aa5ebe}"
