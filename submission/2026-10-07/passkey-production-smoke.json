@@ -1,0 +1,247 @@
+{
+  "observedAt": "2026-10-07T21:05:14.342Z",
+  "site": "https://monad-astheris.vercel.app",
+  "revision": "4d8222dde5befd0e2d78ae2de729056f2fbe5945",
+  "overall": "incomplete-provider-rate-limit",
+  "scope": "Read-only isolated browser verification; no account sign-in, device enrollment, signature or chain transaction.",
+  "initial": {
+    "startedAt": "2026-10-07T21:01:22.811Z",
+    "checks": [
+      {
+        "name": "Page renders ready auth control and responsive navigation",
+        "passed": true,
+        "route": "/",
+        "width": 1425,
+        "title": "Express Checkout Lanes for Autonomous AI Agents on Monad",
+        "links": 3,
+        "selected": "/",
+        "auth": "Sign in with Passkey",
+        "viewport": 1440
+      },
+      {
+        "name": "Unauthenticated access dialog offers sign-in and cannot grant authority",
+        "passed": true,
+        "route": "/",
+        "width": 1440,
+        "title": "Passkeys & task authority",
+        "agent": "1",
+        "executor": "",
+        "authorization": "1",
+        "submitDisabled": true,
+        "passkey": true,
+        "passkeyDisabled": false,
+        "registration": false,
+        "profile": false,
+        "left": 332.5,
+        "right": 1092.5,
+        "scrollWidth": 758,
+        "clientWidth": 758,
+        "focus": "access-title",
+        "alerts": []
+      },
+      {
+        "name": "Page renders ready auth control and responsive navigation",
+        "passed": true,
+        "route": "/agents",
+        "width": 1425,
+        "title": "Real agents. Verifiable identities.",
+        "links": 3,
+        "selected": "/agents",
+        "auth": "Sign in with Passkey",
+        "viewport": 1440
+      },
+      {
+        "name": "Unauthenticated access dialog offers sign-in and cannot grant authority",
+        "passed": true,
+        "route": "/agents",
+        "width": 1440,
+        "title": "Passkeys & task authority",
+        "agent": "1",
+        "executor": "",
+        "authorization": "1",
+        "submitDisabled": true,
+        "passkey": true,
+        "passkeyDisabled": false,
+        "registration": false,
+        "profile": false,
+        "left": 332.5,
+        "right": 1092.5,
+        "scrollWidth": 758,
+        "clientWidth": 758,
+        "focus": "access-title",
+        "alerts": []
+      },
+      {
+        "name": "Page renders ready auth control and responsive navigation",
+        "passed": true,
+        "route": "/visualizer",
+        "width": 1425,
+        "title": "One checkout. Or a lane for every task.",
+        "links": 3,
+        "selected": "/visualizer",
+        "auth": "Sign in with Passkey",
+        "viewport": 1440
+      },
+      {
+        "name": "Page renders ready auth control and responsive navigation",
+        "passed": true,
+        "route": "/",
+        "width": 390,
+        "title": "Express Checkout Lanes for Autonomous AI Agents on Monad",
+        "links": 3,
+        "selected": "/",
+        "auth": "Sign in with Passkey",
+        "viewport": 390
+      },
+      {
+        "name": "Unauthenticated access dialog offers sign-in and cannot grant authority",
+        "passed": true,
+        "route": "/",
+        "width": 390,
+        "title": "Passkeys & task authority",
+        "agent": "1",
+        "executor": "",
+        "authorization": "1",
+        "submitDisabled": true,
+        "passkey": true,
+        "passkeyDisabled": false,
+        "registration": false,
+        "profile": false,
+        "left": 17,
+        "right": 373,
+        "scrollWidth": 354,
+        "clientWidth": 354,
+        "focus": "access-title",
+        "alerts": []
+      },
+      {
+        "name": "Page renders ready auth control and responsive navigation",
+        "passed": true,
+        "route": "/agents",
+        "width": 390,
+        "title": "Real agents. Verifiable identities.",
+        "links": 3,
+        "selected": "/agents",
+        "auth": "Sign in with Passkey",
+        "viewport": 390
+      },
+      {
+        "name": "Unauthenticated access dialog offers sign-in and cannot grant authority",
+        "passed": true,
+        "route": "/agents",
+        "width": 390,
+        "title": "Passkeys & task authority",
+        "agent": "1",
+        "executor": "",
+        "authorization": "1",
+        "submitDisabled": true,
+        "passkey": true,
+        "passkeyDisabled": false,
+        "registration": false,
+        "profile": false,
+        "left": 17,
+        "right": 373,
+        "scrollWidth": 354,
+        "clientWidth": 354,
+        "focus": "access-title",
+        "alerts": []
+      },
+      {
+        "name": "Page renders ready auth control and responsive navigation",
+        "passed": true,
+        "route": "/visualizer",
+        "width": 390,
+        "title": "One checkout. Or a lane for every task.",
+        "links": 3,
+        "selected": "/visualizer",
+        "auth": "Sign in with Passkey",
+        "viewport": 390
+      },
+      {
+        "name": "Production loads the new passkey enrollment implementation",
+        "passed": true,
+        "url": "https://monad-astheris.vercel.app/_next/static/chunks/7811.91c9321fcc15258a.js",
+        "bytes": 10457,
+        "checks": [
+          "unconfirmed-result guard",
+          "account profile fallback",
+          "step-up requirement",
+          "credential-link scope"
+        ]
+      },
+      {
+        "name": "No browser runtime exceptions",
+        "passed": true,
+        "exceptions": []
+      },
+      {
+        "name": "No browser console errors",
+        "passed": false,
+        "errors": [
+          {
+            "current": {
+              "route": "/visualizer",
+              "width": 390
+            },
+            "message": "[2026-10-07T21:01:51.799Z] ERROR: [fetchProjectSettings] Failed to fetch project settings, falling back to cached settings TypeError: Failed to fetch\n    at t$.fetchApi (https://monad-astheris.vercel.app/_next/static/chunks/8735-8f61908f2cd7982f.js:74:205155)\n    at async t$.request (https://monad-astheris.vercel.app/_next/static/chunks/8735-8f61908f2cd7982f.js:74:205653)\n    at async t$.getEnvironmentSettingsRaw (https://monad-astheris.vercel.app/_next/static/chunks/91b2ca88-973c7736b5ad2e9f.js:1:110239)\n    at async t$.getEnvironmentSettings (https://monad-astheris.vercel.app/_next/static/chunks/91b2ca88-973c7736b5ad2e9f.js:1:110478)"
+          }
+        ]
+      }
+    ],
+    "runtimeExceptions": 0,
+    "consoleErrors": 1,
+    "completeSmokePassed": false,
+    "screenshotsInspected": 10
+  },
+  "freshSession": {
+    "startedAt": "2026-10-07T21:03:42.675Z",
+    "dynamicResponses": [
+      {
+        "url": "https://app.dynamicauth.com/api/v0/sdk/5ee665e4-6f64-43c1-9537-99d989371a80/settings",
+        "status": 429
+      },
+      {
+        "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80",
+        "status": 204
+      },
+      {
+        "url": "https://app.dynamicauth.com/api/v0/sdk/5ee665e4-6f64-43c1-9537-99d989371a80/sdkSettings",
+        "status": 204
+      },
+      {
+        "url": "https://app.dynamicauth.com/api/v0/sdk/5ee665e4-6f64-43c1-9537-99d989371a80/nonce",
+        "status": 204
+      },
+      {
+        "url": "https://app.dynamicauth.com/api/v0/sdk/5ee665e4-6f64-43c1-9537-99d989371a80/settings",
+        "status": 429
+      },
+      {
+        "url": "https://app.dynamicauth.com/api/v0/sdk/5ee665e4-6f64-43c1-9537-99d989371a80/settings",
+        "status": 429
+      },
+      {
+        "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80",
+        "status": 204
+      },
+      {
+        "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80",
+        "status": 204
+      },
+      {
+        "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80",
+        "status": 204
+      },
+      {
+        "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80",
+        "status": 204
+      },
+      {
+        "url": "https://app.dynamicauth.com/api/v0/sdk/5ee665e4-6f64-43c1-9537-99d989371a80/nonce",
+        "status": 200
+      }
+    ],
+    "completeSmokePassed": false
+  },
+  "limitation": "Dynamic settings HTTP429 blocked fresh SDK initialization; retries stopped. Deployed asset and page/dialog checks do not establish a physical passkey ceremony."
+}

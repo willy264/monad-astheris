@@ -1,0 +1,468 @@
+{
+  "observedAt": "2026-10-07T20:56:43.669Z",
+  "endpoint": "https://indexer.dev.hyperindex.xyz/635fbf6/v1/graphql",
+  "deployment": {
+    "organisation": "willy264",
+    "indexer": "monad-astheris",
+    "commit": "7569afb",
+    "branch": "main",
+    "rootDirectory": "indexer",
+    "tier": "development"
+  },
+  "scope": {
+    "chainId": 10143,
+    "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+    "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+  },
+  "indexedThrough": "69070913",
+  "checks": {
+    "exactFrontendQueriesAccepted": true,
+    "actualFrontendParsersAccepted": true,
+    "taskMatchesSavedClientProof": true,
+    "canonicalTaskLeafRecomputed": true,
+    "batchIdRecomputed": true,
+    "verifiedCommitmentMatchesExpectedTransaction": true
+  },
+  "configuration": {
+    "publicAggregateEntities": [
+      "Agent",
+      "TaskExecution"
+    ],
+    "hostedSetting": "Agent&TaskExecution",
+    "autoDeploy": false,
+    "reason": "Preserve the verified development endpoint and deployment quota during unrelated frontend/documentation merges."
+  },
+  "note": "The historical overview uses a wider verification window to include the task block. The separate 200-block query matches the normal live dashboard window. Chain receipt verification is recorded by the task client and final submission verifier; this record validates hosted responses and frontend compatibility.",
+  "queries": {
+    "progress": {
+      "request": {
+        "query": "query Progress($id: String!) { progress: SyncStatus(where: {id: {_eq: $id}}, limit: 1) { id chainId router registry blockNumber } }",
+        "variables": {
+          "id": "10143:0xac4a33521b32122c9f014eac8800144dd9aa5ebe:0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+        }
+      },
+      "response": {
+        "data": {
+          "progress": [
+            {
+              "id": "10143:0xac4a33521b32122c9f014eac8800144dd9aa5ebe:0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+              "blockNumber": "69070913"
+            }
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "directory": {
+      "request": {
+        "query": "query Directory($where: Agent_bool_exp!, $offset: Int!) {\n    registered: Agent_aggregate(where: $where) { aggregate { count } }\n    agents: Agent(where: $where, limit: 12, offset: $offset, order_by: {agentId: asc}) { id chainId registry agentId owner agentURI tasksCompleted }\n  }",
+        "variables": {
+          "where": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "registry": {
+              "_eq": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+            }
+          },
+          "offset": 0
+        }
+      },
+      "response": {
+        "data": {
+          "registered": {
+            "aggregate": {
+              "count": 1
+            }
+          },
+          "agents": [
+            {
+              "id": "10143:0x754d7f2fd55a9841dbff248f9cb91d497116f231:1",
+              "chainId": 10143,
+              "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+              "agentId": "1",
+              "owner": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+              "agentURI": "ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea",
+              "tasksCompleted": "1"
+            }
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "overviewIncludingTaskBlock": {
+      "request": {
+        "query": "query Overview($agents: Agent_bool_exp!, $shards: EphemeralShard_bool_exp!, $executions: TaskExecution_bool_exp!, $batches: MerkleBatch_bool_exp!, $commitments: BatchCommitment_bool_exp!) {\n    registered: Agent_aggregate(where: $agents) { aggregate { count } }\n    active: TaskExecution_aggregate(where: $executions) { aggregate { count(columns: agentId, distinct: true) } }\n    executions: TaskExecution_aggregate(where: $executions) { aggregate { count } }\n    shards: EphemeralShard(where: $shards, limit: 201, order_by: [{createdBlock: desc}, {id: asc}]) {\n      id chainId router address agentId taskId sequenceNonce executor inputHash outputHash proofHash status createdBlock completedBlock creationTx agent { registry } execution { transactionHash blockNumber }\n    }\n    batches: MerkleBatch(where: $batches, limit: 12, order_by: {blockNumber: desc}) { chainId router batchId blockNumber blockHash root leafCount status committedRoot committedLeafCount commitmentTx }\n    commitments: BatchCommitment(where: $commitments, limit: 24, order_by: {fromBlock: desc}) { chainId router batchId root leafCount fromBlock toBlock verified transactionHash }\n  }",
+        "variables": {
+          "agents": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "registry": {
+              "_eq": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+            }
+          },
+          "shards": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "router": {
+              "_eq": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe"
+            },
+            "createdBlock": {
+              "_gte": "67972561",
+              "_lte": "69070715"
+            },
+            "agent": {
+              "registry": {
+                "_eq": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+              }
+            }
+          },
+          "executions": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "router": {
+              "_eq": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe"
+            },
+            "blockNumber": {
+              "_gte": "67972561",
+              "_lte": "69070715"
+            },
+            "agent": {
+              "registry": {
+                "_eq": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+              }
+            }
+          },
+          "batches": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "router": {
+              "_eq": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe"
+            },
+            "blockNumber": {
+              "_lte": "69070715"
+            }
+          },
+          "commitments": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "router": {
+              "_eq": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe"
+            },
+            "toBlock": {
+              "_lte": "69070715"
+            }
+          }
+        }
+      },
+      "response": {
+        "data": {
+          "registered": {
+            "aggregate": {
+              "count": 1
+            }
+          },
+          "active": {
+            "aggregate": {
+              "count": 1
+            }
+          },
+          "executions": {
+            "aggregate": {
+              "count": 1
+            }
+          },
+          "shards": [
+            {
+              "id": "10143:0x465c5b7a951a3fbbf5a2a618ff4593c2a1ffefe8",
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "address": "0x465c5b7a951a3fbbf5a2a618ff4593c2a1ffefe8",
+              "agentId": "1",
+              "taskId": "0x1a55a675cb34c941a4de0b1e4269526a7335cb51ea177a235dba724aac244c28",
+              "sequenceNonce": "0",
+              "executor": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+              "inputHash": "0xcdf3188adf0519f15395b5812c9d57fda0615bdaed1997a39ea2c86e2978f03b",
+              "outputHash": "0x123713719f129fd9b5de451cd4ab2d3187e75a27f2f2e7146d41cfe8e6ff5339",
+              "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "status": "completed",
+              "createdBlock": "69066755",
+              "completedBlock": "69066769",
+              "creationTx": "0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d",
+              "agent": {
+                "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+              },
+              "execution": {
+                "transactionHash": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a",
+                "blockNumber": "69066769"
+              }
+            }
+          ],
+          "batches": [
+            {
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+              "blockNumber": "69066769",
+              "blockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3",
+              "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+              "leafCount": "1",
+              "status": "committed",
+              "committedRoot": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+              "committedLeafCount": "1",
+              "commitmentTx": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+            }
+          ],
+          "commitments": [
+            {
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+              "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+              "leafCount": "1",
+              "fromBlock": "69066769",
+              "toBlock": "69066769",
+              "verified": true,
+              "transactionHash": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+            }
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "overviewCurrent200Blocks": {
+      "request": {
+        "query": "query Overview($agents: Agent_bool_exp!, $shards: EphemeralShard_bool_exp!, $executions: TaskExecution_bool_exp!, $batches: MerkleBatch_bool_exp!, $commitments: BatchCommitment_bool_exp!) {\n    registered: Agent_aggregate(where: $agents) { aggregate { count } }\n    active: TaskExecution_aggregate(where: $executions) { aggregate { count(columns: agentId, distinct: true) } }\n    executions: TaskExecution_aggregate(where: $executions) { aggregate { count } }\n    shards: EphemeralShard(where: $shards, limit: 201, order_by: [{createdBlock: desc}, {id: asc}]) {\n      id chainId router address agentId taskId sequenceNonce executor inputHash outputHash proofHash status createdBlock completedBlock creationTx agent { registry } execution { transactionHash blockNumber }\n    }\n    batches: MerkleBatch(where: $batches, limit: 12, order_by: {blockNumber: desc}) { chainId router batchId blockNumber blockHash root leafCount status committedRoot committedLeafCount commitmentTx }\n    commitments: BatchCommitment(where: $commitments, limit: 24, order_by: {fromBlock: desc}) { chainId router batchId root leafCount fromBlock toBlock verified transactionHash }\n  }",
+        "variables": {
+          "agents": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "registry": {
+              "_eq": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+            }
+          },
+          "shards": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "router": {
+              "_eq": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe"
+            },
+            "createdBlock": {
+              "_gte": "69070516",
+              "_lte": "69070715"
+            },
+            "agent": {
+              "registry": {
+                "_eq": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+              }
+            }
+          },
+          "executions": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "router": {
+              "_eq": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe"
+            },
+            "blockNumber": {
+              "_gte": "69070516",
+              "_lte": "69070715"
+            },
+            "agent": {
+              "registry": {
+                "_eq": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+              }
+            }
+          },
+          "batches": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "router": {
+              "_eq": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe"
+            },
+            "blockNumber": {
+              "_lte": "69070715"
+            }
+          },
+          "commitments": {
+            "chainId": {
+              "_eq": 10143
+            },
+            "router": {
+              "_eq": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe"
+            },
+            "toBlock": {
+              "_lte": "69070715"
+            }
+          }
+        }
+      },
+      "response": {
+        "data": {
+          "registered": {
+            "aggregate": {
+              "count": 1
+            }
+          },
+          "active": {
+            "aggregate": {
+              "count": 0
+            }
+          },
+          "executions": {
+            "aggregate": {
+              "count": 0
+            }
+          },
+          "shards": [],
+          "batches": [
+            {
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+              "blockNumber": "69066769",
+              "blockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3",
+              "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+              "leafCount": "1",
+              "status": "committed",
+              "committedRoot": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+              "committedLeafCount": "1",
+              "commitmentTx": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+            }
+          ],
+          "commitments": [
+            {
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+              "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+              "leafCount": "1",
+              "fromBlock": "69066769",
+              "toBlock": "69066769",
+              "verified": true,
+              "transactionHash": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+            }
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "taskSettlement": {
+      "request": {
+        "query": "query Evidence($chain: Int!, $router: String!, $tx: String!, $block: numeric!) {\n  TaskExecution(where: {chainId: {_eq: $chain}, router: {_eq: $router}, transactionHash: {_eq: $tx}}, limit: 2) {\n    agentId taskId inputHash outputHash proofHash leaf blockNumber blockHash transactionHash logIndex\n    shard { address } agent { registry agentId } batch { batchId root leafCount status blockHash }\n  }\n  BatchCommitment(where: {chainId: {_eq: $chain}, router: {_eq: $router}, fromBlock: {_eq: $block}, toBlock: {_eq: $block}, verified: {_eq: true}}, limit: 5) {\n    batchId root leafCount fromBlock toBlock verified transactionHash\n  }\n}",
+        "variables": {
+          "chain": 10143,
+          "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+          "tx": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a",
+          "block": "69066769"
+        }
+      },
+      "response": {
+        "data": {
+          "TaskExecution": [
+            {
+              "agentId": "1",
+              "taskId": "0x1a55a675cb34c941a4de0b1e4269526a7335cb51ea177a235dba724aac244c28",
+              "inputHash": "0xcdf3188adf0519f15395b5812c9d57fda0615bdaed1997a39ea2c86e2978f03b",
+              "outputHash": "0x123713719f129fd9b5de451cd4ab2d3187e75a27f2f2e7146d41cfe8e6ff5339",
+              "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "leaf": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+              "blockNumber": "69066769",
+              "blockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3",
+              "transactionHash": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a",
+              "logIndex": 1,
+              "shard": {
+                "address": "0x465c5b7a951a3fbbf5a2a618ff4593c2a1ffefe8"
+              },
+              "agent": {
+                "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+                "agentId": "1"
+              },
+              "batch": {
+                "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+                "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+                "leafCount": "1",
+                "status": "committed",
+                "blockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3"
+              }
+            }
+          ],
+          "BatchCommitment": [
+            {
+              "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+              "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+              "leafCount": "1",
+              "fromBlock": "69066769",
+              "toBlock": "69066769",
+              "verified": true,
+              "transactionHash": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+            }
+          ]
+        }
+      },
+      "httpStatus": 200
+    }
+  },
+  "parsedOverviews": {
+    "overviewIncludingTaskBlock": {
+      "registered": 1,
+      "active": 1,
+      "executions": 1,
+      "shards": [
+        {
+          "address": "0x465c5b7a951a3fbbf5a2a618ff4593c2a1ffefe8",
+          "agentId": "1",
+          "taskId": "0x1a55a675cb34c941a4de0b1e4269526a7335cb51ea177a235dba724aac244c28",
+          "sequenceNonce": "0",
+          "executor": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+          "inputHash": "0xcdf3188adf0519f15395b5812c9d57fda0615bdaed1997a39ea2c86e2978f03b",
+          "createdBlock": "69066755",
+          "transactionHash": "0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d",
+          "status": "executed",
+          "outputHash": "0x123713719f129fd9b5de451cd4ab2d3187e75a27f2f2e7146d41cfe8e6ff5339",
+          "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "executionTransactionHash": "0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a"
+        }
+      ],
+      "batches": [
+        {
+          "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+          "blockNumber": "69066769",
+          "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+          "leafCount": "1",
+          "verified": true,
+          "status": "committed",
+          "commitmentTx": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+        }
+      ]
+    },
+    "overviewCurrent200Blocks": {
+      "registered": 1,
+      "active": 0,
+      "executions": 0,
+      "shards": [],
+      "batches": [
+        {
+          "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+          "blockNumber": "69066769",
+          "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+          "leafCount": "1",
+          "verified": true,
+          "status": "committed",
+          "commitmentTx": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+        }
+      ]
+    }
+  }
+}

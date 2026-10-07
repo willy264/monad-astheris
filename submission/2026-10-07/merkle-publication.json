@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-10-07T20:54:00.540Z",
+  "sourceCommit": "153b6034a8d9a5a8820f6457ce55e5f42f6bfea8",
+  "method": "daemon --commit-block 69066769",
+  "chainId": 10143,
+  "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+  "status": "committed",
+  "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+  "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+  "leafCount": 1,
+  "block": 69066769,
+  "blockHash": "0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3",
+  "transaction": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc",
+  "receiptVerified": true
+}

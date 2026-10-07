@@ -1,0 +1,17 @@
+{
+  "observedAt": "2026-10-07T21:01:41.825Z",
+  "chainId": 10143,
+  "agentId": "1",
+  "finalizedBlock": "69072094",
+  "completedTasks": "1",
+  "feedbackClients": [],
+  "validationRequests": [
+    "0xf1c6665fe41e6cf2c73d0b30d2609c4b02e242c0be04464a7e1a67b84009326b"
+  ],
+  "creForwarder": "0x0000000000000000000000000000000000000000",
+  "taskWallet": {
+    "address": "0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605",
+    "mon": "4.972286498",
+    "usdcBaseUnits": "39999000"
+  }
+}

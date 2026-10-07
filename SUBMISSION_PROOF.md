@@ -1,54 +1,48 @@
-# Aetheris live verification
+# Aetheris live evidence
 
-## Final execution attempt, 2026-10-07
+Updated **2026-10-07**. A registered agent completed one real MCP task through the paid daemon on **Monad Testnet, chain 10143**. It settled **0.001 testnet USDC**, created an isolated result contract, recorded completion and produced a finalized Merkle commitment that hosted Envio independently indexed. A project-controlled validator separately checked output integrity. Physical passkey enrollment, explicit delegation revocation and the production browser paid flow remain pending.
 
-**Backend checks pass; live submission remains incomplete.** This run rechecked the four deployment receipts/runtime hashes, Agent #1 registration and public services. It did not produce a paid task, delegation, batch, feedback or validation transaction. See the regenerated [live checks](submission/LIVE_CHECKS.md), [public preflight observations](submission/2026-10-07/preflight.json) and [MCP verification](submission/2026-10-07/mcp.json).
+## Verified workflow
 
-**Funding follow-up, 19:35 UTC:** after the user supplied testnet funds, the prepared task wallet held **5 MON**, **zero USDC**, and remained unauthorized for Agent #1. The [follow-up RPC record](submission/2026-10-07/funding-followup.json) supersedes the initial zero-MON observation below. The user requested that the physical passkey ceremony remain pending. Exact Render API key and Envio deployment setup steps are in [live service access](docs/live-service-access.md).
-
-| Requested step | Observed result | Remaining requirement |
+| Step | Observed result | Public evidence |
 | --- | --- | --- |
-| Paid MCP task | Render `/health` and `/v1/config` returned 200. Unsigned `POST /v1/tasks` returned the expected 402 challenge. The actual submission client stopped with `Task signer and executor must both be authorized for the agent`, before calling MCP, signing or posting a paid request. | Fund the dedicated task wallet with testnet USDC and grant it expiring Agent #1 authority; 5 MON has arrived. Preserve the existing task journal and resume it. |
-| Passkey grant/revoke | Existing owner/executor is authorized; the new task wallet is not. No physical WebAuthn ceremony or delegation transaction was performed. | Device sign-in and owner wallet approval; verify grant, authorized execution, then revoke and verify denial. CLI signing does not establish passkey authentication. |
-| Envio and Merkle batch | No hosted GraphQL URL is configured. Render reports batching disabled. The owner/relayer already has committer permission and RPC supports finalized blocks. | A real task receipt, running Envio service and controlled batch-worker execution. There is no task block to publish yet. |
-| Reputation and validation | `completedTasks(1) = 0`, feedback clients `[]`, validation requests `[]`; CRE forwarder is unset. | Verified completed output, independently reviewed feedback and a named validator's actual response. No scores or validation results were manufactured. |
+| Deploy contracts | Four contracts have successful canonical receipts, verified code and registry/role links. Earliest deployment block: `67972561`. | [Live manifest](contracts/deployments/10143.json), [contract explorer links](README.md#deployment-manifest-and-explorer). |
+| Register an agent | Aetheris Monad Observer is agent **1**, with an IPFS card and a public `get_monad_block` MCP tool. | [Registration manifest](contracts/deployments/10143.agent.json), [registration transaction](https://testnet.monadscan.com/tx/0xc9bbd6e8a390f4fb1788f3d305f241293ec919b49d35238c7aeda5c829f3a716), [card bytes](contracts/deployments/10143.agent-card.json). |
+| Grant task authority | The owner granted the dedicated task signer expiring authority. Authorization was verified before execution; this was wallet delegation, not a completed passkey ceremony. | [Grant proof](submission/2026-10-07/delegation-grant.json), [transaction](https://testnet.monadscan.com/tx/0xed2170affe40cff87744fb919280352b3c15db69fc19598513772af7ff083961). |
+| Invoke MCP and execute | The client called the actual observer, committed its input/output bytes, and verified the CREATE2 shard and task event. Execution block: **69066769**. | [Task proof](submission/2026-10-07/task-proof.json), [shard creation](https://testnet.monadscan.com/tx/0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d), [execution](https://testnet.monadscan.com/tx/0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a). |
+| Settle payment | x402 exact/EIP-3009 settled **1,000 base units = 0.001 testnet USDC**. The client checked the token transfer and authorization nonce. | [Payment fields](submission/2026-10-07/task-proof.json), [settlement transaction](https://testnet.monadscan.com/tx/0xb3623f7b05b489fe647372c586a612463a60b6e9c9be87122ba57e1b5ad37db0). |
+| Record completion | The reputation registry recorded the executed task. No independent review or client rating was submitted. | [Completion transaction](https://testnet.monadscan.com/tx/0x5c3d91a10d4e7c0057bec30c94a8ccf43a367fdb85903e4caba4172a293246ab), [task proof](submission/2026-10-07/task-proof.json). |
+| Publish a Merkle batch | The one-block CLI reconstructed all router task logs for the finalized execution block and verified the publication receipt, event, canonical blocks and stored commitment. This block contained **one leaf**. | [Publication proof](submission/2026-10-07/merkle-publication.json), [commitment transaction](https://testnet.monadscan.com/tx/0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc). |
+| Check hosted indexing | Envio returned the exact task, hashes and shard, with a matching verified commitment. Actual frontend queries and parsers passed; Agent #1 has `tasksCompleted: 1`. | [Current Envio evidence](submission/2026-10-07/envio-settlement.json), [saved task/commitment query](submission/indexer-evidence.json). |
+| Validate output integrity | An authenticated project-controlled validator checked committed bytes, matching MCP text/structured output, the reported finalized RPC block and canonical task evidence. | [Validation proof](submission/2026-10-07/output-validation.json), [request](https://testnet.monadscan.com/tx/0xc1e84725ebf676ca8c684e991d402d2f13b96d21ed87dc3d0db05399bb11d4c8), [response](https://testnet.monadscan.com/tx/0xec93029a9e8ec008d2281cdb8f626309b82180a2ef7141d698dcf2c379bbcca6). |
 
-The local task client now has the verified router, agent ID `1`, Render task URL, actual MCP tool/arguments and a maximum payment of **1,000 USDC base units (0.001 testnet USDC)**. A dedicated testnet task signer/payer was generated at **`0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605`**; Render's existing owner/relayer remains the on-chain executor. The new private key is held only in ignored `scripts/.env`; the environment and attempt directories have restricted Windows access. At the preflight the new wallet held zero MON and zero USDC. The existing owner/relayer held approximately 13.93 MON and zero USDC. These are dated balance observations, not funding guarantees.
+The [owner handoff record](submission/2026-10-07/owner-handoff.json) captures the completed remote job, known successful receipts and equal latest/pending nonce before coordinated local signing. Render's worker was disabled. Publication used `daemon --commit-block 69066769`, preserving the worker cursor rather than claiming a scan of the entire deployment history. Exclusive signer use and a retained local journal remain operational requirements.
 
-The registered MCP service is **`https://monad-astheris.vercel.app/api/mcp`** (`get_monad_block`, `{}`). Render hosts the paid task daemon at **`https://monad-astheris-daemon.onrender.com/v1/tasks`**. The independent MCP verifier passed all **11 checks** and matched block `69052210`, hash `0xea29b3d5617eac6882ea75ebc9a2cc437f13b2f30aac483992f702d8f3d519d2`, against public RPC. This free observation is separate from the blocked paid-task attempt.
+## Exact task and batch identifiers
 
-The public Monad facilitator's `/supported` response advertises x402 v2 `exact` for `eip155:10143`. Its advertised support and the daemon's 402 challenge do not prove payment settlement. Token, domain and faucet instructions agree with the [official Monad x402 guide](https://docs.monad.xyz/guides/x402): USDC `0x534b2f3a21130d7a60830c2df862319e593943a3`, domain `USDC`, version `2`.
+| Field | Value |
+| --- | --- |
+| Router | `0xac4a33521b32122c9f014eac8800144dd9aa5ebe` |
+| Agent ID | `1` |
+| Task signer / payer | `0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605` |
+| Owner / executor / payment receiver | `0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57` |
+| Task ID | `0x1a55a675cb34c941a4de0b1e4269526a7335cb51ea177a235dba724aac244c28` |
+| Request ID | `0x07f7edd33120c5d94d8c47035cda16f4e5c7150feb0e45179849e8bcf5119753` |
+| Isolated shard | [0x465c5b7a951a3fbbf5a2a618ff4593c2a1ffefe8](https://testnet.monadscan.com/address/0x465c5b7a951a3fbbf5a2a618ff4593c2a1ffefe8) |
+| Input hash | `0xcdf3188adf0519f15395b5812c9d57fda0615bdaed1997a39ea2c86e2978f03b` |
+| Output hash | `0x123713719f129fd9b5de451cd4ab2d3187e75a27f2f2e7146d41cfe8e6ff5339` |
+| Execution block / hash | `69066769` / `0x980aab91858614bd2c27234604a7b2ed8e5ed25e40e626ab37ee13b7d96026d3` |
+| Batch ID | `0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3` |
+| Merkle root / leaf count | `0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65` / **1** |
+| Payment asset | Testnet USDC `0x534b2f3a21130d7a60830c2df862319e593943a3`, six decimals |
 
-The owner is also Render's active relayer. Coordinate exclusive signer access before owner grant/revoke or validation-request transactions; the daemon's nonce lock only covers its own process. No Render management credential was available for this run. Keep its journal intact when coordinating a stop/restart, especially on the current free hosting plan where persistence remains unverified.
+The [task proof](submission/2026-10-07/task-proof.json) includes the EIP-712 domain, types, message and **expired task signature**. Export waited until the authorization deadline passed on both the local clock and chain; the proof generator recovered the expected signer and request ID. Payment signatures and reusable credentials are excluded. `proofHash` is zero: this task did not supply a TEE or other cryptographic execution proof.
 
-The batch worker scans blocks sequentially. Without an existing cursor, the deployment start at `67972561` is roughly 1.08 million blocks behind the observed finalized head. A verified bounded publication path or efficient complete catch-up is needed; changing the start block or discarding the cursor would not demonstrate historical coverage. Envio configuration already points to the deployment, but no hosted query result is claimed.
+The MCP output observed block **69066749**, hash `0x4753ce0486a20ab50ab2844c799e5a3ef55bf6329b5b6cbcd1cc740b6f8c1351`, timestamp `1791405284`, with **3 transactions**. Exact committed output bytes are included in the [validation artifact](submission/2026-10-07/output-validation.json). The observer reads blockchain metadata; it does not perform AI inference. Its public MCP read is free (`x402Support: false` on the card); the separate task-recording request incurred the daemon's x402 payment.
 
-Resume the existing attempt only after funding and authorization are verified:
+Validation response `100`, tagged `output-integrity`, means the documented integrity checks passed. Its signer is the project-controlled task wallet, not an independent reviewer. It does not establish subjective output quality, manufacturer TEE attestation, Chainlink CRE delivery or a reputation rating.
 
-```sh
-cd scripts
-pnpm submit-task --run-dir .state/tasks/final-live-2026-10-07 --resume
-```
-
-The saved phase is `new`; no MCP invocation or paid submission occurred within that attempt. After verified completion, set `TASK_PROOF_PATH` to its `client-proof.json`. To publish the requested sample task signature, wait until its deadline has passed on both the local clock and chain, then run `pnpm submit-task --run-dir .state/tasks/final-live-2026-10-07 --resume --export-proof`. Normal proof deliberately omits active signatures. Add the real `ENVIO_GRAPHQL_URL` and any required server-side credential, verify the batch and indexed logs, then rerun `pnpm submission-proof`. Feedback additionally requires `REVIEWER_PRIVATE_KEY` and `REVIEW_ASSESSMENT_FILE` for an eligible reviewer who has assessed the actual output. Preserve private task/payment journals outside source control.
-
-Fresh local verification on source `ddb4a29d087cab4b9678616b76eb5bd9e18d2e1a`: **38 Foundry tests** (including two 256-case fuzz tests), clean **`cargo check --locked`**, **20 Rust tests**, clean script typecheck and **17 script tests**. Ubuntu WSL also passed a frozen indexer install, code generation, full typecheck and **both Merkle tests**; details are in the [indexer audit](submission/2026-10-07/indexer-audit.json). These checks establish local behavior; the missing transaction hashes and GraphQL evidence above remain blockers.
-
-## Readiness preflight, 2026-10-06
-
-The public Render daemon returned HTTP 200 for `/health` and `/v1/config` after a cold start. It reports chain `10143`, the deployed router above, one relayer (the registered agent owner), and batching disabled. Its advertised x402 v2 exact policy charges **1,000 base units (0.001 USDC)** per task, using token `0x534b2f3a21130d7a60830c2df862319e593943a3`, signing-domain name `USDC`, version `2`. Read-only contract calls confirmed deployed token code, those domain fields and six decimals. Advertising this policy is not evidence that the facilitator has settled a payment.
-
-At this check the owner/relayer held approximately **13.93 testnet MON and zero of that payment token**. A paid CLI run remains blocked by missing configuration for a separate authorized task signer, agent/executor/payment settings and a valid MCP argument file; the local CLI daemon URL also still targets localhost. Do not reuse the live relayer key in the task producer. Configure the documented public daemon endpoint and fund the intended payer before collecting real receipts.
-
-The production browser task configuration returned **503, `enabled:false`**. No hosted Envio URL is configured. Render journal durability and recovery are not observable through its public health endpoints and remain unverified. The GitHub repository is public. This preflight made no wallet signatures, payments, registrations or chain transactions.
-
-The redesigned dashboard adds a global Dynamic session and a single Observer MCP task action, gated by the existing paid-service configuration. UI availability does not establish a completed device passkey ceremony, delegated execution or paid-task receipt. The dated deployment and registration evidence below remains unchanged.
-
-## Deployment evidence, 2026-10-04
-
-Observed on **2026-10-04**, Monad Testnet, chain **10143**. Four contracts are deployed, the public MCP observer works, and its ERC-8004 identity is registered. A paid task and complete settlement/indexing demonstration remain outstanding.
-
-## Deployed contracts
+## Public services and reproducibility
 
 | Contract | Monad Testnet explorer |
 | --- | --- |
@@ -57,84 +51,34 @@ Observed on **2026-10-04**, Monad Testnet, chain **10143**. Four contracts are d
 | ValidationRegistry | [0xcd0cf354acd2c79145caeac7d4f0639f8957308d](https://testnet.monadscan.com/address/0xcd0cf354acd2c79145caeac7d4f0639f8957308d) |
 | AetherisRouter | [0xac4a33521b32122c9f014eac8800144dd9aa5ebe](https://testnet.monadscan.com/address/0xac4a33521b32122c9f014eac8800144dd9aa5ebe) |
 
-The [deployment manifest](contracts/deployments/10143.json) records deployment transaction/block evidence, runtime/source hashes, compiler settings and verified router linkages. Earliest deployment block: **67972561**. Compiler: Solidity **0.8.24**, optimizer enabled with **200** runs, `viaIR: true`, EVM target `cancun`. Receipt/runtime verification does not imply explorer source verification or an external audit.
-
-The six project Solidity source files in the manifest match [revision `b19b976`](https://github.com/willy264/monad-astheris/tree/b19b9767606f92ee8abf71c6fa222c0ab1958a5b/contracts/src) byte-for-byte by Keccak hash. That revision is the original deployment source reference. The integrated repository includes that contract implementation together with the task client, judge dashboard and production service fixes. These historical deployment hashes remain the reference when checking that later source changes match the live code.
-
-## Registered agent
-
-| Field | Verified value |
+| Service | Endpoint and current scope |
 | --- | --- |
-| Name | Aetheris Monad Observer |
-| Agent ID | **1** |
-| Owner and agent wallet | `0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57` |
-| Registry | `0x754d7f2fd55a9841dbff248f9cb91d497116f231` |
-| Agent Card URI | `ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea` |
-| Registration transaction | [0xc9bbd6e8a390f4fb1788f3d305f241293ec919b49d35238c7aeda5c829f3a716](https://testnet.monadscan.com/tx/0xc9bbd6e8a390f4fb1788f3d305f241293ec919b49d35238c7aeda5c829f3a716) |
-| Registration block | **68105690** |
-| MCP service | `https://monad-astheris.vercel.app/api/mcp` |
-| Tool and arguments | `get_monad_block`, `{}` |
-| Declared capability | `monad-testnet-block-observation` |
-| Payment support | `x402Support: false`; this MCP read is free |
+| Dashboard | [monad-astheris.vercel.app](https://monad-astheris.vercel.app). Read-only and preview UI are live; production paid browser execution and the current Envio connection are not yet configured. |
+| MCP observer | `https://monad-astheris.vercel.app/api/mcp`, tool `get_monad_block`, arguments `{}`. MCP uses POST; a browser GET returns 405. |
+| Paid task daemon | `https://monad-astheris-daemon.onrender.com/v1/tasks`. The verified CLI execution route; Render is paused for coordinated owner signing at this snapshot. |
+| Envio | `https://indexer.dev.hyperindex.xyz/635fbf6/v1/graphql`, deployed from `7569afb`. Exact frontend queries/parsers, task fields and verified commitment pass. Auto-deploy is disabled to preserve this development endpoint and quota. |
 
-The registration command waited for 12 confirmations and checked the `Registered` event, `ownerOf(1)`, `tokenURI(1)`, `getAgentWallet(1)` and canonical receipt block hash. It minted exactly one identity using `register(string)`.
+The saved historical query includes the known execution block. The normal dashboard uses a recent 200-block window, so an older successful task can legitimately fall outside its recent-activity counters; the evidence file records both query scopes.
 
-Public evidence:
+The card is `ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea`; its [committed bytes](contracts/deployments/10143.agent-card.json) hash to `0x2bcfadcd0f5f2243257bf7ca9b0a454cd01047669e0c3eefec2dfa95dd14f356`. The [domain association](frontend/public/.well-known/agent-registration.json) links the service to agent #1. Original deployment Solidity source hashes reference [revision b19b976](https://github.com/willy264/monad-astheris/tree/b19b9767606f92ee8abf71c6fa222c0ab1958a5b/contracts/src).
 
-- [Registration manifest](contracts/deployments/10143.agent.json) and [complete transaction receipt](contracts/deployments/10143.agent-receipt.json).
-- [Exact Agent Card bytes](contracts/deployments/10143.agent-card.json), retrieved through [Pinata's public IPFS gateway](https://gateway.pinata.cloud/ipfs/bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea). The first gateway, `ipfs.io`, returned HTTP 429; the same CID was successfully verified through Pinata without uploading another card.
-- Card Keccak-256: `0x2bcfadcd0f5f2243257bf7ca9b0a454cd01047669e0c3eefec2dfa95dd14f356`. The committed file preserves LF bytes to reproduce that hash.
-- [Domain association](frontend/public/.well-known/agent-registration.json), served from `https://monad-astheris.vercel.app/.well-known/agent-registration.json` after deployment.
-
-Private keys, Pinata credentials and signed raw transaction journals are excluded from these artifacts.
-
-## Live MCP verification
-
-The official MCP SDK negotiated protocol **2025-11-25**, discovered the single read-only tool and invoked it against the production endpoint. The committed [verification report](contracts/deployments/10143.mcp.json) passed **11 checks**, including independent Monad RPC lookups by both block number and block hash.
-
-Actual observed output:
-
-```json
-{
-  "chainId": 10143,
-  "blockNumber": "68105485",
-  "blockHash": "0x06192e2cef3e705d92b729eb2554facf6624d73897313fb12cddf145af3810a7",
-  "timestamp": "1791113935",
-  "transactionCount": 1
-}
-```
-
-This is a point-in-time blockchain observation. It proves the tool returned matching block data; it does not prove AI inference, finalized output, task authorization or payment settlement. A browser GET to `/api/mcp` returns 405 because the MCP service accepts protocol requests through POST.
-
-Reproduce with Node 22+ and pnpm 10.32.1:
+A read-only MCP check requires no wallet or payment:
 
 ```sh
 cd scripts
 pnpm install --frozen-lockfile
-pnpm typecheck
 pnpm verify-mcp https://monad-astheris.vercel.app/api/mcp
 ```
 
-The verifier needs no signing key or environment file. It saves observations under ignored `scripts/.artifacts/mcp/`. See the [MCP service guide](frontend/docs/mcp-agent.md) and [registration runbook](scripts/README.md).
+Use Node 24+ for the whole repository and pnpm 10.32.1. The [October 7 MCP report](submission/2026-10-07/mcp.json) passed 11 checks. The [generated live checks](submission/LIVE_CHECKS.md) and [verification record](VERIFICATION.md) retain reproducibility details. Preserve the completed private task journal when using the client again; a new run is a new paid operation, not a way to regenerate this receipt.
 
-## Validation and remaining submission work
+## Remaining scope
 
-The MCP feature passed **15 integration/security tests**, including malformed requests, wrong-chain responses, bounded inputs and batch-amplification rejection. The **6 existing RPC pagination tests**, frontend typecheck and MCP Vercel build also passed. Registration tooling typecheck and focused public-URL validation checks passed. The directory gateway fix passed **10 tests** covering transient fallback, operator gateway isolation, bounded responses and deadlines. Solidity and Rust were not changed for this service/registration feature; historical local results are recorded separately in the README and are not live-task evidence.
+- **Physical passkey enrollment/sign-in:** the user reported that the registration button did not open a prompt. [PR #40](https://github.com/willy264/monad-astheris/pull/40) passed 61 frontend tests, builds and CI and merged as `4d8222d`. Vercel deployed it successfully at 21:00:54 UTC. The [production check](submission/2026-10-07/passkey-production-smoke.json) verified its assets and page/dialog rendering, then hit Dynamic settings HTTP 429 during fresh-session initialization. The complete authentication smoke and actual device ceremony remain unverified; retries stopped.
+- **Explicit delegation revocation:** the grant and authorized execution are verified. Revocation was requested but is not yet verified. The saved grant expires at `2026-10-07T21:26:38Z`; scheduled expiry is not a recorded revoke transaction or a verified post-revocation rejection.
+- **Production dashboard:** set Vercel's `ENVIO_GRAPHQL_URL` to the verified endpoint, configure the paid-service policy and verify actual task/batch rendering. Vercel management authorization is unavailable. Five paid browser checksum tasks have not been demonstrated.
+- **Durable hosting/recovery:** Render's free ephemeral filesystem does not establish durable payment-journal retention. Backups, restart recovery and exclusive signer handoff need production-grade operation.
+- **Additional claims:** no independent reviewed feedback, live CRE delivery, genuine hardware TEE proof, Mera device ceremony or Privy integration is claimed. One task and one leaf are not a throughput benchmark or evidence of zero scheduler contention.
+- **Submission packaging:** confirm organizer rules, deadline, access, license and recording requirements before publishing a final entry.
 
-Directory reliability fixes accompany registration: live RPC requests explicitly bypass Next.js's persistent data cache, and the default IPFS gateway can fall back to Pinata within one 12-second budget. Application-level agent caching still lasts up to 30 seconds. A separately configured gateway remains exclusive, and an unavailable card is reported as an error rather than substituted with invented metadata.
-
-These acceptance checks remain before claiming a complete submission:
-
-1. Complete an actual Dynamic passkey ceremony and verify expiring wallet-signed executor delegation. Enabling the provider and opening its modal do not establish these outcomes.
-2. Configure and fund the intended payment path, invoke this MCP tool from the task producer, sign the exact EIP-712 authorization, and submit it to the daemon. Capture confirmed `ShardCreated` and `TaskExecuted` receipts plus the actual payment settlement result. No paid-task hash or signed sample is claimed in this record.
-3. Configure Envio with the deployed addresses/start block and publish GraphQL output matching agent, shard and execution logs. Code generation, generated-type checking and two Merkle tests already passed on [Ubuntu CI](https://github.com/willy264/monad-astheris/actions/runs/37158285726); a local/CI generation result does not supply a running hosted endpoint.
-4. Verify a committed Merkle root against canonical execution events; separately record any reputation feedback and validation/CRE/TEE results claimed in the submission. Registering this observer does not perform those workflows.
-5. Verify daemon persistence/recovery on its hosting plan, complete the demo video and submission form, and confirm organizer access requirements. A public repository is accessible for reading, but no email-specific access invitation is claimed.
-
-The deployed observer and its identity provide a real starting point for the task demonstration. They do not establish network-wide collision-free execution or a measured throughput/settlement guarantee.
-
-## Integration verification
-
-The live artifacts above remain the evidence of deployment, registration and the MCP observation. The combined feature/production integration must be checked on its own revision; component results from earlier commits are not substituted for that run. Record completed integration checks and their actual outcomes in [VERIFICATION.md](VERIFICATION.md). The [submission checklist](docs/submission-readiness.md) distinguishes remaining service configuration and live receipts from source integration.
-
-`pnpm submission-proof` writes a separate generated report at `submission/LIVE_CHECKS.md`. It does not overwrite this curated deployment, registration and MCP record. Review that report and link only newly verified outcomes when expanding this submission proof.
+Earlier funding/authorization blockers in [preflight](submission/2026-10-07/preflight.json) and [funding follow-up](submission/2026-10-07/funding-followup.json) are dated history superseded by these successful receipts. The [initial Envio report](submission/2026-10-07/envio-initial.json) records the earlier missing-aggregate issue; the [current report](submission/2026-10-07/envio-settlement.json) confirms the fix. These earlier observations are not current blockers. See the [readiness checklist](docs/submission-readiness.md) for the remaining work.
