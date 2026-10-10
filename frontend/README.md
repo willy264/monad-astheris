@@ -12,7 +12,7 @@ Live records come from Monad RPC and, when configured, Envio. Illustrations and 
 | [Dependency security](docs/dependency-security.md) | Framework updates, pinned fixes and local dependency patches. |
 | [Wallet setup](docs/wallet-setup.md) / [MCP observer](docs/mcp-agent.md) | Production authentication settings and the live read-only tool. |
 | [Logo and brand assets](docs/brand.md) | Download the separate logo PNG, editable SVG and favicon artwork. |
-| [Interface design system](docs/design-system.md) | Typography, local font licenses, palette, cards, tables and responsive behavior. |
+| [Interface design system](docs/design-system.md) | Josefin Sans typography, font loading, palette, cards, tables and responsive behavior. |
 | [System architecture](../docs/architecture.md) / [protocol](../docs/protocol.md) | How contracts, daemon, indexer and dashboard fit together. |
 | [Live submission guide](../docs/live-submission.md) | Deployment, agent registration and the remaining external setup. |
 
