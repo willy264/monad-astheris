@@ -9,6 +9,7 @@ import { postDemo, readDemo, recoverDemo, saveDemo, signDemo, type DemoJournalCo
 import AgentOnboarding from './AgentOnboarding';
 import styles from './InteractiveDemo.module.css';
 import { useAccessSession } from './AccessContext';
+import { userErrorMessage } from '@/lib/user-error';
 
 const taskNames = ['Checksum task 1', 'Checksum task 2', 'Checksum task 3', 'Checksum task 4', 'Checksum task 5'];
 const stageLabels: Record<DemoRecord['stage'], string> = { submitted: 'Submitted', accepted: 'On its own lane', verifying: 'Checking receipts', verified: 'Verified on Monad', unresolved: 'Check saved status' };
@@ -95,7 +96,7 @@ function TaskRun({ config, walletAddress, ready, setupBusy, onBusy, onSettledCou
         if (unresolved.length) { setError(`${unresolved.length} task${unresolved.length === 1 ? '' : 's'} still need confirmation. Use “Recover saved status”; no payment is automatically retried.`); setMessage('Verified lanes retain their explorer receipts. Other lanes stay unconfirmed.'); }
         else setMessage('All five tasks and their payments are verified on Monad Testnet. Open a receipt to inspect the evidence.');
       });
-    } catch (cause) { if (mounted.current) setError(cause instanceof Error ? cause.message.slice(0, 280) : 'The run could not continue. No payment was automatically retried.'); }
+    } catch (cause) { if (mounted.current) setError(userErrorMessage(cause, 'The run could not continue. Check the saved status; no payment was automatically retried.')); }
     finally { busyRef.current = false; if (mounted.current) { setBusy(false); onBusy(false); } }
   }
   const unresolved = journal?.records.some(record => record.stage !== 'verified');
@@ -106,6 +107,7 @@ function TaskRun({ config, walletAddress, ready, setupBusy, onBusy, onSettledCou
         {!ready && <p className={styles.note}>Complete the setup checks above to start a new run. Saved requests can still be checked here.</p>}
         <p className={styles.note}>Five payments of {config.challenge.accepts[0].amount} token base units each. Token {truncate(config.policy.asset)}. Recipient {truncate(config.policy.receiver)}. Your wallet approves each task and payment.</p>
         {journal && <button type="button" className={styles.textButton} disabled={busy || setupBusy} onClick={() => void run(true)}>Recover saved status</button>}
+        {unresolved && !busy && <p className={styles.note}>A saved run needs its receipts checked again. Yellow bars do not mean the tasks failed. Recovering status only checks existing requests; it does not submit another task or payment.</p>}
       </div>
       <div className={styles.step}><h3>Live completion stream</h3><p>Progress follows service status and independent receipt checks.</p><div className={styles.stream}>{taskNames.map((name, index) => {
         const record = journal?.records[index]; const value = record ? stageProgress[record.stage] : 0;

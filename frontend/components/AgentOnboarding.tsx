@@ -9,6 +9,7 @@ import { explorerAddress, explorerTx, truncate } from '@/lib/contracts';
 import { address, type DemoConfig } from '@/lib/demo-protocol';
 import { authorizeExecutors, getSetupState, persistVerifiedSelection, recoverSetup, registerOwnedAgent } from '@/lib/onboarding-client';
 import { useAccessSession } from './AccessContext';
+import { userErrorMessage } from '@/lib/user-error';
 import { Icon } from './Icon';
 import styles from './AgentOnboarding.module.css';
 
@@ -121,7 +122,7 @@ export default function AgentOnboarding({ config, onReady, onSelection, onBusy, 
         }
       }
     } catch (cause) {
-      if (isCurrent()) { setError(cause instanceof Error ? cause.message.slice(0, 400) : 'This step could not finish. Check the saved status before trying again.'); await setup.refetch(); }
+      if (isCurrent()) { setError(userErrorMessage(cause, 'This step could not finish. Check the saved status before trying again.')); await setup.refetch(); }
     } finally {
       busyRef.current = false;
       if (mounted.current) setBusy(false);
@@ -148,7 +149,7 @@ export default function AgentOnboarding({ config, onReady, onSelection, onBusy, 
       setSelection({ identity, agentId: value });
       setMessage(`Agent #${value} is owned by this wallet and saved for your next visit.`);
     } catch (cause) {
-      if (isCurrent()) setError(cause instanceof Error ? cause.message.slice(0, 400) : 'Ownership could not be verified. Your saved agent selection was not changed.');
+      if (isCurrent()) setError(userErrorMessage(cause, 'Ownership could not be verified. Your saved agent selection was not changed.'));
     } finally {
       busyRef.current = false;
       if (mounted.current) setBusy(false);
@@ -184,6 +185,6 @@ export default function AgentOnboarding({ config, onReady, onSelection, onBusy, 
       </>}
     </>}
     {message && <p className={styles.note} role="status">{message}</p>}
-    {(error || setup.error) && <div className={styles.error} role="alert"><p>{error || setup.error?.message.slice(0, 400)}</p><button type="button" className={styles.textButton} disabled={locked || setup.isFetching} onClick={() => { setError(''); void setup.refetch(); }}>Check setup again</button></div>}
+    {(error || setup.error) && <div className={styles.error} role="alert"><p>{error || userErrorMessage(setup.error, 'Setup could not be checked. Try checking its status again.')}</p><button type="button" className={styles.textButton} disabled={locked || setup.isFetching} onClick={() => { setError(''); void setup.refetch(); }}>Check setup again</button></div>}
   </section>;
 }
