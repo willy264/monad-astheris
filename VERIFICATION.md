@@ -1,6 +1,6 @@
 # Verification record
 
-Updated **2026-10-10**. A new user wallet registered Agent #2 and completed five paid browser checksum tasks through the self-service flow. Canonical task, registration, delegation and payment receipts were independently checked, and hosted Envio indexes all five shards/completions. The registered observer previously completed an authorized paid MCP task, reputation completion, finalized Merkle publication and project-controlled output-integrity validation on October 7. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the exact receipts. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
+Updated **2026-10-10**. A new user wallet registered Agent #2 and completed five paid browser checksum tasks through the self-service flow. Canonical task, registration, delegation and payment receipts were independently checked. All five corresponding Merkle batches have now been published, finalized and matched to verified hosted Envio commitments. The registered observer previously completed an authorized paid MCP task, reputation completion, finalized Merkle publication and project-controlled output-integrity validation on October 7. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the exact receipts. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
 
 **Wallet finding:** earlier user screenshots show a malicious-site classification for the production domain. The [review record](submission/2026-10-07/wallet-security-review.md) documents the unresolved warning and separately confirmed Dynamic display-name mismatch. Automated source checks and later successful user transactions do not clear this classification. Provider review and the physical passkey demonstration remain outstanding.
 
@@ -16,14 +16,29 @@ Updated **2026-10-10**. A new user wallet registered Agent #2 and completed five
 | Expiring executor authority | The same owner granted the configured daemon executor authority until **16:11:09 UTC**; all five executions preceded expiry. | A successful wallet grant does not establish passkey enrollment/sign-in or explicit revocation. |
 | Five completed tasks | All screenshot hashes match canonical successful `ShardCreated`/`TaskExecuted` receipts, exact indexed fields, predicted CREATE2 addresses and reconstructed salt mappings. | Five different execution blocks, not a single-slot or throughput benchmark. Original browser workload bytes were not provided for recomputation. |
 | Testnet payments | Five canonical USDC transfers of 1,000 base units from this payer to the configured recipient each contain `AuthorizationUsed`; total **0.005 testnet USDC**. | Original browser request IDs, task signatures and nonce journal were unavailable; independent per-task payment linkage is not claimed. |
-| Indexing and batch status | Envio returns **5 shards / 5 completed tasks**; recomputed leaves match its five one-leaf roots. | On-chain batch storage is still zero for these new batches. October 7's verified commitment belongs to Agent #1. |
+| Indexing and initial batch status | Envio returns **5 shards / 5 completed tasks**; recomputed leaves match its five one-leaf roots. | On-chain batch storage was zero at this **15:35–15:40 UTC** check. The later publication below supersedes that dated state. |
 
 At the recorded block, the new wallet held **5.927053884 MON** and **20.995 testnet USDC**. Balances and grant validity are timestamped observations, not guaranteed future state. Full transaction hashes, blocks, logs, nonces and query output are preserved in the evidence artifact.
+
+## Agent #2 batch publication, October 10
+
+[Independent settlement verification](submission/2026-10-10/agent2-batch-settlement.json) passed at **17:06 UTC**. The daemon CLI published the five existing source blocks `69858093`, `69858120`, `69858148`, `69858175` and `69858203` sequentially. No task or x402 payment was repeated.
+
+| Check | Verified result |
+| --- | --- |
+| Canonical source data | Re-read every source block and exact `TaskExecuted` log; rebuilt domain-separated double-hashed leaves and block-hash-bound batch IDs. Each block has one leaf. |
+| Commitment transactions | Five successful canonical finalized receipts, exact `commitMerkleBatch` calldata and `MerkleBatchCommitted` events match the reconstructed roots, counts and source blocks. [Explorer links](SUBMISSION_PROOF.md#agent-2-merkle-settlement-october-10). |
+| Finalized router storage | All five commitments match at finalized block **69880508**. Owner transaction nonces are **21–25**. |
+| Hosted Envio | All five `MerkleBatch` rows report `committed`; all five `BatchCommitment` rows report `verified: true` and match the corresponding on-chain transaction. The exact GraphQL query and response are saved in the artifact. |
+| Signer handoff | Render suspension, a new SIGTERM/draining log and the shutdown interval were observed before local signing. The existing local journal was retained. Latest/pending owner nonces were both **21** before and **26** after publication. Render resumed healthy at **17:05:28 UTC**. |
+
+This is a five-block publication, not a throughput measurement or a full historical worker scan. The CLI did not advance the worker cursor. Render remains on free ephemeral storage with `batchWorker: disabled`; durable automatic publication and journal retention are still open operational work.
 
 ## Current source checks
 
 | Component / revision | Checks and observed outcome | Scope |
 | --- | --- | --- |
+| Saved receipt recovery, indexed history and owner-aware delegation, `8d52c93` | **168 frontend tests**, typecheck and local production build passed. **69 browser checks**: 34 recovery, 26 ownership and 9 indexed-history checks across desktop/mobile. [Public check record](submission/2026-10-10/frontend-recovery-checks.json). | Automatic recovery never signs or resubmits. Exact task/payment receipts remain required even when the daemon lost its job. History remains separate from recent metrics. Recovery/ownership browser tests use controlled wallet adapters; history rendering uses real Envio/RPC data. No original-user journal or device ceremony was available for this verification. |
 | Observer access and wallet feedback, `00c8226` | **143 frontend tests**, `pnpm typecheck` and local production `pnpm build` passed. **22 controlled browser checks** at 1440px and 390px passed with no runtime/console errors. | Checks cover current Observer permissions before MCP/signing, scoped legacy recovery, self-delegation rejection, wallet rejection/timeout redaction and retained receipt verification. Browser fixtures use real components with controlled wallet/permission adapters; they do not submit transactions or establish a passkey ceremony. |
 | Self-service agent setup, `f646da5` | **134 frontend tests**, `pnpm typecheck` and local production `pnpm build` passed. **68 shared ABI declarations** match compiled Solidity artifacts. | A visitor registers an owned identity, grants one-hour executor authority, checks funding and runs tasks with its selected agent. Tests cover real receipt/event decoding, partial grants, ambiguous recovery, current server permissions and wallet/agent journal isolation. Automated checks do not establish a live visitor registration, paid browser run or physical passkey ceremony. |
 | Compact Overview/cards, demo signer notice and indexed read ordering, `659d3b9` | **94 frontend tests**, `pnpm typecheck` and local production `pnpm build` passed. Eight new regression tests exercise advancing RPC/Envio providers and retained rejection guards. | Layout uses existing live hooks. Indexer progress is captured before a fresh RPC head; genuinely ahead progress, wrong chains and mismatched deployments remain rejected. The demo prevents starting a new run with a relayer wallet; recovery stays available. |
@@ -79,7 +94,7 @@ Earlier feature logs remain available in Git history. Dependency mitigations are
 
 - Complete supported-device passkey enrollment/sign-in on the deployed fix after Dynamic's observed settings rate limit clears. The user's last report was that registration opened no prompt.
 - Verify explicit delegation revocation and rejected new use afterward. Scheduled expiry alone is not the requested revoke transaction.
-- Retain the original five-task browser journal/request IDs for independent per-task EIP-712/payment linkage; the user-submitted Agent #2 tasks and five matching payments now have canonical receipt evidence. Publish and verify the corresponding new Merkle batches separately.
+- Retain the original five-task browser journal/request IDs for independent per-task EIP-712/payment linkage; the user-submitted Agent #2 tasks, five matching payments and five finalized Merkle commitments now have canonical receipt evidence.
 - Move Render's journal to persistent storage; test backup, restart and ambiguous-outcome reconciliation. The service has resumed, but free ephemeral hosting is not production-durable.
 - Demonstrate any advertised independent feedback, CRE delivery, hardware TEE verification, Mera ceremony or Privy integration separately.
 

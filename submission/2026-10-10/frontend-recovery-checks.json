@@ -1,0 +1,450 @@
+{
+  "sourceRevision": "8d52c93",
+  "chainId": 10143,
+  "automatedChecks": {
+    "frontendTestsPassed": 168,
+    "typecheck": "passed",
+    "productionBuild": "passed"
+  },
+  "browserChecks": [
+    {
+      "area": "automatic-recovery",
+      "passed": true,
+      "count": 34,
+      "checks": [
+        {
+          "width": 1440,
+          "name": "Saved lanes start checking without a recovery click",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "New payment stays disabled while saved receipts are unresolved",
+          "passed": true
+        },
+        {
+          "calls": {
+            "reads": 1,
+            "register": 0,
+            "authorize": 0,
+            "recover": 0,
+            "prompts": 0,
+            "auth": 0,
+            "profile": 0,
+            "sign": 0,
+            "post": 0,
+            "saves": 5,
+            "receiptReads": 5,
+            "aborted": 0
+          },
+          "name": "Mount recovery causes no signatures, wallet prompt or payment",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Verification does not loop when busy and ready flags change",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "scroll": 1425,
+          "name": "Recovered task cards fit the viewport",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Transient setup failure retains the same run component and verified receipts",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "New run fails closed while the setup refresh has an error",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Setup read failure does not restart receipt verification",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Expired executor permissions do not prevent read-only recovery",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Zero payment balance does not prevent checking old receipts",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Unavailable evidence leaves old run unresolved and blocks another payment",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Wallet switch removes the previous payer run and cancels its checks",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Late old-wallet results cannot become the new wallet success state",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Observer also starts automatic read-only recovery",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Observer old receipts recover even if current task permission is absent",
+          "passed": true
+        },
+        {
+          "calls": {
+            "reads": 7,
+            "register": 0,
+            "authorize": 0,
+            "recover": 0,
+            "prompts": 0,
+            "auth": 0,
+            "profile": 0,
+            "sign": 0,
+            "post": 0,
+            "saves": 47,
+            "receiptReads": 26,
+            "aborted": 5
+          },
+          "name": "All recovery and permission scenarios remain read-only",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Saved lanes start checking without a recovery click",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "New payment stays disabled while saved receipts are unresolved",
+          "passed": true
+        },
+        {
+          "calls": {
+            "reads": 1,
+            "register": 0,
+            "authorize": 0,
+            "recover": 0,
+            "prompts": 0,
+            "auth": 0,
+            "profile": 0,
+            "sign": 0,
+            "post": 0,
+            "saves": 5,
+            "receiptReads": 5,
+            "aborted": 0
+          },
+          "name": "Mount recovery causes no signatures, wallet prompt or payment",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Verification does not loop when busy and ready flags change",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "scroll": 375,
+          "name": "Recovered task cards fit the viewport",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Transient setup failure retains the same run component and verified receipts",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "New run fails closed while the setup refresh has an error",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Setup read failure does not restart receipt verification",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Expired executor permissions do not prevent read-only recovery",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Zero payment balance does not prevent checking old receipts",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Unavailable evidence leaves old run unresolved and blocks another payment",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Wallet switch removes the previous payer run and cancels its checks",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Late old-wallet results cannot become the new wallet success state",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Observer also starts automatic read-only recovery",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Observer old receipts recover even if current task permission is absent",
+          "passed": true
+        },
+        {
+          "calls": {
+            "reads": 7,
+            "register": 0,
+            "authorize": 0,
+            "recover": 0,
+            "prompts": 0,
+            "auth": 0,
+            "profile": 0,
+            "sign": 0,
+            "post": 0,
+            "saves": 47,
+            "receiptReads": 26,
+            "aborted": 5
+          },
+          "name": "All recovery and permission scenarios remain read-only",
+          "passed": true
+        },
+        {
+          "exceptions": [],
+          "errors": [],
+          "name": "No browser runtime or console errors",
+          "passed": true
+        },
+        {
+          "name": "No attempted external requests",
+          "passed": true
+        }
+      ],
+      "exceptions": [],
+      "errors": []
+    },
+    {
+      "area": "ownership",
+      "passed": true,
+      "count": 26,
+      "checks": [
+        {
+          "width": 1440,
+          "name": "Nonowner Agent1 shows actual ownership and own-agent guidance",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Entering connected nonowner address does not display owner-only self-delegation warning",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Even direct form submission from nonowner causes no wallet prompt or simulation",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Actual Agent2 owner gets correct self-delegation warning and disabled self-grant",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Actual owner may select a different executor without automatic prompts",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Wallet change fails closed during ownership read and hides prior owner result",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Completed read confirms changed wallet cannot manage Agent2",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Changing token ID cannot reuse another agent ownership result",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Ownership read error fails closed even after cached success, without misleading self-owner warning",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "Read-only retry restores true owner state while self-grant remains disabled",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "name": "All checks finish with zero wallet, passkey, simulation, or write requests",
+          "passed": true
+        },
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "name": "Wallet access fits viewport without horizontal overflow",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Nonowner Agent1 shows actual ownership and own-agent guidance",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Entering connected nonowner address does not display owner-only self-delegation warning",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Even direct form submission from nonowner causes no wallet prompt or simulation",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Actual Agent2 owner gets correct self-delegation warning and disabled self-grant",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Actual owner may select a different executor without automatic prompts",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Wallet change fails closed during ownership read and hides prior owner result",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Completed read confirms changed wallet cannot manage Agent2",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Changing token ID cannot reuse another agent ownership result",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Ownership read error fails closed even after cached success, without misleading self-owner warning",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "Read-only retry restores true owner state while self-grant remains disabled",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "name": "All checks finish with zero wallet, passkey, simulation, or write requests",
+          "passed": true
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "name": "Wallet access fits viewport without horizontal overflow",
+          "passed": true
+        },
+        {
+          "name": "No browser runtime or console errors",
+          "passed": true
+        },
+        {
+          "name": "Fixture made no external or write requests",
+          "passed": true
+        }
+      ],
+      "exceptions": [],
+      "errors": []
+    },
+    {
+      "area": "indexed-history",
+      "passed": true,
+      "count": 9,
+      "checks": [
+        {
+          "name": "Historical shard topology and ledger include five old Agent2 lanes",
+          "width": 1440,
+          "passed": true,
+          "nodes": 6,
+          "agent2": 5,
+          "ledger": 12,
+          "stats": "Indexed task lanes\n6\nRecent executions\n0\nVerified batch roots\n6\nRefresh interval\nEvery 12s"
+        },
+        {
+          "name": "Historical lane opens real commitment details",
+          "width": 1440,
+          "passed": true
+        },
+        {
+          "name": "Empty status filter is distinguished from no history",
+          "width": 1440,
+          "passed": true
+        },
+        {
+          "name": "Observer old run is available beyond recent window",
+          "width": 1440,
+          "passed": true
+        },
+        {
+          "name": "Historical shard topology and ledger include five old Agent2 lanes",
+          "width": 390,
+          "passed": true,
+          "nodes": 6,
+          "agent2": 5,
+          "ledger": 12,
+          "stats": "Indexed task lanes\n6\nRecent executions\n0\nVerified batch roots\n6\nRefresh interval\nEvery 12s"
+        },
+        {
+          "name": "Historical lane opens real commitment details",
+          "width": 390,
+          "passed": true
+        },
+        {
+          "name": "Empty status filter is distinguished from no history",
+          "width": 390,
+          "passed": true
+        },
+        {
+          "name": "Observer old run is available beyond recent window",
+          "width": 390,
+          "passed": true
+        },
+        {
+          "name": "No browser exceptions or paid requests; SDK telemetry remained blocked",
+          "passed": true
+        }
+      ],
+      "exceptions": [],
+      "errors": []
+    }
+  ],
+  "limits": [
+    "Recovery and ownership browser adapters are controlled fixtures with real components; no device passkey ceremony or real wallet signature was performed.",
+    "Indexed history browser checks use the local production build and actual public Envio/RPC reads. SDK telemetry/settings POST requests remained blocked by the harness.",
+    "The original user browser journal was not available to the independent verifier. Exact legacy payment nonce recovery is covered by regression fixtures, not asserted as an observed user session.",
+    "Historical recovery is bounded to 200 indexed shards and 200 blocks after execution for the exact payer/authorization nonce."
+  ]
+}
