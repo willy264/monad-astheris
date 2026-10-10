@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { isEthereumWallet } from '@dynamic-labs/ethereum';
 import type { Address, Hex } from 'viem';
-import { address, type DemoConfig, type DemoJournal, type DemoRecord } from '@/lib/demo-protocol';
+import { address, type DemoConfig, type DemoJournal, type DemoRecord, type DemoReceiptHints } from '@/lib/demo-protocol';
 import { postDemo, readDemo, recoverDemo, saveDemo, signDemo, type DemoJournalContext } from '@/lib/demo-client';
 import { checkObserverAccess, observeAgentTask, type ObserverAccess } from '@/lib/observer-task';
 import { explorerTx, truncate } from '@/lib/contracts';
@@ -27,6 +27,7 @@ function ObserverSession({ config, mcpEndpoint, walletAddress }: TaskProps & { w
   const [access, setAccess] = useState<ObserverAccess>(); const [checking, setChecking] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const mounted = useRef(true); const controller = useRef<AbortController>();
+  const autoRecovered = useRef<string>();
   const latestWallet = useRef(primaryWallet); latestWallet.current = primaryWallet;
   const context = useMemo<DemoJournalContext | undefined>(() => walletAddress ? { router: config.router, identity: config.identity, payer: walletAddress, agentId: config.agentId } : undefined, [config.router, config.identity, config.agentId, walletAddress]);
   useEffect(() => {
@@ -48,22 +49,29 @@ function ObserverSession({ config, mcpEndpoint, walletAddress }: TaskProps & { w
     }).finally(() => { if (!abort.signal.aborted) setChecking(false); });
     return () => abort.abort();
   }, [config, walletAddress, refresh]);
-  function update(stage: DemoRecord['stage'], transactionHash?: Hex) {
+  const recoverCurrent = useRef(() => {});
+  recoverCurrent.current = () => { void run(true, true); };
+  const savedRequest = journal?.records[0].requestId;
+  useEffect(() => {
+    if (!ready || unreadable || !savedRequest || busy || autoRecovered.current === savedRequest) return;
+    autoRecovered.current = savedRequest;
+    recoverCurrent.current();
+  }, [ready, unreadable, savedRequest, busy]);
+  function update(stage: DemoRecord['stage'], transactionHash?: Hex, receiptHints?: DemoReceiptHints) {
     if (!mounted.current || !current.current || !context) return;
-    const next = { ...current.current, records: [{ ...current.current.records[0], stage, ...(transactionHash ? { transactionHash } : {}) }] };
+    const next = { ...current.current, records: [{ ...current.current.records[0], stage, ...(transactionHash ? { transactionHash } : {}), ...(receiptHints ? { receiptHints } : {}) }] };
     current.current = next; setJournal(next);
     try { saveDemo(next, next.records[0].requestId, 'agent-task', context); }
     catch { setUnreadable(true); setError('Browser storage could not save this status. Keep the page open and preserve the request ID for reconciliation.'); }
   }
-  async function run(resume = false) {
+  async function run(resume = false, automatic = false) {
     if (busyRef.current || !context || (!resume && (!access?.allowed || checking))) return;
-    if (!navigator.locks) { setError('Use a current browser on HTTPS to coordinate paid requests safely between tabs.'); return; }
+    if (!resume && !navigator.locks) { setError('Use a current browser on HTTPS to coordinate paid requests safely between tabs.'); return; }
     busyRef.current = true; setBusy(true); setError('');
     const abort = new AbortController(); controller.current = abort;
     const isCurrent = () => mounted.current && !abort.signal.aborted && latestWallet.current?.address.toLowerCase() === walletAddress?.toLowerCase();
     try {
-      await navigator.locks.request('aetheris:agent-task:paid-run', { ifAvailable: true }, async lock => {
-        if (!lock) throw new Error('Another tab is following this task. Finish or close that tab before continuing.');
+      const follow = async () => {
         const saved = readDemo('agent-task', context);
         if (saved && saved.records[0].requestId !== current.current?.records[0].requestId) { current.current = saved; setJournal(saved); }
         if (!saved && current.current) throw new Error('The saved task was removed in another tab. Preserve this page for operator reconciliation.');
@@ -88,13 +96,19 @@ function ObserverSession({ config, mcpEndpoint, walletAddress }: TaskProps & { w
           });
           if (!isCurrent()) throw new Error('Signing was interrupted. Recover the saved request before starting again.');
           active = prepared.journal; current.current = active; setJournal(active);
+          autoRecovered.current = active.records[0].requestId;
           setMessage('Task signed. Following its private execution lane and payment settlement.');
           try { initial = await postDemo(prepared.signed[0].task, prepared.signed[0].paymentHeader, abort.signal); }
           catch { /* An ambiguous POST is recovered with status reads only. */ }
         } else setMessage('Checking saved status. The task and payment will not be submitted again.');
         if (!active) throw new Error('There is no saved task to recover.');
-        await recoverDemo(active, 0, abort.signal, update, initial);
+        await recoverDemo(active, 0, abort.signal, update, initial, automatic ? { maxAttempts: 3, receiptTimeoutMs: 15000 } : undefined);
         if (isCurrent()) setMessage('The observation commitment and its exact payment are verified with two confirmations.');
+      };
+      if (resume) await follow();
+      else await navigator.locks.request('aetheris:agent-task:paid-run', { ifAvailable: true }, async lock => {
+        if (!lock) throw new Error('Another tab is following this task. Finish or close that tab before continuing.');
+        await follow();
       });
     } catch (cause) {
       if (isCurrent()) {

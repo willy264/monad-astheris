@@ -1,5 +1,5 @@
 import { encodePacked, keccak256 } from 'viem';
-import type { MerkleBatch, Shard } from './types';
+import type { MerkleBatch, Shard, ShardHistory } from './types';
 
 export class IndexerError extends Error {
   constructor(message = 'The configured Envio indexer is unavailable. Check its endpoint, access settings and generated schema.') { super(message); this.name = 'IndexerError'; }
@@ -61,6 +61,22 @@ export function parseShard(row: Row, scope: IndexerScope, fromBlock: bigint, toB
     createdBlock, transactionHash: hex(row.creationTx, 32), status: executed ? 'executed' : 'created',
     outputHash: executed ? hex(row.outputHash, 32) : undefined, proofHash: executed ? hex(row.proofHash, 32) : undefined,
     executionTransactionHash: executed ? hex(object(row.execution).transactionHash, 32) : undefined };
+}
+export function shardHistoryWhere(scope: IndexerScope, deployment: bigint, indexed: bigint) {
+  return { chainId: { _eq: scope.chainId }, router: { _eq: scope.router },
+    createdBlock: { _gte: deployment.toString(), _lte: indexed.toString() },
+    agent: { registry: { _eq: scope.registry } } };
+}
+export function parseShardHistory(value: unknown, scope: IndexerScope, deployment: bigint, indexed: bigint, recentFrom: bigint) {
+  // Fetch one extra row to distinguish a capped history from a complete result.
+  // Validate the sentinel too, and keep recent counters separate from old tasks.
+  const all = rows(value, 201).map(row => parseShard(row, scope, deployment, indexed));
+  if (new Set(all.map(shard => shard.address)).size !== all.length) throw new IndexerError('Envio returned duplicate shards.');
+  all.sort((a, b) => BigInt(a.createdBlock) > BigInt(b.createdBlock) ? -1 : BigInt(a.createdBlock) < BigInt(b.createdBlock) ? 1 : a.address.localeCompare(b.address));
+  const visible = all.slice(0, 200);
+  const shardHistory: ShardHistory = { shards: visible, fromBlock: deployment.toString(), toBlock: indexed.toString(), resultsLimited: all.length > 200 };
+  return { shardHistory, shards: visible.filter(shard => BigInt(shard.createdBlock) >= recentFrom),
+    resultsLimited: all.length > 200 && BigInt(all[200].createdBlock) >= recentFrom };
 }
 export function parseBatches(value: unknown, commitmentsValue: unknown, scope: IndexerScope, toBlock: bigint): MerkleBatch[] {
   const commitments = rows(commitmentsValue, 24);
