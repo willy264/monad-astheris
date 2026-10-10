@@ -54,6 +54,8 @@ With Envio configured, overview activity and directory identities come from the 
 
 The indexer must run this repository's current schema, including `SyncStatus`, and permit the `Agent` and `TaskExecution` aggregate queries used by the dashboard. `SyncStatus` records the previous fully processed block; source panels show that progress and lag relative to RPC. This is synchronization progress, not consensus finality.
 
+The server captures validated indexer progress before sampling the RPC head. Overview queries keep that captured block as their upper bound; directory reads request a fresh, uncached RPC head after indexed data arrives. This avoids treating normal chain advancement between provider requests as a configuration mismatch. Progress genuinely ahead of the fresh RPC head or outside the deployment range still fails validation.
+
 Without `ENVIO_GRAPHQL_URL`, the API explicitly uses **RPC fallback**. A configured endpoint that is inaccessible, unauthorized or incompatible produces a visible `503`; it does not silently replace indexed results with RPC data. The frontend does not provision a hosted indexer. Follow the [indexer setup](../../indexer/README.md).
 
 ## Metric definitions and limits

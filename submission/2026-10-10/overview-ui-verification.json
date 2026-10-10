@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "project": "Aetheris",
+  "scope": "Simplified Overview, compact agent cards, and live data readiness after the Envio checkpoint read-order fix",
+  "verifiedAt": "2026-10-10T12:18:12.732Z",
+  "result": "passed within the scopes below",
+  "summary": {
+    "passingChecks": 67,
+    "fixtureLayoutChecks": 55,
+    "unmockedFollowUpChecks": 12,
+    "localScreenshots": 21,
+    "browserRuntimeExceptions": 0,
+    "browserConsoleErrors": 0
+  },
+  "fixtureLayout": {
+    "startedAt": "2026-10-10T11:57:30.004Z",
+    "finishedAt": "2026-10-10T11:58:36.124Z",
+    "recordedRevisionLabel": "4c31f49",
+    "sourceNote": "The initial build included the completed Overview, AgentCard and wallet-preflight edits, subsequently committed as 5ba5fcd, 4c31f49 and 2cdac7f. The recorded revision label is not an exact build artifact identity.",
+    "origin": "http://localhost:3100",
+    "routes": ["/", "/agents", "/visualizer"],
+    "viewportWidths": [1440, 768, 390],
+    "passingChecks": 55,
+    "localScreenshots": 19,
+    "coverage": [
+      "Overview contains one hero, four metric cards and one guided demo, with duplicate feature panels removed.",
+      "Overview links to the demo, agent directory and dedicated visualizer.",
+      "Compact Agent #1 cards preserve published identity, owner, capabilities and reputation; desktop card width is approximately 356px and remains below 420px.",
+      "Keyboard-operated details reveal the actual IPFS Agent Card and MCP endpoint without overflow.",
+      "Search filters cards and pagination retains the actual registry total.",
+      "Guided preview completes five explicitly simulated tasks without transaction links; the live-mode view remains available.",
+      "Both visualizer modes work and all three routes fit the tested viewports beside the sidebar.",
+      "One unfaked local error-state check confirms unavailable data is not presented as live."
+    ],
+    "dataMethod": "After the unfaked error-state check, only Overview and directory GET responses were fulfilled with the exact captured public API responses listed below. This phase does not establish local backend readiness.",
+    "snapshotFile": "submission/2026-10-10/dashboard-api-snapshot.json",
+    "localReport": ".tools/overview-focus-verification/2026-10-10T11-57-29-934Z/report.json"
+  },
+  "publicSnapshots": [
+    {
+      "source": "https://monad-astheris.vercel.app/api/overview",
+      "capturedAt": "2026-10-10T11:55:05.875Z",
+      "status": 200,
+      "chainId": 10143,
+      "errors": [],
+      "registeredAgents": "1",
+      "blockNumber": "69818630",
+      "indexedThrough": "69818626",
+      "lagBlocks": "4"
+    },
+    {
+      "source": "https://monad-astheris.vercel.app/api/agents?page=0",
+      "capturedAt": "2026-10-10T11:55:10.047Z",
+      "status": 200,
+      "errors": [],
+      "total": "1",
+      "agentId": "1",
+      "agentName": "Aetheris Monad Observer"
+    }
+  ],
+  "unmockedFollowUp": {
+    "sourceRevision": "659d3b94200f3d34c6c37e78a78c1e869a032e9a",
+    "startedAt": "2026-10-10T12:17:41.054Z",
+    "finishedAt": "2026-10-10T12:18:12.732Z",
+    "origin": "http://localhost:3100",
+    "routes": ["/", "/agents"],
+    "viewportWidths": [1440],
+    "passingChecks": 12,
+    "localScreenshots": 2,
+    "fixturesUsed": false,
+    "endpoints": [
+      {
+        "path": "/api/overview",
+        "status": 200,
+        "errors": [],
+        "chainId": 10143,
+        "registeredAgents": "1",
+        "blockNumber": "69823136",
+        "source": "envio",
+        "indexedThrough": "69823120",
+        "lagBlocks": "16",
+        "checkpointNotAheadOfRpc": true,
+        "lagEqualsRpcHeadMinusCheckpoint": true
+      },
+      {
+        "path": "/api/agents?page=0",
+        "status": 200,
+        "errors": [],
+        "total": "1",
+        "agentName": "Aetheris Monad Observer",
+        "source": "envio",
+        "indexedThrough": "69823134",
+        "lagBlocks": "8"
+      },
+      {
+        "path": "/api/demo/config",
+        "status": 503,
+        "enabled": false,
+        "interpretation": "Live demo execution is disabled in this local environment; the unavailable policy state is expected."
+      }
+    ],
+    "browserResult": "Actual local responses rendered the real registry total and Agent #1, Envio provenance, an active RPC badge, compact card and correct pagination, with no backend error notices or horizontal overflow. All observed application script responses succeeded.",
+    "localReport": ".tools/overview-live-verification/2026-10-10T12-17-41-046Z/report.json"
+  },
+  "resolvedFailure": {
+    "initialAttempt": "2026-10-10T11:49:58.897Z",
+    "excludedFromPassingCounts": true,
+    "symptom": "Local Overview and directory returned HTTP 503 because an Envio checkpoint could advance beyond an RPC head sampled earlier.",
+    "resolution": "The checkpoint is now sampled before the RPC head while deployment and chain guards remain enforced. The rebuilt source passed the unmocked follow-up."
+  },
+  "limitations": [
+    "This record verifies a local production build; the public API captures do not prove deployment of the new UI.",
+    "Responsive rendering uses captured real public data at 1440px, 768px and 390px; the post-fix unmocked browser follow-up is limited to 1440px.",
+    "Authentication, passkey ceremonies, wallet selection, delegation, payments, task submission and chain writes were not exercised. Browser write requests were blocked apart from allowlisted read-only JSON-RPC methods.",
+    "Guided preview progress is simulation, not execution evidence. Local live-demo configuration was disabled.",
+    "The ignored .tools reports and screenshots remain local artifacts. The public response snapshot is separately committed as submission/2026-10-10/dashboard-api-snapshot.json."
+  ]
+}

@@ -6,7 +6,7 @@ The homepage's **Live demo is not available yet** panel means `/api/demo/config`
 
 Render was still suspended from the coordinated owner-wallet verification session. It was resumed after checking that the owner's latest and pending nonces both equaled `11` and the batch worker was disabled. Public `/health` and `/v1/config` now return **200** with chain `10143` and the expected router/payment policy. [Recorded service checks](../../submission/2026-10-10/demo-availability.json).
 
-Vercel `/api/demo/config` still returns **503 / enabled:false**. The route intentionally uses a generic error for configuration and upstream failures; that response cannot identify an individual missing environment variable. Vercel management access was unavailable, so its Production variables have not been inspected or changed.
+After the operator updated Vercel and redeployed, `/api/demo/config` returned **200 / enabled:true** at **11:36 UTC on October 10**, with the intended agent, contracts, relayer and payment policy. [Public endpoint response](../../submission/2026-10-10/demo-config-enabled.json). This supersedes the earlier 503 availability failure. Vercel's private environment settings were not inspected; the public response confirms the effective configuration.
 
 The browser task wallet `0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605` is no longer authorized for Agent #1. Its previous grant expired October 7. MetaMask's domain scan still returned **BLOCK** on October 10. Resolve the [website classification](../../submission/2026-10-07/wallet-security-review.md) before attempting wallet signatures. No new task, payment or delegation was submitted during this recovery.
 
@@ -50,4 +50,4 @@ Saving values in local `.env` files does not update Vercel. Redeploy Production 
 
 Configuration success only establishes availability. A completed paid browser run requires verified task and payment receipts; historical CLI receipts are not evidence that this browser flow has run.
 
-The daemon's current CORS origin still contains a placeholder. The browser demo uses same-origin Vercel API routes, whose server requests do not depend on browser-to-Render CORS. If direct browser access to Render is needed, separately configure Render's `CORS_ORIGIN=https://monad-astheris.vercel.app` and coordinate a restart while retaining the journal. This is not the demonstrated cause of the current Vercel 503.
+The daemon's current CORS origin still contains a placeholder. The browser demo uses same-origin Vercel API routes, whose server requests do not depend on browser-to-Render CORS. If direct browser access to Render is needed, separately configure Render's `CORS_ORIGIN=https://monad-astheris.vercel.app` and coordinate a restart while retaining the journal. The frontend configuration endpoint now succeeds through the existing proxy.
