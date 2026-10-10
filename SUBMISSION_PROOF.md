@@ -1,6 +1,25 @@
 # Aetheris live evidence
 
-Updated **2026-10-07**. A registered agent completed one real MCP task through the paid daemon on **Monad Testnet, chain 10143**. It settled **0.001 testnet USDC**, created an isolated result contract, recorded completion and produced a finalized Merkle commitment that hosted Envio independently indexed. A project-controlled validator separately checked output integrity. Physical passkey enrollment, explicit delegation revocation and the production browser paid flow remain pending.
+Updated **2026-10-10**. The production self-service flow now has user-submitted live evidence: a new wallet registered **Agent #2**, granted the daemon expiring execution authority and completed **five browser checksum tasks** on **Monad Testnet, chain 10143**. Read-only verification confirmed five distinct CREATE2 shards, all five canonical completion receipts, and five **0.001 testnet USDC** authorization settlements. Hosted Envio indexes all five tasks. The earlier Agent #1 MCP task, reputation completion, finalized Merkle commitment and project-controlled output-integrity validation remain documented below. Physical passkey enrollment and explicit delegation revocation remain unverified.
+
+## Self-service browser execution, October 10
+
+The [public verification artifact](submission/2026-10-10/self-service-agent2.json) records the user wallet `0xce77b053D322ae8380aD2D0458f3605966EBDD22`, exact receipts, indexed responses, reconstructed salts and CREATE2 predictions. The agent is **Aetheris Checksum Agent**, token **2**. Its registered card is an inline JSON data URI describing deterministic browser checksums; it is separate from the IPFS-backed Monad Observer, token 1.
+
+- [Agent #2 registration](https://testnet.monadscan.com/tx/0x280d7724cf1466a7f65d663551d1235d12b412bd0b9606444071e44b416464bb): the connected wallet submitted the registration and received the ERC-721 mint.
+- [Executor grant](https://testnet.monadscan.com/tx/0x32b10fd80d977a3b6d89a91d51f364f6a7653d44650a9158711967f4cfac3128): that same owner authorized the daemon wallet until **2026-10-10 16:11:09 UTC**. All five executions occurred before expiry. This is wallet delegation, not proof of a device passkey ceremony.
+
+| Browser lane | Confirmed TaskExecuted transaction | Execution block |
+| --- | --- | --- |
+| Checksum task 1 | [0xdf4c591…2710188](https://testnet.monadscan.com/tx/0xdf4c591369968ad52145170913e0d3c8f5a2c9a243b1496afd28865082710188) | `69858093` |
+| Checksum task 2 | [0xa9d25f5…11afb93](https://testnet.monadscan.com/tx/0xa9d25f58fa1a72e1bf746abba75a0bdbf7f7910920a9f2dce670b1da511afb93) | `69858175` |
+| Checksum task 3 | [0x8eba449…d272922](https://testnet.monadscan.com/tx/0x8eba4496c5b024827beac851b1b7a81564ca56a6c50106343d88099b6d272922) | `69858203` |
+| Checksum task 4 | [0xc5428fa…e1c4ae0](https://testnet.monadscan.com/tx/0xc5428faadc9172b56e5476d74a13149d967ae1edf04eb7cd139896535e1c4ae0) | `69858148` |
+| Checksum task 5 | [0x3281519…662876d](https://testnet.monadscan.com/tx/0x328151947bcfe78cc1e028f959c1c671e506777e51104d5b46cb29ac5662876d) | `69858120` |
+
+The audit checked canonical successful creation/execution receipts, executor/router addresses, every indexed task field, reconstructed `keccak256(agentId | taskId | sequenceNonce)`, predicted shard addresses and stored salt mappings. Envio reports `shardsCreated: 5` and `tasksCompleted: 5`; recomputed Merkle leaves match its results. Its five new one-leaf batches are **not committed on chain** at this check.
+
+Five canonical payment receipts contain the exact token transfer from this user to the configured recipient and an `AuthorizationUsed` event: **5,000 base units = 0.005 testnet USDC** total. Complete receipts and nonces are in the artifact. The original browser journal, task signatures and request IDs were unavailable to this independent verifier, so it does not independently reconstruct each payment nonce's binding to a particular task. The user's screenshot reports all five lanes as browser-verified. No new signature or transaction was generated to produce this evidence, and no AI inference, TEE proof or throughput measurement is implied.
 
 ## Verified workflow
 
@@ -53,9 +72,9 @@ Validation response `100`, tagged `output-integrity`, means the documented integ
 
 | Service | Endpoint and current scope |
 | --- | --- |
-| Dashboard | [monad-astheris.vercel.app](https://monad-astheris.vercel.app). Read-only and preview UI are live; production paid browser execution and the current Envio connection are not yet configured. |
+| Dashboard | [monad-astheris.vercel.app](https://monad-astheris.vercel.app). Self-service registration and five paid browser checksum tasks are evidenced above. Live Envio configuration is recorded in the October 10 operational checks. |
 | MCP observer | `https://monad-astheris.vercel.app/api/mcp`, tool `get_monad_block`, arguments `{}`. MCP uses POST; a browser GET returns 405. |
-| Paid task daemon | `https://monad-astheris-daemon.onrender.com/v1/tasks`. The verified CLI execution route; Render is paused for coordinated owner signing at this snapshot. |
+| Paid task daemon | `https://monad-astheris-daemon.onrender.com/v1/tasks`. The CLI and self-service browser execution route. Render resumed after the October 7 coordinated signing window; October 10 task receipts supersede that earlier paused snapshot. |
 | Envio | `https://indexer.dev.hyperindex.xyz/635fbf6/v1/graphql`, deployed from `7569afb`. Exact frontend queries/parsers, task fields and verified commitment pass. Auto-deploy is disabled to preserve this development endpoint and quota. |
 
 The saved historical query includes the known execution block. The normal dashboard uses a recent 200-block window, so an older successful task can legitimately fall outside its recent-activity counters; the evidence file records both query scopes.
@@ -74,10 +93,10 @@ Use Node 24+ for the whole repository and pnpm 10.32.1. The [October 7 MCP repor
 
 ## Remaining scope
 
-- **Website security classification:** subsequent user screenshots show MetaMask classifying the production domain as malicious. Wallet interaction is paused pending investigation and provider review. Dynamic's configured name `uiriamuzu` explains the unexpected sign-in wording; it does not establish the classification's cause. See the [review record and unsent support request](submission/2026-10-07/wallet-security-review.md). No clearance or completed device ceremony is claimed.
+- **Website security classification:** earlier user screenshots show MetaMask classifying the production domain as malicious. Investigation and provider review remain unresolved; later successful user transactions do not clear the classification. Dynamic's configured name `uiriamuzu` explains the unexpected sign-in wording; it does not establish the classification's cause. See the [review record and unsent support request](submission/2026-10-07/wallet-security-review.md). No clearance or completed device ceremony is claimed.
 - **Physical passkey enrollment/sign-in:** the user reported that the registration button did not open a prompt. [PR #40](https://github.com/willy264/monad-astheris/pull/40) passed 61 frontend tests, builds and CI and merged as `4d8222d`. Vercel deployed it successfully at 21:00:54 UTC. The [production check](submission/2026-10-07/passkey-production-smoke.json) verified its assets and page/dialog rendering, then hit Dynamic settings HTTP 429 during fresh-session initialization. The complete authentication smoke and actual device ceremony remain unverified; retries stopped.
 - **Explicit delegation revocation:** the grant and authorized execution are verified. Revocation was requested but is not yet verified. The saved grant expires at `2026-10-07T21:26:38Z`; scheduled expiry is not a recorded revoke transaction or a verified post-revocation rejection.
-- **Production dashboard:** set Vercel's `ENVIO_GRAPHQL_URL` to the verified endpoint, configure the paid-service policy and verify actual task/batch rendering. Vercel management authorization is unavailable. Five paid browser checksum tasks have not been demonstrated.
+- **New task settlement:** five paid browser checksum tasks are now evidenced. Publish and verify the new Agent #2 Merkle batches separately; Envio indexing alone is not an on-chain commitment. Preserve the browser journal to permit independent per-task payment/signature reconstruction.
 - **Durable hosting/recovery:** Render's free ephemeral filesystem does not establish durable payment-journal retention. Backups, restart recovery and exclusive signer handoff need production-grade operation.
 - **Additional claims:** no independent reviewed feedback, live CRE delivery, genuine hardware TEE proof, Mera device ceremony or Privy integration is claimed. One task and one leaf are not a throughput benchmark or evidence of zero scheduler contention.
 - **Submission packaging:** confirm organizer rules, deadline, access, license and recording requirements before publishing a final entry.
