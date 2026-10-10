@@ -71,6 +71,17 @@ For paid tasks, return to the original wallet and agent and choose **Recover sav
 
 Agent #1 is still the **Aetheris Monad Observer**, whose directory task calls the registered MCP service. It requires that identity's owner or an unexpired delegate and costs **0.001 testnet USDC** at the recorded price. Registering a personal checksum agent does not grant access to the Observer. If the Observer's owner must grant a delegate, coordinate the transaction with Render because that owner account is also the daemon relayer. A new visitor's personal-agent setup avoids sharing that signer.
 
-Configuration success only establishes availability. A completed paid browser run requires verified task and payment receipts; historical CLI receipts are not evidence that this browser flow has run.
+Configuration success only establishes availability. The user's later Agent #2 registration and five-task browser run now have [live receipt and Envio evidence](../../SUBMISSION_PROOF.md#self-service-browser-execution-october-10). That record separates independently checked receipts from the browser's per-task payment verification and does not claim a passkey ceremony.
+
+## Understand task and permission messages
+
+| Message or screen | Meaning and next step |
+| --- | --- |
+| Observer #1 access is unavailable for this wallet | An agent has its own permissions. Owning Agent #2 does not authorize Agent #1. Use **Continue with your own agent** to return to the homepage run. The Observer checks authority before calling MCP or requesting signatures. |
+| You entered your connected wallet as executor | The agent owner already has task authority. In guided setup, approve the displayed daemon executor; do not enter your own address in the manual delegation form. |
+| The wallet request was cancelled | The wallet reported rejection of the request. It does not undo an earlier confirmed registration, grant or task. Retry only the intended action when ready. |
+| Monad Testnet is taking too long to respond | A network read or confirmation timed out. Check any saved transaction or task status before retrying a write; a timeout alone cannot prove a transaction failed. |
+| Yellow **Check saved status** bars | The browser has saved requests whose receipts must be checked again, including after a reload. Select **Recover saved status**. This reads existing jobs and receipts without another payment or task submission. |
+| Five green **Verified on Monad** bars | All five execution and exact payment receipt checks completed. Open their explorer links to inspect the transactions. |
 
 The daemon's current CORS origin still contains a placeholder. The browser demo uses same-origin Vercel API routes, whose server requests do not depend on browser-to-Render CORS. If direct browser access to Render is needed, separately configure Render's `CORS_ORIGIN=https://monad-astheris.vercel.app` and coordinate a restart while retaining the journal. The frontend configuration endpoint now succeeds through the existing proxy.
