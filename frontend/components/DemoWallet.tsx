@@ -4,7 +4,7 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { isEthereumWallet } from '@dynamic-labs/ethereum';
 import type { Address, Hex } from 'viem';
 import { explorerTx, truncate } from '@/lib/contracts';
-import { address, type DemoConfig, type DemoJournal, type DemoRecord } from '@/lib/demo-protocol';
+import { address, type DemoConfig, type DemoJournal, type DemoRecord, type DemoReceiptHints } from '@/lib/demo-protocol';
 import { postDemo, readDemo, recoverDemo, saveDemo, signDemo, type DemoJournalContext } from '@/lib/demo-client';
 import AgentOnboarding from './AgentOnboarding';
 import styles from './InteractiveDemo.module.css';
@@ -32,6 +32,7 @@ function TaskRun({ config, walletAddress, ready, setupBusy, onBusy, onSettledCou
   const [message, setMessage] = useState(''); const [error, setError] = useState('');
   const [journalUnreadable, setJournalUnreadable] = useState(false); const [loaded, setLoaded] = useState(false);
   const controller = useRef<AbortController>(); const mounted = useRef(true);
+  const autoRecovered = useRef<string>();
   const context = useMemo<DemoJournalContext>(() => ({ router: config.router, identity: config.identity, payer: walletAddress, agentId: config.agentId }), [config.router, config.identity, walletAddress, config.agentId]);
   const latest = useRef({ primaryWallet, config }); latest.current = { primaryWallet, config };
   const callbacks = useRef({ onBusy, onSettledCount }); callbacks.current = { onBusy, onSettledCount };
@@ -44,21 +45,31 @@ function TaskRun({ config, walletAddress, ready, setupBusy, onBusy, onSettledCou
   }, [context]);
   useEffect(() => { callbacks.current.onSettledCount?.(journal?.records.filter(record => record.stage === 'verified').length ?? 0); }, [journal]);
 
-  function update(index: number, stage: DemoRecord['stage'], transactionHash?: Hex) {
+  // Loading a saved run only reads receipts. It never asks for signatures,
+  // submits another request, or depends on current funding/delegation readiness.
+  const recoverCurrent = useRef(() => {});
+  recoverCurrent.current = () => { void run(true, true); };
+  const savedRequest = journal?.records[0].requestId;
+  useEffect(() => {
+    if (!loaded || journalUnreadable || !savedRequest || setupBusy || busy || autoRecovered.current === savedRequest) return;
+    autoRecovered.current = savedRequest;
+    recoverCurrent.current();
+  }, [loaded, journalUnreadable, savedRequest, setupBusy, busy]);
+
+  function update(index: number, stage: DemoRecord['stage'], transactionHash?: Hex, receiptHints?: DemoReceiptHints) {
     if (!mounted.current || !current.current) return;
-    const next: DemoJournal = { ...current.current, records: current.current.records.map((record, position) => position === index ? { ...record, stage, ...(transactionHash ? { transactionHash } : {}) } : record) };
+    const next: DemoJournal = { ...current.current, records: current.current.records.map((record, position) => position === index ? { ...record, stage, ...(transactionHash ? { transactionHash } : {}), ...(receiptHints ? { receiptHints } : {}) } : record) };
     current.current = next; setJournal(next);
     try { saveDemo(next, next.records[0].requestId, 'demo', context); }
     catch { setJournalUnreadable(true); setError('Browser storage could not save the latest status. Keep this page open; do not resubmit a payment.'); }
   }
-  async function run(resume = false) {
+  async function run(resume = false, automatic = false) {
     if (busyRef.current || setupBusy || (!resume && !ready)) return;
-    if (!navigator.locks) { setError('Use a current browser on HTTPS or localhost to coordinate paid requests between tabs.'); return; }
+    if (!resume && !navigator.locks) { setError('Use a current browser on HTTPS or localhost to coordinate paid requests between tabs.'); return; }
     busyRef.current = true; setBusy(true); onBusy(true); setError('');
     const abort = new AbortController(); controller.current = abort;
     try {
-      await navigator.locks.request('aetheris:judge-demo:paid-run', { ifAvailable: true }, async lock => {
-        if (!lock) throw new Error('Another tab is following a paid run. Finish or close that tab before continuing.');
+      const follow = async () => {
         const saved = readDemo('demo', context);
         if (saved && saved.records[0].requestId !== current.current?.records[0].requestId) { current.current = saved; setJournal(saved); }
         if (!saved && current.current) throw new Error('The saved journal was removed in another tab. Preserve this page for reconciliation.');
@@ -77,6 +88,7 @@ function TaskRun({ config, walletAddress, ready, setupBusy, onBusy, onSettledCou
           active = prepared.journal; submissions = prepared.signed;
           if (!isCurrent()) throw new Error('Signing was interrupted. Recover the saved status before starting another run.');
           current.current = active; setJournal(active);
+          autoRecovered.current = active.records[0].requestId;
         }
         if (!active) throw new Error('There are no saved requests for this wallet and agent.');
         setMessage(resume ? 'Checking saved requests. No task or payment is submitted again.' : 'Following five independent lanes and their payment receipts.');
@@ -88,13 +100,18 @@ function TaskRun({ config, walletAddress, ready, setupBusy, onBusy, onSettledCou
             try { initial = await postDemo(signed[index].task, signed[index].paymentHeader, abort.signal); }
             catch { /* An ambiguous POST is followed only by GET status requests. */ }
           }
-          await recoverDemo(savedRun, index, abort.signal, (stage, transactionHash) => update(index, stage, transactionHash), initial);
+          await recoverDemo(savedRun, index, abort.signal, (stage, transactionHash, hints) => update(index, stage, transactionHash, hints), initial, automatic ? { maxAttempts: 3, receiptTimeoutMs: 15000 } : undefined);
         }));
         if (!mounted.current) return;
         const unresolved = outcomes.flatMap((result, index) => result.status === 'rejected' ? [index] : []);
         unresolved.forEach(index => update(index, 'unresolved'));
         if (unresolved.length) { setError(`${unresolved.length} task${unresolved.length === 1 ? '' : 's'} still need confirmation. Use “Recover saved status”; no payment is automatically retried.`); setMessage('Verified lanes retain their explorer receipts. Other lanes stay unconfirmed.'); }
         else setMessage('All five tasks and their payments are verified on Monad Testnet. Open a receipt to inspect the evidence.');
+      };
+      if (resume) await follow();
+      else await navigator.locks.request('aetheris:judge-demo:paid-run', { ifAvailable: true }, async lock => {
+        if (!lock) throw new Error('Another tab is following a paid run. Finish or close that tab before continuing.');
+        await follow();
       });
     } catch (cause) { if (mounted.current) setError(userErrorMessage(cause, 'The run could not continue. Check the saved status; no payment was automatically retried.')); }
     finally { busyRef.current = false; if (mounted.current) { setBusy(false); onBusy(false); } }

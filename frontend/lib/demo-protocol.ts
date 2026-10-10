@@ -19,7 +19,9 @@ export interface PaymentPolicy { resource: string; asset: Address; receiver: Add
 export interface ExactPayment { scheme: 'exact'; network: 'eip155:10143'; amount: string; asset: Address; payTo: Address; maxTimeoutSeconds: number; extra: { name: string; version: string }; }
 export interface DemoConfig { enabled: true; chainId: 10143; router: Address; identity: Address; agentId: string; relayers: Address[]; policy: PaymentPolicy; challenge: { x402Version: 2; resource: { url: string }; accepts: ExactPayment[] }; }
 export interface DemoJob { requestId: Hex; status: 'accepted' | 'completed' | 'settlement_pending' | 'reconciliation_required'; result?: { shard: Address; salt: Hex; createTx: Hex; executionTx: Hex }; payment?: { success: boolean; network: string; payer: Address; transaction: Hex }; }
-export interface DemoRecord { task: DemoTask; requestId: Hex; payer: Address; paymentNonce: Hex; amount: string; stage: 'submitted' | 'accepted' | 'verifying' | 'verified' | 'unresolved'; transactionHash?: Hex; }
+// Public receipt locations are recovery hints, never proof of successful execution.
+export interface DemoReceiptHints { createTx: Hex; executionTx: Hex; paymentTx: Hex; }
+export interface DemoRecord { task: DemoTask; requestId: Hex; payer: Address; paymentNonce: Hex; amount: string; stage: 'submitted' | 'accepted' | 'verifying' | 'verified' | 'unresolved'; transactionHash?: Hex; receiptHints?: DemoReceiptHints; }
 export interface DemoJournal { version: 1; router: Address; asset: Address; receiver: Address; createdAt: string; records: DemoRecord[]; }
 
 export const taskTypes = { TaskAuthorization: [
