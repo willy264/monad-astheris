@@ -4,7 +4,7 @@ import { keccak256, toBytes, type WalletClient } from 'viem';
 import { contracts, walletPublicClient } from '../lib/contracts';
 import { readDemo, saveDemo, signDemo } from '../lib/demo-client';
 import { requestId, type DemoConfig, type DemoJournal, type DemoTask } from '../lib/demo-protocol';
-import { observeAgentTask, observerWorkload } from '../lib/observer-task';
+import { checkObserverAccess, observeAgentTask, observerWorkload } from '../lib/observer-task';
 import { createMonadMcpHandler } from '../lib/mcp-server';
 
 const signer = `0x${'11'.repeat(20)}` as const, router = `0x${'22'.repeat(20)}` as const, identity = `0x${'33'.repeat(20)}` as const;
@@ -43,6 +43,89 @@ test('single-agent task recovery is isolated from the five-task demo and never t
     assert.throws(() => readDemo('agent-task'), /does not match/);
     assert.equal(readDemo()?.records.length, 5, 'a damaged single-task journal must not affect the demo');
   } finally { local.restore(); }
+});
+
+test('observer journals are wallet-scoped and legacy requests remain recoverable only by their original payer', () => {
+  const local = storage();
+  try {
+    const context = { identity, router, payer: signer, agentId: '1' };
+    const other = { ...context, payer: executor };
+    saveDemo(journal(1), undefined, 'agent-task');
+    assert.ok(readDemo('agent-task', context), 'the original wallet retains its pre-upgrade recovery');
+    assert.equal(readDemo('agent-task', other), undefined);
+    const own = journal(1); own.records[0].payer = executor;
+    saveDemo(own, undefined, 'agent-task', other);
+    assert.equal(readDemo('agent-task', other)?.records[0].payer, executor);
+    assert.equal(readDemo('agent-task', context)?.records[0].payer, signer);
+    assert.equal(readDemo('agent-task', context)?.records[0].stage, 'unresolved');
+  } finally { local.restore(); }
+});
+
+test('observer access preflight denies unrelated wallets at one fresh block before any MCP or wallet request', async context => {
+  const originalContracts = { ...contracts }; Object.assign(contracts, { router, identity });
+  const reads: { functionName: string; blockNumber?: bigint; args?: unknown[] }[] = [];
+  const rpc = {
+    getChainId: async () => 10143,
+    getBlockNumber: async (options: { cacheTime: number }) => { assert.equal(options.cacheTime, 0); return 100n; },
+    readContract: async (args: typeof reads[number]) => {
+      reads.push(args);
+      if (args.functionName === 'identityRegistry') return identity;
+      if (args.functionName === 'ownerOf') return receiver;
+      return args.args?.[1] === executor;
+    },
+  } as unknown as typeof walletPublicClient;
+  context.mock.method(globalThis, 'fetch', async () => { throw new Error('Preflight must not call MCP or submit a payment'); });
+  try {
+    const result = await checkObserverAccess(config, signer, new AbortController().signal, rpc);
+    assert.equal(result.allowed, false);
+    assert.match(result.message, /Run your own agent/);
+    assert.equal(reads.length, 4); assert.ok(reads.every(read => read.blockNumber === 100n));
+    assert.deepEqual(reads.find(read => read.functionName === 'ownerOf')?.args, [1n]);
+  } finally { Object.assign(contracts, originalContracts); }
+});
+
+test('observer preflight requires both current signer authority and every executor grant', async () => {
+  const originalContracts = { ...contracts }; Object.assign(contracts, { router, identity });
+  let signerAllowed = true; let executorAllowed = true; let head = 100n;
+  const rpc = {
+    getChainId: async () => 10143, getBlockNumber: async () => ++head,
+    readContract: async (args: { functionName: string; args?: unknown[] }) => {
+      if (args.functionName === 'identityRegistry') return identity;
+      if (args.functionName === 'ownerOf') return signer;
+      return args.args?.[1] === signer ? signerAllowed : executorAllowed;
+    },
+  } as unknown as typeof walletPublicClient;
+  try {
+    assert.equal((await checkObserverAccess(config, signer, new AbortController().signal, rpc)).allowed, true);
+    signerAllowed = false;
+    assert.equal((await checkObserverAccess(config, signer, new AbortController().signal, rpc)).allowed, false, 'a previous positive check never caches a now-revoked grant');
+    signerAllowed = true; executorAllowed = false;
+    const missingExecutor = await checkObserverAccess(config, signer, new AbortController().signal, rpc);
+    assert.equal(missingExecutor.allowed, false); assert.match(missingExecutor.message, /active executor delegation/);
+    const sameExecutor = await checkObserverAccess(config, executor, new AbortController().signal, rpc);
+    assert.equal(sameExecutor.allowed, false); assert.match(sameExecutor.message, /cannot also sign/);
+    assert.equal(head, 103n, 'daemon signer rejection requires no network reads');
+  } finally { Object.assign(contracts, originalContracts); }
+});
+
+test('observer preflight fails closed on a wrong chain, changed registry, cancellation or RPC failure', async () => {
+  const originalContracts = { ...contracts }; Object.assign(contracts, { router, identity });
+  let calls = 0;
+  const fail = async () => { calls++; throw new Error('unexpected call'); };
+  try {
+    const wrongChain = { getChainId: async () => 143, getBlockNumber: fail, readContract: fail } as unknown as typeof walletPublicClient;
+    await assert.rejects(checkObserverAccess(config, signer, new AbortController().signal, wrongChain), /not connected to Monad Testnet/);
+    assert.equal(calls, 0);
+    const abort = new AbortController();
+    const cancelled = { getChainId: async () => { abort.abort(); return 10143; }, getBlockNumber: fail, readContract: fail } as unknown as typeof walletPublicClient;
+    await assert.rejects(checkObserverAccess(config, signer, abort.signal, cancelled), /abort/i);
+    assert.equal(calls, 0);
+    const unavailable = { getChainId: async () => { throw new Error('RPC unavailable'); }, readContract: fail } as unknown as typeof walletPublicClient;
+    await assert.rejects(checkObserverAccess(config, signer, new AbortController().signal, unavailable), /RPC unavailable/);
+    const wrongRegistry = { getChainId: async () => 10143, getBlockNumber: async () => 100n, readContract: async (args: { functionName: string }) => args.functionName === 'identityRegistry' ? receiver : args.functionName === 'ownerOf' ? signer : true } as unknown as typeof walletPublicClient;
+    await assert.rejects(checkObserverAccess(config, signer, new AbortController().signal, wrongRegistry), /registry could not be verified/);
+    await assert.rejects(checkObserverAccess({ ...config, agentId: '2' }, signer, new AbortController().signal, wrongChain), /belongs to Agent #1/);
+  } finally { Object.assign(contracts, originalContracts); }
 });
 
 test('observer workloads commit exact validated block data and reject malformed or wrong-chain output', () => {
