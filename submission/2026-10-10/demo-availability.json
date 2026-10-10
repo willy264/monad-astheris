@@ -1,0 +1,170 @@
+{
+  "scope": "Service recovery and read-only configuration/chain checks; no new wallet signatures, payments, tasks or delegations",
+  "precheck": {
+    "observedAt": "2026-10-10T10:12:06.576Z",
+    "vercelAccessConfigured": false,
+    "checks": [
+      {
+        "check": "render-policy",
+        "ok": true,
+        "result": {
+          "service": "srv-db0pe2vavr4c738pa9h0",
+          "expectedPublicPolicy": {
+            "PAYMENT_MODE": {
+              "configured": true,
+              "matchesExpected": true
+            },
+            "PAYMENT_AMOUNT": {
+              "configured": true,
+              "matchesExpected": true
+            },
+            "PAYMENT_ASSET": {
+              "configured": true,
+              "matchesExpected": true
+            },
+            "PAYMENT_RECEIVER": {
+              "configured": true,
+              "matchesExpected": true
+            },
+            "PAYMENT_ASSET_NAME": {
+              "configured": true,
+              "matchesExpected": true
+            },
+            "PAYMENT_ASSET_VERSION": {
+              "configured": true,
+              "matchesExpected": true
+            },
+            "PUBLIC_TASK_URL": {
+              "configured": true,
+              "matchesExpected": true
+            },
+            "BATCH_ENABLED": {
+              "configured": true,
+              "matchesExpected": true
+            },
+            "AETHERIS_ROUTER_ADDRESS": {
+              "configured": true,
+              "matchesExpected": true
+            }
+          },
+          "batchDisabled": true
+        }
+      },
+      {
+        "check": "chain",
+        "ok": true,
+        "result": {
+          "chainId": 10143,
+          "owner": "0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57",
+          "latestNonce": 11,
+          "pendingNonce": 11,
+          "ownerMon": "13.838838265299552524",
+          "delegateAuthorized": false,
+          "ownerAuthorized": true
+        }
+      },
+      {
+        "check": "wallet-domain",
+        "ok": true,
+        "result": {
+          "hostname": "monad-astheris.vercel.app",
+          "recommendedAction": "BLOCK"
+        }
+      }
+    ]
+  },
+  "resume": {
+    "observedAt": "2026-10-10T10:14:39.215Z",
+    "action": "resume",
+    "before": {
+      "id": "srv-db0pe2vavr4c738pa9h0",
+      "name": "monad-astheris-daemon",
+      "suspended": "suspended"
+    },
+    "httpStatus": 202,
+    "after": {
+      "id": "srv-db0pe2vavr4c738pa9h0",
+      "name": "monad-astheris-daemon",
+      "suspended": "not_suspended"
+    }
+  },
+  "services": {
+    "observedAt": "2026-10-10T10:21:12.604Z",
+    "checks": [
+      {
+        "url": "https://monad-astheris-daemon.onrender.com/health",
+        "status": 200,
+        "routing": null,
+        "body": {
+          "batchWorker": "disabled",
+          "blockNumber": 69799984,
+          "chainId": 10143,
+          "relayers": [
+            "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+          ],
+          "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+          "status": "ok"
+        }
+      },
+      {
+        "url": "https://monad-astheris-daemon.onrender.com/v1/config",
+        "status": 200,
+        "routing": null,
+        "body": {
+          "chainId": 10143,
+          "payment": {
+            "accepts": [
+              {
+                "amount": "1000",
+                "asset": "0x534b2f3a21130d7a60830c2df862319e593943a3",
+                "extra": {
+                  "name": "USDC",
+                  "version": "2"
+                },
+                "maxTimeoutSeconds": 120,
+                "network": "eip155:10143",
+                "payTo": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+                "scheme": "exact"
+              }
+            ],
+            "resource": {
+              "description": "Create isolated agent shard and commit caller-supplied output hashes",
+              "mimeType": "application/json",
+              "url": "https://monad-astheris-daemon.onrender.com/v1/tasks"
+            },
+            "x402Version": 2
+          },
+          "relayers": [
+            "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+          ],
+          "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+          "taskAuthorization": {
+            "name": "AetherisTask",
+            "version": "1"
+          }
+        }
+      },
+      {
+        "url": "https://monad-astheris.vercel.app/api/demo/config",
+        "status": 503,
+        "routing": null,
+        "body": {
+          "enabled": false,
+          "error": "Live demo setup is incomplete or its task service is unavailable. The operator must connect the deployed agent, executor and testnet payment service. You can explore the preview now."
+        }
+      }
+    ]
+  },
+  "limits": [
+    "Vercel Production variables were not inspected or changed; management access unavailable",
+    "MetaMask classification remains unresolved",
+    "Task wallet delegation is inactive",
+    "Free Render storage remains ephemeral; this check is not journal-recovery proof"
+  ],
+  "documentedPolicyValidation": {
+    "passed": true,
+    "validator": "frontend/lib/demo-protocol.ts parseConfig",
+    "enabledUsedOnlyForValidation": true,
+    "productionConfigChanged": false
+  }
+}

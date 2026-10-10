@@ -4,6 +4,8 @@ Updated **2026-10-07**. The registered observer has completed an authorized paid
 
 **Subsequent wallet finding:** user screenshots show a malicious-site classification for the production domain. The [review record](submission/2026-10-07/wallet-security-review.md) documents the unresolved warning and separately confirmed Dynamic display-name mismatch. Automated source checks and earlier transaction receipts do not clear this classification. Website wallet interaction and the physical passkey demonstration remain paused pending investigation.
 
+**October 10 operational check:** Render was resumed after equal latest/pending owner nonces and a disabled batch worker were verified. Its public health and configuration endpoints now return 200. Vercel's demo configuration still returns 503, the prior task delegation is inactive, and MetaMask's scan still returns `BLOCK`. [Evidence](submission/2026-10-10/demo-availability.json) and [Vercel setup values](frontend/docs/live-demo-setup.md). No new transaction or payment was submitted; engine tests were not repeated for this operational check.
+
 ## Current source checks
 
 | Component / revision | Checks and observed outcome | Scope |

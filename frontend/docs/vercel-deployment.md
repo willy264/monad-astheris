@@ -10,4 +10,6 @@ Configure the public contract addresses from the [verified deployment manifest](
 
 The Dynamic project is already the public default; [wallet setup](wallet-setup.md) explains allowed origins and passkey configuration. Leave `DEMO_ENABLED=false` until the separately hosted daemon, task signer and payment policy are ready. Hosted Envio credentials are optional server-only settings; without them the dashboard labels its RPC data source. Never add private signing keys to Vercel's frontend configuration.
 
+For **Live demo is not available yet**, follow the [live demo setup guide](live-demo-setup.md). It includes the exact public deployment/payment values checked on October 10, the recovered Render service status and the remaining Vercel, signer and website-review requirements.
+
 For a failed deployment, open its **Build Logs** and record the first error plus the Node/pnpm versions. A successful CI build verifies the source under CI's environment; it does not verify Vercel's environment or deployment settings. If authentication is needed to inspect logs, share only the relevant error text, never credentials. After a successful deployment, check `/api/overview`, `/api/agents?page=0`, the MCP endpoint and the three dashboard pages before marking production verified.
