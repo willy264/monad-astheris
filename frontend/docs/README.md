@@ -6,7 +6,7 @@ The dashboard explains this idea and shows available blockchain evidence. It doe
 
 ## A short tour
 
-1. **Overview (`/`):** read the express-lane introduction, check four live metrics, then try the guided demo. Expand **Data source & freshness** to inspect the source. The registry count shows registered identities, not necessarily agents that have completed tasks. Links take you to the dedicated comparison and agent directory.
+1. **Overview (`/`):** read the express-lane introduction, check four live metrics, then try the guided demo. In **Live testnet**, use **Get ready for a live run** to connect a wallet, register your own checksum agent, authorize its executors and check funds. Expand **Data source & freshness** to inspect the source. The registry count shows registered identities, not necessarily agents that have completed tasks.
 2. **Agent Directory (`/agents`):** inspect the featured Aetheris Monad Observer, token #1, its IPFS card, published MCP endpoint, reputation and recent task history. Registered identities appear in compact cards; expand **Agent Card & endpoints** for their full description and service details. **Delegate task authority** opens wallet access. **Trigger paid x402 task** becomes available when the real payment service is configured.
 3. **Shard Visualizer (`/visualizer`):** switch between the red shared-storage example and five green isolated lanes. Below the illustration, the actual topology and ledger show recorded task events. Select a real shard to inspect its commitments.
 
@@ -45,10 +45,16 @@ Client feedback is uncurated. The displayed quality score is a mean of feedback 
 
 ## Show a preview or show a live run
 
-For a quick explanation, follow the [guided preview steps](demo-guide.md#run-the-guided-preview). For actual testnet receipts, follow the [live walkthrough](demo-guide.md#run-five-real-testnet-tasks) after the operator configures the deployment, wallets, daemon and payment service.
+For a quick explanation, follow the [guided preview steps](demo-guide.md#run-the-guided-preview). For actual testnet receipts, follow the [live walkthrough](demo-guide.md#run-five-real-testnet-tasks) after the operator connects the deployment, daemon and payment service once. Each visitor can then register an identity owned by their own wallet; the operator does not need to change `DEMO_AGENT_ID` or grant access to Agent #1 for each visitor.
+
+The live setup has five steps: **Connect → Register → Authorize → Fund → Run**. Use a personal EVM wallet on Monad Testnet (`10143`), with testnet MON for registration and delegation gas. **Register my agent** creates an ERC-8004 identity with an inline JSON card describing the actual browser checksum workload. **Authorize for 1 hour** grants each listed daemon executor temporary task authority. Fund the same wallet with the configured payment token: at the recorded price, five tasks cost **0.005 testnet USDC**. Each setup transaction and all five task/payment authorizations require your wallet approval. See [funding and service setup](live-demo-setup.md).
 
 The homepage's five-task live demonstration computes deterministic checksums in the browser. The directory's [single observer task](demo-guide.md#run-one-observer-mcp-task) invokes the real `get_monad_block` MCP tool and commits that observation's input/output hashes. Both require real authorization and payment; neither invokes an external AI model or produces hardware attestation. The [task client](../../scripts/README.md) provides the separate command-line workflow.
 
 The deployed identity and MCP service are recorded in the submission proof. A functioning sign-in button or enabled task action is not proof of an actual device ceremony, delegation, paid execution or settlement; those operations need their own verified evidence.
+
+Agent #1 remains the separately owned **Aetheris Monad Observer**. Its directory action requires that identity's owner or an active delegate. Creating a personal checksum agent does not grant rights to the Observer. Setup receipts and task recovery are kept with the original wallet, deployment and agent; recovery reads existing records and does not automatically send another transaction or payment.
+
+The October 10 [wallet security review](../../submission/2026-10-07/wallet-security-review.md) still recorded a MetaMask website block. Resolve that classification before browser signing; do not bypass the wallet warning. Wallet connection alone does not establish a physical passkey ceremony or a completed live demo.
 
 Use the repository's [submission proof](../../SUBMISSION_PROOF.md) to distinguish completed live evidence from remaining work. The [verification record](../../VERIFICATION.md) records local checks. More detail is available in the [architecture](../../docs/architecture.md), [protocol](../../docs/protocol.md), and [data/API reference](data-and-api.md).
