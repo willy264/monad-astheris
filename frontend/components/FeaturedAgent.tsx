@@ -1,5 +1,6 @@
 'use client';
 import { useAgents, useSnapshot } from '@/lib/queries';
+import { shardDisplay } from '@/lib/shard-history';
 import { explorerAddress, explorerTx, truncate } from '@/lib/contracts';
 import { Icon } from './Icon';
 import PasskeyAuth from './PasskeyAuth';
@@ -26,7 +27,8 @@ export default function FeaturedAgent() {
   </section>;
   const mcp = agent.endpoints.find(endpoint => endpoint.name.toLowerCase() === 'mcp');
   const metadataUrl = cardLink(agent.uri); const endpointUrl = mcp && serviceLink(mcp.endpoint);
-  const tasks = snapshot?.shards.filter(shard => shard.agentId === agent.id) ?? [];
+  const history = shardDisplay(snapshot);
+  const tasks = history.shards.filter(shard => shard.agentId === agent.id);
   const recent = [...tasks].sort((a, b) => BigInt(a.createdBlock) < BigInt(b.createdBlock) ? 1 : BigInt(a.createdBlock) > BigInt(b.createdBlock) ? -1 : 0).slice(0, 3);
   const historyAvailable = snapshot?.eventsAvailable && !historyError;
   return <section id="agent-1" className={styles.feature} aria-labelledby="featured-agent-title">
@@ -52,9 +54,9 @@ export default function FeaturedAgent() {
         <div className={styles.delegate}><PasskeyAuth variant="button" agentId="1" /><span>Delegate task authority with an expiry you control.</span></div>
       </div>
       <aside className={styles.execution}><AgentTaskAction agentId={agent.id} mcpEndpoint={endpointUrl} /><div className={styles.history}>
-        <div className={styles.historyHeading}><h3>Recent task history</h3><span>{snapshot?.source.kind === 'envio' ? 'Envio indexed' : 'RPC events'}</span></div>
-        {!historyAvailable ? <p className={styles.note}>{historyError || snapshot ? 'Task history is unavailable. The agent’s identity is shown independently.' : 'Checking the latest execution events…'}</p> : recent.length ? <ul>{recent.map(task => <li key={task.address}><div><span>{task.status === 'executed' ? 'Executed' : 'Shard created'}</span><small>Block {task.createdBlock}</small></div><a href={explorerTx(task.executionTransactionHash || task.transactionHash)} target="_blank" rel="noreferrer">{truncate(task.taskId, 5)}<Icon name="external" size={13} /></a></li>)}</ul> : <p className={styles.note}>No tasks observed in the current event window. A confirmed paid run will leave an explorer receipt here.</p>}
-        {historyAvailable && <p className={styles.note}>Blocks {snapshot.fromBlock}–{snapshot.blockNumber}{snapshot.resultsLimited ? ' · Results limited' : ''}. This window is not a lifetime total.</p>}
+        <div className={styles.historyHeading}><h3>{history.indexedHistory ? 'Indexed task history' : 'Recent task history'}</h3><span>{snapshot?.source.kind === 'envio' ? 'Envio indexed' : 'RPC events'}</span></div>
+        {!historyAvailable ? <p className={styles.note}>{historyError || snapshot ? 'Task history is unavailable. The agent’s identity is shown independently.' : 'Checking the latest execution events…'}</p> : recent.length ? <ul>{recent.map(task => <li key={task.address}><div><span>{task.status === 'executed' ? 'Executed' : 'Shard created'}</span><small>Block {task.createdBlock}</small></div><a href={explorerTx(task.executionTransactionHash || task.transactionHash)} target="_blank" rel="noreferrer">{truncate(task.taskId, 5)}<Icon name="external" size={13} /></a></li>)}</ul> : <p className={styles.note}>{history.indexedHistory ? 'No tasks for this agent among the latest indexed task lanes.' : 'No tasks observed in the current event window. A confirmed paid run will leave an explorer receipt here.'}</p>}
+        {historyAvailable && <p className={styles.note}>{history.indexedHistory ? <>Latest indexed records through block {history.toBlock}{history.resultsLimited ? ' · Within the latest 200 task lanes' : ''}.</> : <>Blocks {history.fromBlock}–{history.toBlock}{history.resultsLimited ? ' · Results limited' : ''}. This window is not a lifetime total.</>}</p>}
       </div></aside>
     </div>
   </section>;

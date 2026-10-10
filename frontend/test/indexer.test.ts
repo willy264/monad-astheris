@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
 import { encodePacked, keccak256 } from 'viem';
-import { count, graphqlRequest, parseAgent, parseBatches, parseProgress, parseShard } from '../lib/indexer-protocol';
+import { count, graphqlRequest, parseAgent, parseBatches, parseProgress, parseShard, parseShardHistory } from '../lib/indexer-protocol';
 
 const scope = { chainId: 10143, router: `0x${'11'.repeat(20)}`, registry: `0x${'22'.repeat(20)}` };
 const hash = `0x${'33'.repeat(32)}` as const;
@@ -22,6 +22,42 @@ test('directory and shard parsing reject mismatched identities and malformed out
   assert.throws(() => parseShard({ ...shard, outputHash: '0x1234' }, scope, 40n, 42n), /invalid address or hash/);
   assert.throws(() => parseShard(shard, scope, 42n, 50n), /outside/);
   assert.equal(parseShard({ ...shard, completedBlock: '43' }, scope, 40n, 42n).status, 'created');
+});
+function historicalShard(index: number, createdBlock: number) {
+  const shardAddress = `0x${index.toString(16).padStart(40, '0')}`;
+  return { id: `10143:${shardAddress}`, chainId: 10143, router: scope.router, address: shardAddress, agentId: '2', taskId: hash,
+    sequenceNonce: String(index), executor: address, inputHash: hash, outputHash: hash, proofHash: hash, status: 'completed',
+    createdBlock: String(createdBlock), completedBlock: String(createdBlock + 1), creationTx: hash, agent: { registry: scope.registry }, execution: { transactionHash: hash, blockNumber: String(createdBlock + 1) } };
+}
+test('indexed shard history retains earlier completed runs without counting them as recent activity', () => {
+  const oldRun = Array.from({ length: 5 }, (_, index) => historicalShard(index + 1, 100 + index));
+  const reading = parseShardHistory(oldRun, scope, 90n, 1000n, 801n);
+  assert.equal(reading.shards.length, 0);
+  assert.equal(reading.resultsLimited, false);
+  assert.equal(reading.shardHistory.shards.length, 5);
+  assert.ok(reading.shardHistory.shards.every(shard => shard.agentId === '2' && shard.status === 'executed' && shard.executionTransactionHash === hash));
+  assert.equal(reading.shardHistory.shards[0].createdBlock, '104');
+  assert.deepEqual([reading.shardHistory.fromBlock, reading.shardHistory.toBlock], ['90', '1000']);
+  for (const invalid of [
+    { ...oldRun[0], chainId: 1 }, { ...oldRun[0], router: address }, { ...oldRun[0], agent: { registry: address } },
+    { ...oldRun[0], createdBlock: '89' }, { ...oldRun[0], createdBlock: '1001' },
+  ]) assert.throws(() => parseShardHistory([invalid], scope, 90n, 1000n, 801n));
+  assert.throws(() => parseShardHistory([oldRun[0], oldRun[0]], scope, 90n, 1000n, 801n), /duplicate/);
+});
+test('history caps are independent from recent window caps and the extra row is validated', () => {
+  const rows = Array.from({ length: 201 }, (_, index) => historicalShard(index + 1, 100 + index));
+  const oldHistory = parseShardHistory(rows, scope, 90n, 1000n, 801n);
+  assert.equal(oldHistory.shardHistory.shards.length, 200);
+  assert.equal(oldHistory.shardHistory.resultsLimited, true);
+  assert.equal(oldHistory.resultsLimited, false);
+  const recent = parseShardHistory(rows, scope, 90n, 301n, 100n);
+  assert.equal(recent.shards.length, 200);
+  assert.equal(recent.resultsLimited, true);
+  const exactWindow = parseShardHistory(rows, scope, 90n, 301n, 101n);
+  assert.equal(exactWindow.shards.length, 200);
+  assert.equal(exactWindow.resultsLimited, false);
+  assert.throws(() => parseShardHistory([...rows.slice(0, 200), { ...rows[200], router: address }], scope, 90n, 1000n, 801n), /different contract/);
+  assert.throws(() => parseShardHistory([...rows, historicalShard(202, 302)], scope, 90n, 1000n, 801n), /oversized/);
 });
 test('Merkle verified status requires matching canonical batch identity, root, range and count', () => {
   const batchId = keccak256(encodePacked(['uint256', 'address', 'uint256', 'bytes32'], [10143n, scope.router as `0x${string}`, 42n, hash]));

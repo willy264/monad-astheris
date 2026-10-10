@@ -30,7 +30,7 @@ const previous = Object.fromEntries(Object.keys(settings).map(key => [key, proce
 Object.assign(process.env, settings);
 const server = import('../lib/server');
 
-type Changes = { chainId?: number; indexedOffset?: bigint; progressRouter?: string; linkedRegistry?: `0x${string}`; start?: bigint };
+type Changes = { chainId?: number; indexedOffset?: bigint; progressRouter?: string; linkedRegistry?: `0x${string}`; start?: bigint; shardCreatedBlock?: bigint };
 function fixture(context: TestContext, changes: Changes = {}) {
   const calls: string[] = [];
   let head = changes.start ?? 1000n;
@@ -58,7 +58,7 @@ function fixture(context: TestContext, changes: Changes = {}) {
         return Response.json({ data: {
           registered: { aggregate: { count: 1 } }, active: { aggregate: { count: 0 } }, executions: { aggregate: { count: 0 } },
           shards: [{ id: `10143:${other}`, chainId: 10143, router, address: other, agentId: '1', taskId: hash, sequenceNonce: '1', executor: other,
-            inputHash: hash, outputHash: hash, proofHash: hash, status: 'completed', createdBlock: (captured - 1n).toString(), completedBlock: head.toString(),
+            inputHash: hash, outputHash: hash, proofHash: hash, status: 'completed', createdBlock: (changes.shardCreatedBlock ?? captured - 1n).toString(), completedBlock: head.toString(),
             creationTx: hash, agent: { registry }, execution: { transactionHash: hash, blockNumber: head.toString() } }],
           batches: [], commitments: [],
         } });
@@ -139,6 +139,23 @@ test('indexed reads pin their checkpoint before sampling a fresh RPC head', asyn
       assert.equal(state.calls.filter(call => call === 'rpc:eth_blockNumber').length, 2, 'Each indexed response needs a newly sampled head');
       const directory = state.calls.indexOf('indexer:directory');
       assert.ok(directory >= 0 && directory < state.calls.indexOf('rpc:eth_blockNumber'));
+    });
+    await context.test('history query keeps earlier shards while execution aggregates remain in the recent window', async child => {
+      const { getIndexedCheckpoint, getIndexedSnapshot } = await import('../lib/indexer');
+      const state = fixture(child, { start: 2000n, shardCreatedBlock: 901n });
+      const checkpoint = await getIndexedCheckpoint();
+      const snapshot = await getIndexedSnapshot(2007n, 200n, 900n, checkpoint);
+      assert.equal(snapshot.shards.length, 0);
+      assert.equal(snapshot.shardHistory.shards.length, 1);
+      assert.equal(snapshot.shardHistory.shards[0].createdBlock, '901');
+      assert.equal(snapshot.executions, 0);
+      assert.equal(snapshot.activeAgents, 0);
+      assert.equal(snapshot.fromBlock, '1804');
+      const variables = state.variables()!;
+      assert.deepEqual(variables.shards, { chainId: { _eq: 10143 }, router: { _eq: router }, createdBlock: { _gte: '900', _lte: '2003' }, agent: { registry: { _eq: registry } } });
+      assert.deepEqual(variables.executions.blockNumber, { _gte: '1804', _lte: '2003' });
+      assert.equal(state.calls.filter(call => call === 'indexer:overview').length, 1);
+      assert.ok(!state.calls.some(call => call.startsWith('rpc:')), 'Reading history must not scan historical RPC logs');
     });
     await context.test('directory still rejects progress ahead of its fresh RPC head', async child => {
       fixture(child, { indexedOffset: 20n });

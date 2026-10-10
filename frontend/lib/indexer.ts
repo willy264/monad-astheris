@@ -1,6 +1,6 @@
 import 'server-only';
 import { contracts, monadTestnet } from './contracts';
-import { count, graphqlRequest, IndexerError, object, parseAgent, parseBatches, parseProgress, parseShard, rows, type IndexerScope } from './indexer-protocol';
+import { count, graphqlRequest, IndexerError, object, parseAgent, parseBatches, parseProgress, parseShardHistory, rows, shardHistoryWhere, type IndexerScope } from './indexer-protocol';
 
 export const indexerConfigured = Boolean(process.env.ENVIO_GRAPHQL_URL);
 function scope(): IndexerScope {
@@ -41,13 +41,13 @@ export async function getIndexedSnapshot(networkHead: bigint, lookback: bigint, 
     batches: MerkleBatch(where: $batches, limit: 12, order_by: {blockNumber: desc}) { chainId router batchId blockNumber blockHash root leafCount status committedRoot committedLeafCount commitmentTx }
     commitments: BatchCommitment(where: $commitments, limit: 24, order_by: {fromBlock: desc}) { chainId router batchId root leafCount fromBlock toBlock verified transactionHash }
   }`, {
-    agents: agentWhere(current), shards: { ...routerWhere(current), createdBlock: range, agent: { registry: { _eq: current.registry } } },
+    agents: agentWhere(current), shards: shardHistoryWhere(current, deployment, indexed),
     executions: { ...routerWhere(current), blockNumber: range, agent: { registry: { _eq: current.registry } } },
     batches: { ...routerWhere(current), blockNumber: { _lte: indexed.toString() } }, commitments: { ...routerWhere(current), toBlock: { _lte: indexed.toString() } },
   });
-  const shards = rows(data.shards, 201);
+  const shardData = parseShardHistory(data.shards, current, deployment, indexed, from);
   return { fromBlock: from.toString(), registeredAgents: String(count(data.registered)), activeAgents: count(data.active), executions: count(data.executions),
-    shards: shards.slice(0, 200).map(row => parseShard(row, current, from, indexed)), batches: parseBatches(data.batches, data.commitments, current, indexed), resultsLimited: shards.length > 200,
+    ...shardData, batches: parseBatches(data.batches, data.commitments, current, indexed),
     source: { kind: 'envio' as const, indexedThrough: indexed.toString(), lagBlocks: (networkHead - indexed).toString() } };
 }
 export async function getIndexedAgents(page: number) {
