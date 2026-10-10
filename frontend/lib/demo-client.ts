@@ -4,17 +4,37 @@ import { address, boundedJson, demoReadAbi, ensure, hash, object, parseJob, pars
 
 export type DemoScope = 'demo' | 'agent-task';
 export interface DemoWorkload { inputHash: Hex; outputHash: Hex }
-type RunOptions = { scope?: 'demo' } | { scope: 'agent-task'; workload: DemoWorkload };
+export interface DemoJournalContext { router: Address; identity: Address; payer: Address; agentId: string }
+type RunOptions = ({ scope?: 'demo' } | { scope: 'agent-task'; workload: DemoWorkload }) & {
+  journalContext?: DemoJournalContext;
+  isCurrent?: () => boolean;
+};
 const journalKeys: Record<DemoScope, string> = { demo: 'aetheris:judge-demo:v1', 'agent-task': 'aetheris:agent-task:v1' };
 function taskCount(scope: DemoScope) { ensure(scope === 'demo' || scope === 'agent-task', 'Unsupported task workflow.'); return scope === 'demo' ? 5 : 1; }
 const randomHash = (): Hex => bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
-export function saveDemo(journal: DemoJournal, expectedFirstRequest?: Hex, scope: DemoScope = 'demo'): void {
-  ensure(journal.records.length === taskCount(scope), 'The saved journal has an unexpected task count.');
-  if (expectedFirstRequest) { const saved = readDemo(scope); ensure(saved?.records[0].requestId === expectedFirstRequest, 'Another page changed the saved demo journal. Keep this page open for reconciliation.'); }
-  localStorage.setItem(journalKeys[scope], JSON.stringify(journal));
+function journalKey(scope: DemoScope, context?: DemoJournalContext) {
+  if (!context) return journalKeys[scope];
+  ensure(uint(context.agentId) > 0n, 'Choose a registered agent.');
+  return `${journalKeys[scope]}:10143:${address(context.identity).toLowerCase()}:${address(context.router).toLowerCase()}:${address(context.payer).toLowerCase()}:${context.agentId}`;
 }
-export function readDemo(scope: DemoScope = 'demo'): DemoJournal | undefined {
-  const count = taskCount(scope); const raw = localStorage.getItem(journalKeys[scope]); if (!raw) return undefined; ensure(raw.length < 32768, 'The saved demo journal is invalid.');
+function belongsTo(journal: DemoJournal, context: DemoJournalContext) {
+  return same(journal.router, context.router) && journal.records.every(record => same(record.payer, context.payer) && record.task.agentId === context.agentId);
+}
+export function saveDemo(journal: DemoJournal, expectedFirstRequest?: Hex, scope: DemoScope = 'demo', context?: DemoJournalContext): void {
+  ensure(journal.records.length === taskCount(scope), 'The saved journal has an unexpected task count.');
+  ensure(!context || belongsTo(journal, context), 'The saved requests belong to a different wallet or agent.');
+  if (expectedFirstRequest) { const saved = readDemo(scope, context); ensure(saved?.records[0].requestId === expectedFirstRequest, 'Another page changed the saved demo journal. Keep this page open for reconciliation.'); }
+  localStorage.setItem(journalKey(scope, context), JSON.stringify(journal));
+}
+export function readDemo(scope: DemoScope = 'demo', context?: DemoJournalContext): DemoJournal | undefined {
+  const count = taskCount(scope); const raw = localStorage.getItem(journalKey(scope, context));
+  if (!raw) {
+    // Preserve earlier requests after this upgrade. A legacy journal is exposed
+    // only to its original payer and agent; it is never deleted or resubmitted.
+    if (context) { const legacy = readDemo(scope); return legacy && belongsTo(legacy, context) ? legacy : undefined; }
+    return undefined;
+  }
+  ensure(raw.length < 32768, 'The saved demo journal is invalid.');
   const item = object(JSON.parse(raw)); ensure(item.version === 1 && Array.isArray(item.records) && item.records.length === count, 'The saved demo journal is invalid.');
   const router = address(item.router); const records = item.records.map(value => {
     const record = object(value); const task = parseTask(record.task); const id = hash(record.requestId);
@@ -23,16 +43,29 @@ export function readDemo(scope: DemoScope = 'demo'): DemoJournal | undefined {
     return { task, requestId: id, payer: address(record.payer), paymentNonce: hash(record.paymentNonce), amount: uint(record.amount).toString(), stage: 'unresolved' as const };
   });
   ensure(new Set(records.map(record => record.requestId)).size === count, 'Saved task IDs must be unique.');
-  return { version: 1, router, asset: address(item.asset), receiver: address(item.receiver), createdAt: String(item.createdAt), records };
+  const journal: DemoJournal = { version: 1, router, asset: address(item.asset), receiver: address(item.receiver), createdAt: String(item.createdAt), records };
+  ensure(!context || belongsTo(journal, context), 'The saved requests belong to a different wallet or agent.');
+  return journal;
 }
 
 export async function signDemo(config: DemoConfig, wallet: WalletClient, signer: Address, onSigning: (index: number, kind: string) => void, signal?: AbortSignal, options: RunOptions = {}) {
   const scope = options.scope ?? 'demo'; const count = taskCount(scope);
+  const assertSession = () => ensure(!signal?.aborted && (!options.isCurrent || options.isCurrent()), 'The wallet or selected agent changed. No requests were submitted.');
+  assertSession();
   const workload = options.scope === 'agent-task' ? { inputHash: hash(options.workload.inputHash), outputHash: hash(options.workload.outputHash) } : undefined;
   ensure(contracts.router && contracts.identity && same(config.router, contracts.router) && same(config.identity, contracts.identity), 'The dashboard and demo are configured for different contracts.');
   ensure(await rpc.getChainId() === 10143, 'The RPC is not Monad Testnet.');
-  if (await wallet.getChainId() !== 10143) await wallet.switchChain({ id: 10143 });
+  assertSession();
+  const initialChain = await wallet.getChainId(); assertSession();
+  if (initialChain !== 10143) { await wallet.switchChain({ id: 10143 }); assertSession(); }
   ensure(wallet.account && same(wallet.account.address, signer), 'The connected wallet account changed.');
+  async function assertWallet() {
+    assertSession();
+    const [accounts, chainId] = await Promise.all([wallet.getAddresses(), wallet.getChainId()]);
+    ensure(chainId === 10143 && accounts[0] && same(accounts[0], signer), 'The wallet account or network changed. No requests were submitted.');
+    assertSession();
+  }
+  await assertWallet();
   const relayers = [...new Set(config.relayers)];
   ensure(!relayers.some(relayer => same(relayer, signer)), 'Use the agent owner or a separate delegated wallet; the daemon executor key cannot also be the browser signer.');
   const [identity, authorized, owner, head, balance, ...executorAuth] = await Promise.all([
@@ -53,7 +86,7 @@ export async function signDemo(config: DemoConfig, wallet: WalletClient, signer:
   const signed: { task: SignedDemoTask; paymentHeader: string; validBefore: number }[] = [];
   const records: DemoRecord[] = [];
   for (let index = 0; index < count; index++) {
-    ensure(!signal?.aborted, 'Signing stopped. No requests were submitted.');
+    await assertWallet();
     // The five-lane demo uses disclosed browser checksums. A single observer task
     // supplies the validated MCP input/output hashes through its scoped workload.
     const input = JSON.stringify({ workload: 'aetheris-checksum-demo-v1', batchId, lane: index + 1, numbers: [index + 1, index + 2, index + 3] });
@@ -61,7 +94,7 @@ export async function signDemo(config: DemoConfig, wallet: WalletClient, signer:
     const task: DemoTask = { agentId: config.agentId, taskId: randomHash(), sequenceNonce: BigInt(randomHash()).toString(), inputHash: workload?.inputHash ?? inputHash, outputHash: workload?.outputHash ?? keccak256(toBytes(output)), proofHash: `0x${'00'.repeat(32)}`, executor: relayers[index % relayers.length], deadline };
     onSigning(index, 'task authorization');
     const authorization = await wallet.signTypedData({ ...taskTypedData(task, config.router), account: wallet.account });
-    ensure(!signal?.aborted, 'Signing stopped. No requests were submitted.');
+    await assertWallet();
     onSigning(index, 'testnet payment');
     const validBefore = Math.floor(Date.now() / 1000) + clockOffset + accepted.maxTimeoutSeconds; const nonce = randomHash();
     const paymentAuthorization = { from: signer, to: config.policy.receiver, value: accepted.amount, validAfter: '0', validBefore: String(validBefore), nonce };
@@ -71,12 +104,12 @@ export async function signDemo(config: DemoConfig, wallet: WalletClient, signer:
     signed.push({ task: { ...task, authorization }, paymentHeader, validBefore });
     records.push({ task, requestId: requestId(task, config.router), payer: signer, paymentNonce: nonce, amount: accepted.amount, stage: 'submitted' });
   }
-  ensure(!signal?.aborted, 'Signing stopped. No requests were submitted.');
+  await assertWallet();
   ensure(signed.every(item => item.validBefore > Math.floor(Date.now() / 1000) + 15) && deadline > Math.floor(Date.now() / 1000) + 30, 'Signing took longer than the payment window. Nothing was submitted. Start again when ready to approve the wallet prompts.');
   const journal: DemoJournal = { version: 1, router: config.router, asset: config.policy.asset, receiver: config.policy.receiver, createdAt: new Date().toISOString(), records };
   // Only public task metadata is persisted. Active task/payment signatures stay in memory.
   // A storage failure aborts before the first POST, preserving status-only recovery.
-  saveDemo(journal, undefined, scope);
+  saveDemo(journal, undefined, scope, options.journalContext);
   return { signed, journal };
 }
 
