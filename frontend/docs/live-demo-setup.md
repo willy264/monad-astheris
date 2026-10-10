@@ -2,13 +2,15 @@
 
 The homepage's **Live demo is not available yet** panel means `/api/demo/config` could not return a validated deployment and payment configuration. Passkey sign-in does not enable this service.
 
+Once the operator connects the service, visitors use **Get ready for a live run** to register an identity owned by their personal wallet. They authorize the daemon to execute that identity's tasks and pay from their own testnet token balance. No per-visitor `DEMO_AGENT_ID` change or permission from Agent #1's owner is needed for this homepage checksum demo.
+
 ## October 10 recovery
 
-Render was still suspended from the coordinated owner-wallet verification session. It was resumed after checking that the owner's latest and pending nonces both equaled `11` and the batch worker was disabled. Public `/health` and `/v1/config` now return **200** with chain `10143` and the expected router/payment policy. [Recorded service checks](../../submission/2026-10-10/demo-availability.json).
+Render was suspended from the coordinated owner-wallet verification session. It was resumed after checking that the owner's latest and pending nonces both equaled `11` and the batch worker was disabled. Public `/health` and `/v1/config` returned **200** with chain `10143` and the expected router/payment policy in that check. [Recorded service checks](../../submission/2026-10-10/demo-availability.json).
 
 After the operator updated Vercel and redeployed, `/api/demo/config` returned **200 / enabled:true** at **11:36 UTC on October 10**, with the intended agent, contracts, relayer and payment policy. [Public endpoint response](../../submission/2026-10-10/demo-config-enabled.json). This supersedes the earlier 503 availability failure. Vercel's private environment settings were not inspected; the public response confirms the effective configuration.
 
-The browser task wallet `0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605` is no longer authorized for Agent #1. Its previous grant expired October 7. MetaMask's domain scan still returned **BLOCK** on October 10. Resolve the [website classification](../../submission/2026-10-07/wallet-security-review.md) before attempting wallet signatures. No new task, payment or delegation was submitted during this recovery.
+The old task wallet `0x44Cd39dCe9b074E27eFf4D914Ff9a3e182963605` lost its Agent #1 authority when its grant expired October 7. That restriction still applies to the Observer directory action; a visitor's own new identity uses separate permissions. MetaMask's domain scan returned **BLOCK** on October 10. Resolve the [website classification](../../submission/2026-10-07/wallet-security-review.md) before signing and do not bypass the warning. No new task, payment or delegation was submitted during the recorded availability recovery. Implementation of self-service setup does not establish a completed live run or passkey ceremony.
 
 ## Vercel Production settings
 
@@ -18,7 +20,8 @@ In the `monad-astheris` Vercel project, open **Settings → Environment Variable
 # Keep disabled while website security review and signer setup are pending.
 DEMO_ENABLED=false
 DAEMON_URL=https://monad-astheris-daemon.onrender.com
-DEMO_AGENT_ID=1
+# Optional default for the legacy/Observer route; not required per visitor.
+# DEMO_AGENT_ID=1
 DEMO_TASK_RESOURCE=https://monad-astheris-daemon.onrender.com/v1/tasks
 DEMO_PAYMENT_ASSET=0x534b2f3a21130d7a60830c2df862319e593943a3
 DEMO_PAYMENT_RECEIVER=0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57
@@ -40,13 +43,33 @@ DEPLOYMENT_BLOCK=67972561
 
 Saving values in local `.env` files does not update Vercel. Redeploy Production after changing its environment variables. Never add the daemon relayer key or a task-wallet private key to frontend configuration.
 
+`DEMO_ENABLED` remains a global service switch, and payment/daemon settings are configured once by the operator. `DEMO_AGENT_ID` is optional with default `1`; it does not restrict the service to one identity. `GET /api/demo/config?agentId=2` can return service settings for another valid positive ID before that identity is ready. Before forwarding a paid request, the server reads the actual chain, router/registry linkage, identity owner and current signer/executor permissions through `MONAD_RPC_URL`. Those authorization results are not cached, and the daemon checks authority again before payment.
+
 ## Enable and verify when the remaining blockers are resolved
 
 1. Resolve the MetaMask website classification and verify the intended Dynamic project configuration.
-2. Use a browser signing wallet separate from every daemon relayer. The owner wallet `0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57` is currently a relayer, so the browser task client deliberately rejects it as the payer/signer. The separate browser wallet needs an unexpired Agent #1 delegation and testnet USDC. Coordinate owner transactions with the running daemon, since they share the owner signer.
-3. With the observed price, the homepage run needs **5,000 base units = 0.005 testnet USDC** for five tasks. The directory's single-task flow costs **1,000 base units = 0.001 testnet USDC**. Each task and payment still needs explicit signatures; no payment was made by configuring these values.
-4. Set `DEMO_ENABLED=true` in Vercel Production and redeploy. A successful `/api/demo/config` response must contain `enabled:true`, chain `10143`, and the intended router, agent, relayer and payment policy. Setting only the flag is insufficient if the other fields are absent or mismatched.
-5. Select **Check connection again** or reload after the deployment completes. If the endpoint still returns 503, inspect Vercel's configuration and function logs, compare the exact policy with daemon `/v1/config`, and verify that Vercel can reach Render. A free Render instance may need time to wake up; `/health` must recover before retrying the frontend.
+2. Set `DEMO_ENABLED=true` in Vercel Production and redeploy when service and website review are ready. A successful `/api/demo/config` response contains `enabled:true`, chain `10143`, and the intended router, relayers and payment policy. Setting only the flag is insufficient if payment/service fields are absent or mismatched.
+3. Select **Check connection again** or reload after deployment. For a 503, compare Vercel's effective policy with daemon `/v1/config`, inspect function logs and verify Render `/health`. A free instance may need time to wake up. Relayers need gas, and the daemon needs durable task/payment journal storage.
+4. Follow the visitor setup below. Keep the project owner/relayer account out of the visitor flow; each visitor signs with their own wallet.
+
+## Register and run your own agent
+
+1. Select **Live testnet → Connect wallet to begin**. Connect a personal EVM wallet and use Monad Testnet, chain **10143**. **Change wallet** can select another account. The existing owner `0x5D8853E81F580A12e3Affaa9a7c76E0A65E02F57` is also a relayer and cannot serve as the browser payer.
+2. Select **Copy address** and fund that address with testnet MON from the [Monad faucet](https://faucet.monad.xyz/). MON pays registration and delegation gas. Select **Check balances & status** after funding.
+3. Select **Register my agent** and approve the transaction. The app checks the registration and ERC-721 mint receipts, then displays your assigned token ID. The URI is bounded inline base64 JSON using the ERC-8004 registration format; the card honestly describes the browser checksum capability and wallet endpoint. It does not claim an Observer MCP endpoint, external AI execution or hardware attestation. You need no IPFS pinning credential. Existing owners may use **Already own an agent? Use its token ID. → Check ownership**.
+4. Select **Authorize for 1 hour** and approve each required executor grant. The app lists the exact daemon addresses. It checks that your wallet owns the identity and that each executor has enough authority remaining for a run. Grants expire automatically; an explicit **Revoke access** action in wallet access is available to the owner and costs gas.
+5. Fund the same wallet with testnet USDC using the [Circle faucet](https://faucet.circle.com/): choose **USDC → Monad Testnet**. Check the token address against the displayed policy. At the recorded price, the homepage needs **5,000 base units = 0.005 testnet USDC** for five tasks, in addition to setup gas. Select **Check balances & status** until setup shows **Ready to run**.
+6. Select **Spawn 5 Autonomous Tasks** and approve five task signatures and five payment signatures. The selected agent ID is bound into each task authorization. All five requests dispatch after signing and saving the public recovery journal. Green lanes require verified execution and payment receipts.
+
+Wallet connection does not prove a physical passkey ceremony. To demonstrate that separately, enroll and sign in with an actual device passkey on the configured origin. The sign-in method does not replace on-chain ownership, executor permissions or payment signatures.
+
+## Recovery and the existing Observer
+
+Setup journals are separated by wallet and deployment and retain the selected agent and transaction hashes. Task journals are also scoped by payer and agent. If setup is interrupted, use **Check saved transaction**; if a returned hash was lost, supply the actual hash from the wallet. Receipt recovery never sends the transaction again. An uncertain intent must be reconciled before another setup write.
+
+For paid tasks, return to the original wallet and agent and choose **Recover saved status**. It issues status GETs and verifies existing receipts; it does not automatically broadcast, create another payment or repeat signatures. Preserve unresolved browser and daemon journals.
+
+Agent #1 is still the **Aetheris Monad Observer**, whose directory task calls the registered MCP service. It requires that identity's owner or an unexpired delegate and costs **0.001 testnet USDC** at the recorded price. Registering a personal checksum agent does not grant access to the Observer. If the Observer's owner must grant a delegate, coordinate the transaction with Render because that owner account is also the daemon relayer. A new visitor's personal-agent setup avoids sharing that signer.
 
 Configuration success only establishes availability. A completed paid browser run requires verified task and payment receipts; historical CLI receipts are not evidence that this browser flow has run.
 

@@ -41,7 +41,7 @@ export default function AgentCard({ agent }: { agent: Agent }) {
     <details className={styles.details}>
       <summary>Agent Card & endpoints <span aria-hidden="true">+</span></summary>
       <div className={styles.detailBody}>
-        <div><h3>Agent Card</h3>{cardUrl ? <a href={cardUrl} target="_blank" rel="noreferrer">{agent.uri}<Icon name="external" size={12} /></a> : <code>{agent.uri || 'No Agent Card URI'}</code>}</div>
+        <div><h3>Agent Card</h3>{cardUrl ? <a href={cardUrl} target="_blank" rel="noreferrer">{agent.uri}<Icon name="external" size={12} /></a> : agent.uri.startsWith('data:application/json;base64,') ? <p>JSON metadata stored directly in the on-chain identity. Its description and published capabilities are shown in this card.</p> : <code>{agent.uri || 'No Agent Card URI'}</code>}</div>
         {agent.description && <div><h3>Published description</h3><p>{agent.description}</p></div>}
         {agent.endpoints.length ? agent.endpoints.map((endpoint, index) => <div key={`${endpoint.name}-${index}`}><h3>{endpoint.name}</h3><code>{endpoint.endpoint}</code></div>) : <p>No service endpoints published.</p>}
       </div>

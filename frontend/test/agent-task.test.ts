@@ -84,7 +84,7 @@ test('one-task signing binds the observed hashes, charges one payment and leaves
     return true;
   });
   context.mock.method(globalThis, 'fetch', async () => { throw new Error('Signing must never submit a task or payment'); });
-  const wallet = { account: { address: signer }, getChainId: async () => 10143, signTypedData: async (data: Record<string, unknown>) => { signatures.push(data); return `0x${'bb'.repeat(65)}`; } } as unknown as WalletClient;
+  const wallet = { account: { address: signer }, getAddresses: async () => [signer], getChainId: async () => 10143, signTypedData: async (data: Record<string, unknown>) => { signatures.push(data); return `0x${'bb'.repeat(65)}`; } } as unknown as WalletClient;
   try {
     saveDemo(journal(5)); const untouched = local.values.get('aetheris:judge-demo:v1');
     const workload = observerWorkload(result);

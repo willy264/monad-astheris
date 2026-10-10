@@ -8,6 +8,11 @@
 .modeToggle button { background: transparent; color: #b4b2c3; border: 0; padding: 10px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; min-height: 40px; cursor: pointer; }
 .modeToggle button[aria-pressed=true] { background: #31274c; color: #e1d7ff; }
 .steps { display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 16px; }
+.liveRun { margin-top: 20px; }
+.runSteps { display: grid; grid-template-columns: 1fr 1.25fr; gap: 16px; }
+.requestDetails { margin-top: 6px; font-size: 10px; color: #aaa4c0; }
+.requestDetails summary { cursor: pointer; padding: 4px 0; }
+.requestDetails code { display: block; overflow-wrap: anywhere; padding-top: 5px; }
 .step { border: 1px solid #2c2f40; background: #0c0e18; border-radius: 12px; padding: 22px; min-width: 0; }
 .stepNumber { font: 500 13px var(--font-mono), monospace; color: #c4b5fd; border: 1px solid #836ef94d; background: #836ef91a; border-radius: 9px; width: 38px; height: 38px; display: grid; place-items: center; }
 .step h3 { font-family: var(--font-display), sans-serif; font-size: 20px; font-weight: 700; margin: 22px 0 12px; color: #fff; }
@@ -58,7 +63,7 @@
   .heading { flex-direction: column; gap: 18px; }
   .modeToggle { align-self: stretch; }
   .modeToggle button { flex: 1; padding-inline: 10px; }
-  .steps { grid-template-columns: 1fr; }
+  .steps, .runSteps { grid-template-columns: 1fr; }
   .streamStep { grid-column: auto; }
   .stream { grid-template-columns: 1fr; }
   .step { padding: 20px 18px; }
@@ -71,7 +76,7 @@
   .heading { flex-direction: column; align-items: stretch; gap: 18px; }
   .modeToggle { align-self: stretch; }
   .modeToggle button { flex: 1; }
-  .steps, .stream { grid-template-columns: 1fr; }
+  .steps, .runSteps, .stream { grid-template-columns: 1fr; }
   .streamStep { grid-column: auto; }
 }
 @container demo (max-width: 360px) {

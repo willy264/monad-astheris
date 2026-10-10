@@ -1,3 +1,5 @@
+import { decodeInlineAgentCard, INLINE_AGENT_CARD_PREFIX } from './onboarding-metadata';
+
 const DEFAULT_GATEWAY = 'https://ipfs.io/ipfs/';
 const FALLBACK_GATEWAY = 'https://gateway.pinata.cloud/ipfs/';
 const MAX_BYTES = 256 * 1024;
@@ -76,6 +78,7 @@ async function attempt(url: URL, duration: number, request: typeof fetch): Promi
 // NFT owners control only an immutable IPFS path, never the gateway or request origin.
 // A custom operator gateway stays exclusive; the default has one fixed public fallback.
 export async function agentCard(uri: string, options: Options = {}): Promise<AgentCard> {
+  if (uri.startsWith(INLINE_AGENT_CARD_PREFIX)) return decodeInlineAgentCard(uri) as AgentCard;
   const match = /^ipfs:\/\/(?:ipfs\/)?([a-zA-Z0-9]+)(\/[a-zA-Z0-9_.\/-]*)?$/.exec(uri);
   if (!match || (match[2] || '').split('/').some(segment => segment === '..' || segment === '.')) throw new Error('Agent Card requires an ipfs:// URI.');
   const gateway = new URL(options.gateway || DEFAULT_GATEWAY);

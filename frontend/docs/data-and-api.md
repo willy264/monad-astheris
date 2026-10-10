@@ -18,7 +18,7 @@ Copy [`.env.example`](../.env.example) to ignored `.env.local`. Public variables
 
 | Server-only variable | Default | Purpose |
 | --- | --- | --- |
-| `MONAD_RPC_URL` | Public Monad Testnet RPC | RPC for server reads; may contain a private provider credential. |
+| `MONAD_RPC_URL` | Public Monad Testnet RPC | RPC for server reads and fresh paid-task permission checks; may contain a private provider credential. |
 | `DEPLOYMENT_BLOCK` | `0` | Earliest block of your deployment; set it from verified receipts. |
 | `EVENT_LOOKBACK_BLOCKS` | `200` | Event observation window, clamped to 12–1,000 blocks. |
 | `IPFS_GATEWAY` | `https://ipfs.io/ipfs/` | HTTPS gateway for `ipfs://` Agent Cards. The default may fall back once to fixed `https://gateway.pinata.cloud/ipfs/` after a transient failure; a custom gateway stays exclusive. |
@@ -27,7 +27,7 @@ Copy [`.env.example`](../.env.example) to ignored `.env.local`. Public variables
 | `ENVIO_GRAPHQL_TOKEN` | Empty | Optional server-side bearer token. |
 | `DEMO_ENABLED` | `false` | Set `true` only after live task/payment setup. |
 | `DAEMON_URL` | `http://127.0.0.1:8080` | Configured task-service origin; HTTPS is required outside localhost. |
-| `DEMO_AGENT_ID` | Empty | Registered identity used by the paid browser workflows. Must be `1` for the directory's observer task. |
+| `DEMO_AGENT_ID` | `1` | Optional legacy/default identity returned when no agent is selected. It is not a per-user allowlist. Visitors register/select their own identity; the Observer remains Agent #1. |
 | `DEMO_TASK_RESOURCE` | Empty | Exact task resource URL advertised by the daemon's x402 configuration. |
 | `DEMO_PAYMENT_ASSET` | Empty | Expected EIP-3009 payment-token address. |
 | `DEMO_PAYMENT_RECEIVER` | Empty | Expected settlement recipient. |
@@ -104,15 +104,23 @@ React Query polls the overview every 12 seconds and uses an 8-second stale inter
 
 | Method and path | Behavior |
 | --- | --- |
-| `GET /api/demo/config` | `200` returns validated chain/router/identity/agent configuration, relayers and the pinned x402 payment policy. `503` returns `enabled: false` and a setup/unavailability explanation. |
-| `POST /api/demo/tasks` | Requires same-origin JSON and a `PAYMENT-SIGNATURE` header. Validates the configured agent/executor, task deadline, token/domain/amount and matching task/payment signers, then forwards once to daemon `POST /v1/tasks`. Returns validated job state for recognized `200`, `202` or `502` job responses. Other upstream errors remain errors. Validation/transport exceptions currently return a generic `502`, so query saved status after an ambiguous submission. |
+| `GET /api/demo/config?agentId=2` | `200` returns validated service configuration, relayers and pinned x402 payment policy for the selected positive decimal uint256 ID. Omit the query to use `DEMO_AGENT_ID`, or `1` when unset. Invalid, duplicate or unknown query parameters return `400`; unavailable configuration returns `503 / enabled: false`. Configuration is available before registration/delegation and does not prove authority. |
+| `POST /api/demo/tasks` | Requires same-origin JSON and a `PAYMENT-SIGNATURE` header. Checks deadline, token/domain/amount and matching task/payment signers. Fresh server RPC reads then verify chain `10143`, router/identity linkage, a registered owner, current signer authority and authorization of every configured executor for the selected agent. A relayer cannot also be the payer. Only then does it forward once to daemon `POST /v1/tasks`. Recognized `200`, `202` or `502` jobs are validated; other upstream failures remain errors. Validation/transport exceptions return generic `502`, so recover saved status after ambiguity. |
 | `GET /api/demo/tasks/[requestId]` | Status-only recovery. Malformed IDs return `400`; unknown requests return `404`; valid upstream jobs retain their status; transport/invalid-response errors return `503`. It never resubmits a payment. |
 
-The task body contains decimal strings `agentId` and `sequenceNonce`; bytes32 `taskId`, `inputHash`, `outputHash`, `proofHash`; address `executor`; numeric `deadline`; and the task's `authorization` signature. Its exact EIP-712 domain is `AetherisTask`, version `1`, chain `10143`, verifying contract equal to the configured router. The request ID is the typed-data digest. The payment header carries base64 x402 v2 `exact` EIP-3009 authorization.
+The task body contains decimal strings `agentId` and `sequenceNonce`; bytes32 `taskId`, `inputHash`, `outputHash`, `proofHash`; address `executor`; numeric `deadline`; and the task's `authorization` signature. Its exact EIP-712 domain is `AetherisTask`, version `1`, chain `10143`, verifying contract equal to the configured router. The request ID is the typed-data digest. The payment header carries base64 x402 v2 `exact` EIP-3009 authorization. Permission results are never cached across submissions; each check pins its contract reads to a fresh block from server-only `MONAD_RPC_URL`. The daemon rechecks current authority before charging because authority can change after the proxy reads it.
 
 Use the provided browser workflow to construct these messages; do not reuse expired or ambiguous paid requests. The [protocol source](../lib/demo-protocol.ts) contains the shared types and validators, and the [demo guide](demo-guide.md#recover-an-interrupted-run) explains the public journal, Web Locks and status-only recovery. The daemon independently enforces current delegation, signature validity, replay protection and settlement. The frontend proxy has no signing key and is not a general-purpose upstream proxy.
 
-Both browser workflows use these same paid-task routes and shared Dynamic wallet session. The homepage submits five disclosed checksum workloads. The directory submits one Agent #1 MCP observation, using an independent `agent-task` journal and Web Lock. Payment signing and receipt verification are unchanged between workloads; one successful observation does not automatically count as five tasks or update the homepage's demo payment metric.
+Both browser workflows use these same paid-task routes and shared Dynamic wallet session. The homepage submits five disclosed checksum workloads for the visitor's selected identity. The directory submits one Agent #1 MCP observation. Setup journals are scoped to wallet and deployment and retain the selected agent; new homepage task journals additionally include the agent ID. The Observer has a separate `agent-task` journal and Web Lock. Legacy task journals remain recoverable for their original payer/agent; none are automatically resubmitted. One successful observation does not count as five tasks or update the homepage's demo payment metric.
+
+## Personal agent setup
+
+The browser calls `AgentRegistry.register(string)` directly from the connected owner wallet. Its bounded `data:application/json;base64,` card uses the ERC-8004 registration type and describes **Aetheris Checksum Agent**, its wallet service and `browser-checksum` capability. It advertises no external MCP service or AI model and requires no IPFS pinning account. The directory decodes this JSON locally; the existing Observer's IPFS card remains unchanged.
+
+After verifying the registration receipt, owner, token ID and mint event, setup calls `setDelegate(agentId, executor, expiresAt)` for each configured relayer needing authority. Each grant lasts one hour; readiness requires at least ten minutes remaining for the demo. The owner signs each transaction and pays testnet MON gas. This permission cannot transfer the identity or spend the owner's tokens. x402 payments need separate EIP-3009 signatures from the task wallet.
+
+The setup journal saves intent before opening the wallet, then the returned transaction hash before any account-change check. Canonical receipts, transaction recipient/sender/calldata and exact registration/delegation events are checked. **Check saved transaction** only reads RPC state; it never rebroadcasts. A missing hash requires the actual transaction hash from the wallet for reconciliation, not another registration. Web Locks prevent overlapping setup actions in supported browsers.
 
 ## Directory observer MCP request
 
@@ -125,7 +133,7 @@ This path makes a bounded, read-only MCP call to a fixed same-origin URL. The br
 ## Boundaries around external data
 
 - GraphQL requires HTTPS outside localhost, rejects redirects, times out after 8 seconds and caps responses at 1 MiB. Returned counts, addresses, hashes, IDs and ranges are validated. Raw credentials/upstream diagnostics are not intentionally exposed in browser error messages.
-- Agent Cards are untrusted. Only `ipfs://` cards are fetched through the configured HTTPS gateway. Path traversal and redirects are rejected; requests have a 12-second timeout and 256 KiB response limit. Text is escaped by React. Declared service endpoints are displayed, not invoked automatically.
+- Agent Cards are untrusted. `ipfs://` cards are fetched through the configured HTTPS gateway; path traversal and redirects are rejected, with a 12-second timeout and 256 KiB response limit. Inline `data:application/json;base64,` cards are decoded locally with canonical base64, valid UTF-8 JSON and an 8 KiB decoded limit. Other owner-controlled URL schemes are not fetched. Text is escaped by React. Declared service endpoints are displayed, not invoked automatically.
 - The demo upstream is a configured origin without credentials, query or fragment. Redirects are rejected. Upstream GETs time out after 10 seconds and POSTs after 25 seconds; response JSON is capped at 32 KiB. Submitted task bodies are capped at 8 KiB and payment headers at 16 KiB. These timeouts do not mean an upstream transaction was canceled.
 - Public wallet RPC reads remain browser-visible. Configuring a private provider URL there exposes it in the bundle; use `MONAD_RPC_URL` for private server reads.
 

@@ -14,6 +14,7 @@ export const contracts = {
 };
 export const routerAbi = parseAbi([
   'function setDelegate(uint256 agentId,address delegate,uint64 expiresAt)',
+  'function delegates(uint256 agentId,address delegate) view returns (address owner,uint64 expiresAt,uint256 ownershipEpoch)',
   'function isAuthorized(uint256 agentId,address account) view returns (bool)',
   'function identityRegistry() view returns (address)',
   'function predictShardAddress(uint256 agentId,bytes32 taskId,uint256 sequenceNonce,address executor,bytes32 inputHash) view returns (address)',
@@ -21,11 +22,15 @@ export const routerAbi = parseAbi([
   'function executeTask(address shard,bytes32 outputHash,bytes32 proofHash)',
   'event ShardCreated(address indexed shard,uint256 indexed agentId,bytes32 indexed taskId,uint256 sequenceNonce,address executor,bytes32 inputHash)',
   'event TaskExecuted(address indexed shard,uint256 indexed agentId,bytes32 indexed taskId,bytes32 inputHash,bytes32 outputHash,bytes32 proofHash)',
+  'event DelegateSet(uint256 indexed agentId,address indexed delegate,uint64 expiresAt,address owner)',
 ]);
 export const identityAbi = parseAbi([
+  'function register(string agentURI) returns (uint256 agentId)',
   'function totalSupply() view returns (uint256)',
   'function ownerOf(uint256 tokenId) view returns (address)',
   'function tokenURI(uint256 tokenId) view returns (string)',
+  'event Registered(uint256 indexed agentId,string agentURI,address indexed owner)',
+  'event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)',
 ]);
 export const reputationAbi = parseAbi([
   'function getIdentityRegistry() view returns (address)',

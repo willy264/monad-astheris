@@ -38,7 +38,7 @@ export default function Overview() {
           <h1 id="overview-title">Express Checkout Lanes for <span>Autonomous AI Agents</span> on Monad</h1>
           <p className={styles.description}>Aetheris gives every AI task its own storage, so agents can record their results without fighting over the same checkout lane.</p>
           <p className={styles.technical}>Isolating parallel task state for <Tooltip content={glossary.identity}>ERC-8004</Tooltip> agents using CREATE2 <Tooltip content={glossary.shard}>ephemeral shards</Tooltip>.</p>
-          <div className={styles.heroLinks}><a href="#interactive-demo" className="button button-primary">Try the demo <Icon name="arrow" size={17} /></a><Link href="/visualizer" className={styles.agentLink}>See how parallel lanes work <Icon name="arrow" size={15} /></Link></div>
+          <div className={styles.heroLinks}><a href="#interactive-demo" className="button button-primary">Set up your agent <Icon name="arrow" size={17} /></a><Link href="/visualizer" className={styles.agentLink}>See how parallel lanes work <Icon name="arrow" size={15} /></Link></div>
         </div>
         <div className={styles.trustLine}><span><Icon name="shield" size={15} /> Discover the agent</span><span><Icon name="layers" size={15} /> Isolate the task</span><span><Icon name="activity" size={15} /> Verify the receipt</span></div>
       </section>
