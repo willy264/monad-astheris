@@ -40,6 +40,12 @@
 .receipt:hover { text-decoration: underline; }
 .textButton { font-size: 12px; color: #c4b5fd; text-decoration: underline; border: none; background: none; padding: 12px 0; cursor: pointer; }
 .textButton:disabled { opacity: .55; cursor: not-allowed; }
+.walletAddress { font-family: var(--font-mono), monospace; font-variant-numeric: tabular-nums; }
+.walletNotice { margin: 0 0 18px; padding: 14px; border: 1px solid #fbbf2438; border-radius: 10px; background: #fbbf2408; }
+.walletNotice strong { display: block; margin-bottom: 8px; color: #f5d894; font-size: 13px; line-height: 1.6; }
+.step .walletNotice p { margin: 0; color: #c8bea7; font-size: 12px; line-height: 1.8; }
+.walletNotice .textButton { padding: 10px 0; color: #e6d4ff; text-align: left; }
+.walletNotice .textButton + p { padding-top: 3px; }
 .error { font-size: 12px; line-height: 1.8; color: #fecaca; border: 1px solid #ef444450; background: #ef444410; padding: 14px; border-radius: 9px; overflow-wrap: anywhere; }
 @media (max-width: 1100px) {
   .steps { grid-template-columns: 1fr 1fr; }

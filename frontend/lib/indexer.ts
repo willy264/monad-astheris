@@ -20,8 +20,12 @@ async function progress(current: IndexerScope) {
 }
 const agentWhere = (current: IndexerScope) => ({ chainId: { _eq: current.chainId }, registry: { _eq: current.registry } });
 const routerWhere = (current: IndexerScope) => ({ chainId: { _eq: current.chainId }, router: { _eq: current.router } });
-export async function getIndexedSnapshot(networkHead: bigint, lookback: bigint, deployment: bigint) {
-  const current = scope(), indexed = await progress(current);
+export async function getIndexedCheckpoint() {
+  const current = scope();
+  return { current, indexed: await progress(current) };
+}
+export async function getIndexedSnapshot(networkHead: bigint, lookback: bigint, deployment: bigint, checkpoint: Awaited<ReturnType<typeof getIndexedCheckpoint>>) {
+  const { current, indexed } = checkpoint;
   if (indexed > networkHead) throw new IndexerError('Envio progress is ahead of the configured RPC. Check the chain and deployment.');
   if (indexed < deployment) throw new IndexerError('Envio is still catching up to the configured deployment block.');
   const windowStart = indexed >= lookback - 1n ? indexed - lookback + 1n : 0n;

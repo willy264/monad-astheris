@@ -8,7 +8,7 @@ The homepage separates a **Guided preview** from **Live testnet**. Preview works
 2. In **From sign-in to settlement**, keep **Guided preview** selected.
 3. Select **Preview passkey sign-in**, then **Preview 5 Autonomous Tasks**.
 4. Watch the five progress bars finish. Their labels say **Simulated**; there are no transaction links or charges.
-5. Switch between **Standard EVM Mode** and **Aetheris Parallel Mode** in the homepage comparison or on `/visualizer`. Explain shared storage versus isolated task lanes, and use **Pause animation** when describing the graph.
+5. Follow **See how parallel lanes work** to `/visualizer` and switch between **Standard EVM Mode** and **Aetheris Parallel Mode**. Explain shared storage versus isolated task lanes, and use **Pause animation** when describing the graph.
 
 Preview sign-in does not authenticate a wallet. The comparison's collision/delay/efficiency/timing numbers are explicitly illustrative, including `12 re-executions`, `+1,200ms`, `100%` and `300ms`. They do not measure network finality, and shared router state may still contend. The live ledger below the comparison remains a separate view of real events.
 
@@ -50,7 +50,7 @@ The browser client supports x402 v2 `exact` EIP-3009 on Monad Testnet, with one 
 
 1. Select **Live testnet** on the homepage. Resolve any visible configuration blocker before continuing.
 2. Select **1-Tap Sign In with Passkey** and complete the configured Dynamic/device flow. A first-time account may require onboarding or a separate EVM-wallet connection. Signing in does not itself authorize an agent.
-3. Confirm that the displayed agent, payment token, recipient and five-payment amount are the ones you intend to use. Fund/authorize the accounts described above.
+3. Confirm that the displayed agent, payment token, recipient and five-payment amount are the ones you intend to use. Fund/authorize the accounts described above. If **Choose a separate signing wallet** appears, the connected account is also a daemon relayer. **Change wallet** opens its Dynamic profile; connect a different authorized wallet before starting. This does not grant that wallet authority. **Manage connected wallet** also opens the profile, while **Recover saved status** remains available for an existing run without new signatures or payments.
 4. Select **Spawn 5 Autonomous Tasks**. Approve **five task authorizations and five EIP-3009 payment authorizations**. The “1-Tap” sign-in label is not a promise that the full paid run needs one interaction. If signing exceeds the payment window, the client stops before submitting anything.
 5. Once every signature is ready and the public recovery journal is saved, the client submits five concurrent signed requests. Progress reflects service status and receipt verification, not a timed completion animation.
 6. Wait for **Verified on Monad** on each lane, then open its execution transaction link. If a lane stays unresolved, use recovery below.
@@ -97,7 +97,7 @@ Wallet rejection and ordinary preflight errors can be corrected and retried when
 
 ## Dynamic sign-in and expiring delegation
 
-The global **Passkey sign-in** button uses one Dynamic session shared by the overview, directory and visualizer. After connecting, select the wallet button to open **Passkeys & task authority**. The homepage's **Try passkey delegation** and directory's **Delegate task authority** open the same dialog. Configure Dynamic's EVM wallets, allowed origin, embedded-wallet/passkey authentication and recovery, then set `NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID` if using a project other than the default Aetheris sandbox. SDK 5.9.2 provides authentication and explicit passkey sign-in/registration actions. Available choices depend on the environment and wallet provider.
+The global **Passkey sign-in** button uses one Dynamic session shared by the overview, directory and visualizer. After connecting, select the sidebar wallet button to open **Passkeys & task authority**. The directory's **Delegate task authority** opens the same dialog. The demo's **Manage connected wallet** opens the Dynamic profile to manage the task signer. Configure Dynamic's EVM wallets, allowed origin, embedded-wallet/passkey authentication and recovery, then set `NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID` if using a project other than the default Aetheris sandbox. SDK 5.9.2 provides authentication and explicit passkey sign-in/registration actions. Available choices depend on the environment and wallet provider.
 
 Dynamic handles WebAuthn challenges, origins and credentials. This application does not extract a P-256 private key or claim to verify raw P-256 signatures on-chain; credential algorithms are selected by the provider. A Dynamic account session alone grants no router permission.
 

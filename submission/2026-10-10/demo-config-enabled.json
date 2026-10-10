@@ -1,0 +1,101 @@
+{
+  "observedAt": "2026-10-10T11:36:17.671Z",
+  "checks": [
+    {
+      "url": "https://monad-astheris-daemon.onrender.com/health",
+      "status": 200,
+      "routing": null,
+      "body": {
+        "batchWorker": "disabled",
+        "blockNumber": 69814894,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok"
+      }
+    },
+    {
+      "url": "https://monad-astheris-daemon.onrender.com/v1/config",
+      "status": 200,
+      "routing": null,
+      "body": {
+        "chainId": 10143,
+        "payment": {
+          "accepts": [
+            {
+              "amount": "1000",
+              "asset": "0x534b2f3a21130d7a60830c2df862319e593943a3",
+              "extra": {
+                "name": "USDC",
+                "version": "2"
+              },
+              "maxTimeoutSeconds": 120,
+              "network": "eip155:10143",
+              "payTo": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+              "scheme": "exact"
+            }
+          ],
+          "resource": {
+            "description": "Create isolated agent shard and commit caller-supplied output hashes",
+            "mimeType": "application/json",
+            "url": "https://monad-astheris-daemon.onrender.com/v1/tasks"
+          },
+          "x402Version": 2
+        },
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "taskAuthorization": {
+          "name": "AetherisTask",
+          "version": "1"
+        }
+      }
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config",
+      "status": 200,
+      "routing": null,
+      "body": {
+        "enabled": true,
+        "chainId": 10143,
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "identity": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+        "agentId": "1",
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "policy": {
+          "resource": "https://monad-astheris-daemon.onrender.com/v1/tasks",
+          "asset": "0x534b2f3a21130d7a60830c2df862319e593943a3",
+          "receiver": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+          "maxAmount": "1000",
+          "name": "USDC",
+          "version": "2"
+        },
+        "challenge": {
+          "x402Version": 2,
+          "resource": {
+            "url": "https://monad-astheris-daemon.onrender.com/v1/tasks"
+          },
+          "accepts": [
+            {
+              "amount": "1000",
+              "asset": "0x534b2f3a21130d7a60830c2df862319e593943a3",
+              "extra": {
+                "name": "USDC",
+                "version": "2"
+              },
+              "maxTimeoutSeconds": 120,
+              "network": "eip155:10143",
+              "payTo": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+              "scheme": "exact"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

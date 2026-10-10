@@ -1,0 +1,132 @@
+{
+  "kind": "Real public API response snapshots for local layout verification; local data backend not verified",
+  "items": [
+    {
+      "path": "/api/overview",
+      "source": "https://monad-astheris.vercel.app/api/overview",
+      "status": 200,
+      "capturedAt": "2026-10-10T11:55:05.875Z",
+      "data": {
+        "fromBlock": "69818427",
+        "registeredAgents": "1",
+        "activeAgents": 0,
+        "executions": 0,
+        "shards": [],
+        "batches": [
+          {
+            "batchId": "0x3a5e3ec71f061a59e57fbbf1b3d52ab6c57d66dc4254049c7c999418ece777c3",
+            "blockNumber": "69066769",
+            "root": "0xb3559a6b33f5a1674ec469dfbfc95556afd5e37b08a76e0745853e7f14a3bc65",
+            "leafCount": "1",
+            "verified": true,
+            "status": "committed",
+            "commitmentTx": "0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc"
+          }
+        ],
+        "resultsLimited": false,
+        "source": {
+          "kind": "envio",
+          "indexedThrough": "69818626",
+          "lagBlocks": "4"
+        },
+        "blockNumber": "69818630",
+        "chainId": 10143,
+        "sampledAt": "2026-10-10T11:55:05.743Z",
+        "tps": 11.333333333333334,
+        "sampleSeconds": 3,
+        "blockSamples": [
+          {
+            "block": "69818619",
+            "transactions": 4
+          },
+          {
+            "block": "69818620",
+            "transactions": 3
+          },
+          {
+            "block": "69818621",
+            "transactions": 1
+          },
+          {
+            "block": "69818622",
+            "transactions": 4
+          },
+          {
+            "block": "69818623",
+            "transactions": 2
+          },
+          {
+            "block": "69818624",
+            "transactions": 4
+          },
+          {
+            "block": "69818625",
+            "transactions": 2
+          },
+          {
+            "block": "69818626",
+            "transactions": 4
+          },
+          {
+            "block": "69818627",
+            "transactions": 4
+          },
+          {
+            "block": "69818628",
+            "transactions": 4
+          },
+          {
+            "block": "69818629",
+            "transactions": 2
+          },
+          {
+            "block": "69818630",
+            "transactions": 4
+          }
+        ],
+        "errors": [],
+        "routerConfigured": true,
+        "registryConfigured": true,
+        "eventsAvailable": true
+      }
+    },
+    {
+      "path": "/api/agents?page=0",
+      "source": "https://monad-astheris.vercel.app/api/agents?page=0",
+      "status": 200,
+      "capturedAt": "2026-10-10T11:55:10.047Z",
+      "data": {
+        "agents": [
+          {
+            "id": "1",
+            "owner": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+            "uri": "ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea",
+            "name": "Aetheris Monad Observer",
+            "description": "Publishes live Monad Testnet block metadata through a read-only MCP tool for agent workflows.",
+            "capabilities": [
+              "monad-testnet-block-observation"
+            ],
+            "endpoints": [
+              {
+                "name": "MCP",
+                "endpoint": "https://monad-astheris.vercel.app/api/mcp"
+              }
+            ],
+            "score": null,
+            "feedbackCount": "0",
+            "tasksCompleted": "1"
+          }
+        ],
+        "total": "1",
+        "page": 0,
+        "pageSize": 12,
+        "errors": [],
+        "source": {
+          "kind": "envio",
+          "indexedThrough": "69818626",
+          "lagBlocks": "4"
+        }
+      }
+    }
+  ]
+}

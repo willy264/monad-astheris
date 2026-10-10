@@ -1,14 +1,17 @@
 # Verification record
 
-Updated **2026-10-07**. The registered observer has completed an authorized paid MCP task, actual x402 settlement, a reputation completion record, a finalized Merkle publication and project-controlled output-integrity validation. Hosted Envio returns the matching task and verified commitment. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the exact receipts. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
+Updated **2026-10-10**. The registered observer completed an authorized paid MCP task, actual x402 settlement, a reputation completion record, a finalized Merkle publication and project-controlled output-integrity validation on October 7. Hosted Envio returns the matching task and verified commitment. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the exact receipts. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
 
 **Subsequent wallet finding:** user screenshots show a malicious-site classification for the production domain. The [review record](submission/2026-10-07/wallet-security-review.md) documents the unresolved warning and separately confirmed Dynamic display-name mismatch. Automated source checks and earlier transaction receipts do not clear this classification. Website wallet interaction and the physical passkey demonstration remain paused pending investigation.
+
+**October 10 operational checks:** Render was resumed after equal latest/pending owner nonces and a disabled batch worker were verified. Its public health and configuration endpoints return 200. After the operator's Vercel redeploy, the demo configuration also returns **200 / enabled:true**, with the expected contracts and payment policy; this supersedes the earlier 503. The connected owner is also a daemon relayer and cannot be the browser task signer. The prior separate task delegation is inactive, and the recorded MetaMask scan still returns `BLOCK`. [Recovery evidence](submission/2026-10-10/demo-availability.json), [enabled configuration](submission/2026-10-10/demo-config-enabled.json) and [setup guide](frontend/docs/live-demo-setup.md). No new transaction or payment was submitted.
 
 ## Current source checks
 
 | Component / revision | Checks and observed outcome | Scope |
 | --- | --- | --- |
-| Passkey reauthentication-close recovery, this revision | **86 frontend tests**, including **29 passkey tests**, `pnpm typecheck` and local `pnpm build` passed. | Recovers only Dynamic 5.9.2's exact close error after a fresh credential-link permission check for the same account. Cancellation, failed checks and undefined registration results cannot become success. Physical WebAuthn enrollment and MetaMask domain clearance remain unverified. |
+| Compact Overview/cards, demo signer notice and indexed read ordering, `659d3b9` | **94 frontend tests**, `pnpm typecheck` and local production `pnpm build` passed. Eight new regression tests exercise advancing RPC/Envio providers and retained rejection guards. | Layout uses existing live hooks. Indexer progress is captured before a fresh RPC head; genuinely ahead progress, wrong chains and mismatched deployments remain rejected. The demo prevents starting a new run with a relayer wallet; recovery stays available. |
+| Passkey reauthentication-close recovery, PR #42 / `63d493c` | **86 frontend tests**, including **29 passkey tests**, `pnpm typecheck` and local `pnpm build` passed. | Recovers only Dynamic 5.9.2's exact close error after a fresh credential-link permission check for the same account. Cancellation, failed checks and undefined registration results cannot become success. Physical WebAuthn enrollment and MetaMask domain clearance remain unverified. |
 | Contracts, PR #39 / merged `7569afb` | **38 Foundry tests** passed, including two 256-case fuzz tests. | Storage isolation, permissions, registries and CRE receiver behavior; no live CRE delivery or scheduler benchmark implied. |
 | Daemon publisher, `153b603`, merged in [PR #39](https://github.com/willy264/monad-astheris/pull/39) | `cargo fmt --check`, `cargo check --locked --offline --jobs 1`, `cargo test --locked --offline --jobs 1`, and `cargo clippy --locked --offline --all-targets --jobs 1 -- -D warnings` passed; **27 tests**. Component CI passed. | Includes one-block argument validation, canonical/finalized block and receipt checks, exact stored commitments, private-error redaction, cursor preservation and worker recovery of existing commitments. |
 | Shared interfaces, PR #39 | `node scripts/check-interfaces.mjs`: **63 declarations** match compiled Solidity ABIs. | Includes committer and Merkle state views used by the publisher. |
@@ -40,6 +43,8 @@ The successful task supersedes the initial October 7 funding/authorization block
 
 These checks apply to their exact revisions and do not replace verification of a later deployment.
 
+The [October 10 UI verification](submission/2026-10-10/overview-ui-verification.json) records **55 layout checks** at 1440px, 768px and 390px, using exact captured production API responses, plus **12 separate unmocked checks** against the rebuilt local production server at `659d3b9`. The latter confirmed healthy Overview/directory APIs, real RPC/Envio readings, current registry data and compact card rendering after the read-order fix. Both runs recorded zero browser exceptions or console errors. No wallet authentication, passkey ceremony, task signatures or payments were performed; the relayer-wallet notice was reviewed in code, not exercised with a connected account.
+
 The [October 7 production passkey smoke record](submission/2026-10-07/passkey-production-smoke.json) confirms the `4d8222d` asset contains the new credential-link step-up and unconfirmed-result checks. All three routes rendered at 1440px and 390px, and four access dialogs opened correctly; the initial run had no runtime exception but recorded one provider fetch error. A fresh-session follow-up received three HTTP 429 responses from Dynamic's public settings endpoint and could not initialize the SDK. Retries stopped. The complete smoke run is **not a pass**, and no account authentication or physical ceremony was performed.
 
 | Date / revision | Recorded verification |
@@ -56,8 +61,8 @@ Earlier feature logs remain available in Git history. Dependency mitigations are
 
 - Complete supported-device passkey enrollment/sign-in on the deployed fix after Dynamic's observed settings rate limit clears. The user's last report was that registration opened no prompt.
 - Verify explicit delegation revocation and rejected new use afterward. Scheduled expiry alone is not the requested revoke transaction.
-- Configure production Vercel with the verified Envio URL and paid-service policy, then capture real task/batch rendering and the chosen browser paid flow.
-- Resume coordinated service availability and move Render's journal to persistent storage; test backup, restart and ambiguous-outcome reconciliation. Free ephemeral hosting is not production-durable.
+- Capture the chosen paid browser workflow using a separately authorized signer. Vercel's paid-service policy is now validated; configuration success is not proof of browser execution.
+- Move Render's journal to persistent storage; test backup, restart and ambiguous-outcome reconciliation. The service has resumed, but free ephemeral hosting is not production-durable.
 - Demonstrate any advertised independent feedback, CRE delivery, hardware TEE verification, Mera ceremony or Privy integration separately.
 
 The [readiness checklist](docs/submission-readiness.md) separates these remaining tasks from the paid workflow already evidenced on chain.

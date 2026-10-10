@@ -4,7 +4,7 @@ import { contracts, identityAbi, monadTestnet, reputationAbi, routerAbi } from '
 import type { Agent, AgentPage, Shard, Snapshot } from './types';
 import { readEventWindow } from './rpc-events.mjs';
 import { agentCard } from './agent-card';
-import { getIndexedAgents, getIndexedSnapshot, indexerConfigured } from './indexer';
+import { getIndexedAgents, getIndexedCheckpoint, getIndexedSnapshot, indexerConfigured } from './indexer';
 import { IndexerError } from './indexer-protocol';
 
 type ShardCreatedEvent = GetContractEventsReturnType<typeof routerAbi, 'ShardCreated', true, bigint, bigint>[number];
@@ -27,6 +27,9 @@ export function getSnapshot(): Promise<Snapshot> {
 }
 
 async function loadSnapshot(): Promise<Snapshot> {
+  // Pin validated indexer progress before sampling the chain: Monad can advance
+  // several blocks while these independent providers answer the request.
+  const checkpoint = indexerConfigured ? await getIndexedCheckpoint() : undefined;
   const [chainId, latest] = await Promise.all([rpc.getChainId(), rpc.getBlock({ blockTag: 'latest' })]);
   if (chainId !== monadTestnet.id) throw new Error('The configured RPC is not Monad Testnet. Expected chain 10143.');
   if (latest.number === null) throw new Error('Latest block is not mined.');
@@ -45,10 +48,10 @@ async function loadSnapshot(): Promise<Snapshot> {
       routerAddress = undefined;
     }
   }
-  if (indexerConfigured) {
+  if (checkpoint) {
     if (!routerAddress || !contracts.identity) throw new IndexerError('The configured router and identity registry must match before Envio data can be used.');
     const [indexed, sampleResult] = await Promise.all([
-      getIndexedSnapshot(head, lookback, deployment),
+      getIndexedSnapshot(head, lookback, deployment, checkpoint),
       Promise.all(Array.from({ length: Math.min(12, Number(head + 1n)) }, (_, index) => index === 0 ? Promise.resolve(latest) : rpc.getBlock({ blockNumber: head - BigInt(index) }))).then(value => value.reverse()).catch(() => []),
     ]);
     const seconds = sampleResult.length > 1 ? Number(sampleResult[sampleResult.length - 1].timestamp - sampleResult[0].timestamp) : 0;
@@ -110,7 +113,9 @@ async function loadAgentPage(page: number): Promise<AgentPage> {
   const registry = contracts.identity;
   if (!registry) throw new Error('Connect your deployment by setting NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS.');
   if (await rpc.getChainId() !== monadTestnet.id) throw new Error('The configured RPC is not Monad Testnet.');
-  const blockNumber = await rpc.getBlockNumber();
+  const indexed = indexerConfigured ? await getIndexedAgents(page) : undefined;
+  // A cached head can predate the indexed response even with this ordering.
+  const blockNumber = await rpc.getBlockNumber({ cacheTime: 0 });
   const errors: string[] = [];
   let reputationAddress = contracts.reputation;
   if (reputationAddress) {
@@ -122,7 +127,6 @@ async function loadAgentPage(page: number): Promise<AgentPage> {
       reputationAddress = undefined;
     }
   }
-  const indexed = indexerConfigured ? await getIndexedAgents(page) : undefined;
   if (indexed) {
     if (!contracts.router) throw new IndexerError('Envio requires a router address.');
     const identity = await rpc.readContract({ address: contracts.router, abi: routerAbi, functionName: 'identityRegistry', blockNumber });
