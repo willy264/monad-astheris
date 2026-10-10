@@ -6,11 +6,11 @@ The dashboard pairs a simple express-lane story with inspectable blockchain reco
 
 | Role | Family | Use |
 | --- | --- | --- |
-| Display | Space Grotesk, weight 700 | Hero, section headings, agent names and card titles. |
-| Interface | Plus Jakarta Sans, weights 400–700 | Navigation, buttons, body copy, tooltips and labels. |
+| Display | Josefin Sans, weight 700 | Hero, section headings, agent names and card titles. |
+| Interface | Josefin Sans, weights 400–700 | Navigation, buttons, body copy, tooltips and labels. |
 | Data | JetBrains Mono, weights 400–500 | Counts, addresses, token IDs, block numbers and transaction hashes. Use tabular figures for changing values. |
 
-The three Latin variable WOFF2 files are bundled in [`app/fonts`](../app/fonts) and loaded through `next/font/local` in [`layout.tsx`](../app/layout.tsx). They total approximately 79 KiB before any HTTP compression. A build or page view does not request Google Fonts. Each family includes its SIL Open Font License; [`sources.json`](../app/fonts/sources.json) records the upstream URL, byte count and SHA-256 digest. Unsupported characters use the configured system fallback.
+Josefin Sans loads from the Google Fonts import at the top of [`globals.css`](../app/globals.css), with normal and italic styles, weights 100–700 and `display=swap`. Page views request Google Fonts; system sans-serif text remains readable while the font loads or if it is unavailable. JetBrains Mono remains bundled in [`app/fonts`](../app/fonts) and loaded through `next/font/local` in [`layout.tsx`](../app/layout.tsx) for technical data. Bundled font files retain their SIL Open Font Licenses and provenance in [`sources.json`](../app/fonts/sources.json).
 
 Use CSS variables `--font-display`, `--font-sans` and `--font-mono`, or the matching Tailwind `font-display`, `font-sans` and `font-mono` utilities. Headings use the supplied font's real 700 weight. Data uses `font-variant-numeric: tabular-nums`; a visual counter does not change its source or meaning.
 
