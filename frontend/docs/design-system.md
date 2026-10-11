@@ -24,7 +24,7 @@ Use CSS variables `--font-display`, `--font-sans` and `--font-mono`, or the matc
 | Border | `#414146` | Thin neutral dividers and panel outlines. |
 | Action and chart accent | `#F5CE38` | Yellow highlights for primary actions, chart marks and interactive emphasis. |
 | Primary action fill | Yellow-to-amber, approximately `#FFE459` to `#EFBD2C` | Dark text (`#1B1B1E`) keeps the filled action readable. Component variants use the same color relationship. |
-| Aetheris mark | `#836EF9` | The existing purple logo remains recognizable; it is not the general surface/accent palette. |
+| Aetheris mark | `#F5CE38`, `#EFBD2C`, `#FFE459` | Gold and amber task lanes with a bright yellow crossbar; charcoal icon tiles match the canvas. |
 | Parallel lanes | `#10B981` | Illustrative isolated execution and actual successful statuses, distinguished by their labels. |
 | Conflicts | `#EF4444` | Illustrative shared-storage contention and error accents. |
 | Main / secondary text | `#FFFFFF` / `#B2B2B8` | Clear headings and quieter supporting copy. |

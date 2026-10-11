@@ -23,7 +23,7 @@ The static image establishes no live hover/dropdown behavior, chart transitions 
 | Compact table | Registry, network and browser-session payment readings with provenance |
 | Detailed workflows | Existing onboarding and paid-run component; directory profiles; visualizer and public receipts |
 
-Josefin Sans remains the user-selected typeface; JetBrains Mono remains for hashes and numeric records. The purple Aetheris logo retains brand recognition while yellow/amber becomes the interface accent. Tablet and phone layouts reflow the desktop hierarchy without hiding wallet access or forcing page-wide horizontal scrolling.
+Josefin Sans remains the user-selected typeface; JetBrains Mono remains for hashes and numeric records. The Aetheris logo keeps its open-A geometry and now uses the same gold and amber palette as the interface, with charcoal icon tiles. Tablet and phone layouts reflow the desktop hierarchy without hiding wallet access or forcing page-wide horizontal scrolling.
 
 The live registry currently supplies two agents, so the desktop grid contains two real cards in its four-column layout. Charts represent Aetheris task counts and sampled network activity. The account row uses the existing wallet and network controls; the reference's unrelated notification/avatar controls have no working Aetheris counterpart. These content and typography differences are intentional adaptations. The implementation is visually compared with the reference, without claiming pixel-level accuracy.
 

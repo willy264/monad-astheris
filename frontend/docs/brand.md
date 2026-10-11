@@ -22,15 +22,17 @@ When the frontend is running, the separate PNG is available at **`/brand/aetheri
 
 | Role | Color |
 | --- | --- |
-| Primary lane | `#836EF9` |
-| Secondary lane | `#A18EFF` |
-| Floating crossbar | `#D8D1FF` |
-| Icon background | `#121020` |
-| Quiet tile border | `#342D51` |
+| Primary lane | `#F5CE38` |
+| Secondary lane | `#EFBD2C` |
+| Floating crossbar | `#FFE459` |
+| Icon background | `#171719` |
+| Quiet tile border | `#414146` |
+
+The mark uses the dashboard's yellow accent and amber action tones. All SVG, PNG, Apple touch icon and favicon exports share this palette, with charcoal icon tiles matching the application canvas.
 
 Keep the square proportions and the separation between all three shapes. The SVG includes built-in clear space; do not crop tightly around the strokes or close the gaps. The transparent mark is intended primarily for dark backgrounds. Use the dark tile when the surrounding surface is unknown, including browser tabs. Do not add a glow or shadow to the small favicon frames.
 
-The word **AETHERIS** appears next to the mark in the expanded sidebar. Compact and mobile rails retain the mark and accessible home-link name. The image is decorative within the navigation link, whose accessible name remains **Aetheris home**. [Sidebar.tsx](../components/Sidebar.tsx) loads the shared SVG through Next.js Image, and [Sidebar.module.css](../components/Sidebar.module.css) controls its desktop and mobile sizes. [Shell.tsx](../components/Shell.tsx) includes this global navigation on every page.
+The word **Aetheris** appears next to the mark in the desktop header. The narrow mobile header retains the mark and accessible home-link name. The image is decorative within the navigation link, whose accessible name remains **Aetheris home**. [Sidebar.tsx](../components/Sidebar.tsx) loads the shared SVG through Next.js Image, and [Sidebar.module.css](../components/Sidebar.module.css) controls its desktop and mobile sizes. [Shell.tsx](../components/Shell.tsx) includes this global navigation on every page. The Visualizer router node uses the same SVG, while the repository README uses the 512px tile.
 
 ## Favicon integration and verification
 
