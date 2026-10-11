@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAgents, useSnapshot } from '@/lib/queries';
+import { activityMetrics } from '@/lib/activity-metrics';
 import { Icon } from '@/components/Icon';
 import { LiveStatus, Metric, Notice } from '@/components/Shared';
 import { SourceNotice } from '@/components/IndexedData';
@@ -25,7 +26,8 @@ export default function Overview() {
   const observer = directory.data?.agents.find(agent => agent.id === '1');
   const registered = data?.registeredAgents ?? directory.data?.total;
   const registrationStale = data?.registeredAgents != null ? Boolean(error) : Boolean(directory.error);
-  const shards = data?.eventsAvailable ? data.shards.length : null;
+  const metrics = activityMetrics(data);
+  const shards = metrics.taskLanes;
   const observedBadge = error ? 'Last observed' : 'Live data';
   const observedKind = error ? 'cached' : 'live';
 
@@ -50,10 +52,10 @@ export default function Overview() {
         badge={registered == null ? isPending || directory.isPending ? 'Connecting' : 'Unavailable' : registrationStale ? 'Last observed' : 'Live registry'}
         provenance={registered == null ? 'loading' : registrationStale ? 'cached' : 'live'}
         detail={observer ? `${observer.name} · #${observer.id}` : 'Public on-chain agent identities'} icon="agents" accent />
-      <Metric id="metric-shards" title={<Tooltip content={glossary.shard}>Parallel task lanes</Tooltip>}
-        value={<><Counter value={shards} />{data?.resultsLimited && shards !== null && <span className="metric-plus">+</span>}</>}
-        badge={shards == null ? isPending ? 'Connecting' : 'Unavailable' : observedBadge} provenance={shards == null ? 'loading' : observedKind}
-        detail={data?.resultsLimited ? 'Recent created shards · results capped' : 'Created shards in the observed window'} icon="layers" />
+      <Metric id="metric-shards" title={<Tooltip content={glossary.shard}>Completed task lanes</Tooltip>}
+        value={<><Counter value={shards} />{metrics.taskLanesLimited && shards !== null && <span className="metric-plus">+</span>}</>}
+        badge={shards == null ? isPending ? 'Connecting' : metrics.indexedTotalsUnavailable ? 'Totals unavailable' : 'Unavailable' : error ? 'Last observed' : metrics.indexedTotal ? 'Indexed total' : 'Recent activity'} provenance={shards == null ? 'loading' : observedKind}
+        detail={metrics.indexedTotal ? `All indexed completions · through block ${metrics.indexedThrough}` : metrics.indexedTotalsUnavailable ? 'Task history remains available in the visualizer' : metrics.taskLanesLimited ? 'Recent completed lanes · results capped' : 'Completed lanes in the observed window'} icon="layers" />
       <Metric id="metric-payments" title="Micropayments settled" value={<Counter value={settledCount} />}
         badge={settledCount == null ? 'No demo result' : 'This browser session'} provenance={settledCount == null ? 'loading' : 'live'}
         detail="Confirmed payments from the guided demo" icon="shield" />

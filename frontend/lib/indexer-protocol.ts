@@ -88,9 +88,13 @@ export function parseBatches(value: unknown, commitmentsValue: unknown, scope: I
     const expected = keccak256(encodePacked(['uint256', 'address', 'uint256', 'bytes32'], [BigInt(scope.chainId), scope.router as `0x${string}`, BigInt(block), blockHash]));
     if (batchId !== expected) throw new IndexerError('Envio returned a Merkle batch from a different block or deployment.');
     const commitment = commitments.find(item => item.batchId === batchId);
-    const verified = row.status === 'committed' && row.committedRoot === root && row.committedLeafCount !== null && uint(row.committedLeafCount) === leafCount &&
+    const commitmentBlock = row.commitmentBlock == null ? undefined : BigInt(uint(row.commitmentBlock));
+    if (commitmentBlock !== undefined && commitmentBlock < BigInt(block)) throw new IndexerError('Envio commitment precedes its execution batch.');
+    const published = commitmentBlock !== undefined && commitmentBlock <= toBlock;
+    const verified = published && row.status === 'committed' && row.committedRoot === root && row.committedLeafCount !== null && uint(row.committedLeafCount) === leafCount &&
       !!commitment && commitment.verified === true && hex(commitment.root, 32) === root && uint(commitment.leafCount) === leafCount && uint(commitment.fromBlock) === block && uint(commitment.toBlock) === block;
-    return { batchId, blockNumber: block, root, leafCount, verified, status: text(row.status) as MerkleBatch['status'], commitmentTx: row.commitmentTx == null ? undefined : hex(row.commitmentTx, 32) };
+    const status = !published && (row.status === 'committed' || row.status === 'mismatch') ? 'complete' : text(row.status) as MerkleBatch['status'];
+    return { batchId, blockNumber: block, root, leafCount, verified, status, commitmentTx: !published || row.commitmentTx == null ? undefined : hex(row.commitmentTx, 32) };
   });
 }
 

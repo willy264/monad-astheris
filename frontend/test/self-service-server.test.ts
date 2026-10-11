@@ -38,8 +38,8 @@ async function signedRequest(agentId = '2', options: { payer?: typeof signer; ta
   });
 }
 
-function fixture(context: TestContext, overrides: Partial<{ chainId: number; linkedIdentity: Address; owner: Address; signerAuthorized: boolean; executorAuthorized: boolean; configStatus: number; relayers: Address[] }> = {}) {
-  const state = { chainId: 10143, linkedIdentity: identity as Address, owner: signer.address, signerAuthorized: true, executorAuthorized: true, configStatus: 200, relayers: [executor] as Address[], ...overrides };
+function fixture(context: TestContext, overrides: Partial<{ chainId: number; linkedIdentity: Address; owner: Address; signerAuthorized: boolean; executorAuthorized: boolean; configStatus: number; relayers: Address[]; taskSubmissionEnabled: boolean }> = {}) {
+  const state = { chainId: 10143, linkedIdentity: identity as Address, owner: signer.address, signerAuthorized: true, executorAuthorized: true, configStatus: 200, relayers: [executor] as Address[], taskSubmissionEnabled: true, ...overrides };
   const forwarded: DemoTask[] = [];
   const permissions: { agentId: bigint; account: Address }[] = [];
   let chainChecks = 0;
@@ -50,6 +50,7 @@ function fixture(context: TestContext, overrides: Partial<{ chainId: number; lin
     assert.ok(init?.signal);
     if (url === `${daemon}/v1/config`) return Response.json({
       chainId: 10143, router, relayers: state.relayers, taskAuthorization: { name: 'AetherisTask', version: '1' },
+      taskSubmissionEnabled: state.taskSubmissionEnabled,
       payment: { x402Version: 2, resource: { url: `${daemon}/v1/tasks` }, accepts: [accepted] },
     }, { status: state.configStatus });
     if (url === `${daemon}/v1/tasks`) {
@@ -131,6 +132,14 @@ test('self-service server validates selected agents before forwarding any paid r
       const response = await GET(new Request('https://dashboard.example/api/demo/config?agentId=2'));
       assert.equal(response.status, 503); assert.equal(response.headers.get('cache-control'), 'no-store');
       assert.equal((await response.text()).includes(rpcUrl), false);
+    });
+
+    await context.test('read-only deployment blocks new paid requests before permission RPC or forwarding', async child => {
+      const state = fixture(child, { taskSubmissionEnabled: false });
+      const response = await GET(new Request('https://dashboard.example/api/demo/config?agentId=2'));
+      assert.equal(response.status, 503);
+      await assert.rejects(() => signedRequest().then(submitDemo), /task service is being updated/);
+      assert.equal(state.forwarded.length, 0); assert.equal(state.chainChecks(), 0);
     });
 
     for (const id of ['1', '2']) await context.test(`authorized owner of Agent #${id} forwards exactly once`, async child => {

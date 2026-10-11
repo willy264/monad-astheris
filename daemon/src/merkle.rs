@@ -10,6 +10,8 @@ use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{sync::Arc, time::Duration};
+mod worker;
+pub use worker::{progress_key, Progress};
 
 /// Domain-separated and double-hashed leaves, compatible with Solidity and viem.
 pub fn task_leaf(router: Address, event: &AetherisRouter::TaskExecuted) -> B256 {
@@ -136,7 +138,8 @@ async fn header(engine: &Engine, block: u64) -> Result<Value> {
             "eth_getBlockByNumber",
             json!([format!("0x{block:x}"), false]),
         )
-        .await?;
+        .await
+        .context(worker::ReadUnavailable)?;
     check_header(&result, block, None)?;
     Ok(result)
 }
@@ -204,7 +207,7 @@ fn block_batch(
 
 async fn reconstruct_block(engine: &Engine, block: u64, hash: B256) -> Result<Option<BlockBatch>> {
     // A fixed blockHash filter cannot mix logs from different forks or scan history.
-    let logs = engine.rpc("eth_getLogs", json!([{"address":engine.router,"blockHash":hash,"topics":[AetherisRouter::TaskExecuted::SIGNATURE_HASH]}])).await?;
+    let logs = engine.rpc("eth_getLogs", json!([{"address":engine.router,"blockHash":hash,"topics":[AetherisRouter::TaskExecuted::SIGNATURE_HASH]}])).await.context(worker::ReadUnavailable)?;
     let batch = block_batch(engine.router, block, hash, serde_json::from_value(logs)?)?;
     check_header(&header(engine, block).await?, block, Some(hash))?;
     Ok(batch)
@@ -478,51 +481,13 @@ async fn verify_existing_publication(engine: &Engine, batch: &BlockBatch) -> Res
     Ok(())
 }
 
-/// Scans finalized blocks only. Finalized-tag support is mandatory; a hash change halts
-/// settlement instead of silently treating orphaned events as canonical.
-pub async fn run_worker(engine: Arc<Engine>, deployment_block: u64) -> Result<()> {
-    let cursor_key = format!("merkle-cursor:{}:{}", CHAIN_ID, engine.router);
-    let mut cursor = engine.store.get::<Cursor>(cursor_key.clone()).await?;
-    loop {
-        if let Some(previous) = &cursor {
-            ensure!(
-                block_hash(&header(&engine, previous.number).await?)? == previous.hash,
-                "finalized block changed; batch reconciliation required"
-            );
-        }
-        let finalized = engine
-            .rpc("eth_getBlockByNumber", json!(["finalized", false]))
-            .await?;
-        let finalized_number = quantity(&finalized["number"])?;
-        let next = cursor
-            .as_ref()
-            .map_or(deployment_block, |c| c.number.saturating_add(1));
-        if next > finalized_number {
-            tokio::time::sleep(Duration::from_secs(2)).await;
-            continue;
-        }
-        let block = header(&engine, next).await?;
-        let hash = block_hash(&block)?;
-        if let Some(previous) = &cursor {
-            let parent: B256 = block["parentHash"]
-                .as_str()
-                .context("block missing parent")?
-                .parse()?;
-            ensure!(
-                parent == previous.hash,
-                "noncontiguous canonical block chain"
-            );
-        }
-        if let Some(batch) = reconstruct_block(&engine, next, hash).await? {
-            let publication = publish_batch(&engine, batch).await?;
-            tracing::info!(block = next, root = %publication.batch.root, leaves = publication.batch.leaf_count, transaction = ?publication.transaction, status = publication.status, "Merkle batch finalized");
-        }
-        cursor = Some(Cursor { number: next, hash });
-        engine
-            .store
-            .put(cursor_key.clone(), &cursor.as_ref().expect("cursor set"))
-            .await?;
-    }
+/// Range discovery and recent-block priority share exact canonical publication.
+pub async fn run_worker(
+    engine: Arc<Engine>,
+    deployment_block: u64,
+    indexer_url: Option<String>,
+) -> Result<()> {
+    worker::run(engine, deployment_block, indexer_url).await
 }
 
 #[cfg(test)]
@@ -546,7 +511,7 @@ mod tests {
         );
     }
 
-    fn task_log() -> Log {
+    pub(super) fn task_log() -> Log {
         let event = AetherisRouter::TaskExecuted {
             shard: Address::repeat_byte(0x22),
             agentId: U256::from(1),
@@ -569,7 +534,7 @@ mod tests {
         }
     }
 
-    fn fixture_batch() -> BlockBatch {
+    pub(super) fn fixture_batch() -> BlockBatch {
         block_batch(
             Address::repeat_byte(0x11),
             42,
@@ -785,6 +750,8 @@ mod tests {
             confirmations: 1,
             deployment_block: 0,
             batch_enabled: false,
+            task_submission_enabled: true,
+            envio_graphql_url: None,
             max_inflight: 1,
         };
         let engine = Engine::connect(&config, store.clone()).await.unwrap();
@@ -826,7 +793,7 @@ mod tests {
             )
             .await
             .unwrap();
-        let worker = tokio::spawn(run_worker(engine, 0));
+        let worker = tokio::spawn(run_worker(engine, 0, None));
         tokio::time::timeout(Duration::from_secs(5), async {
             loop {
                 if store
@@ -856,7 +823,7 @@ mod tests {
                 .iter()
                 .filter(|call| call["method"] == "eth_getLogs")
                 .count(),
-            2
+            5
         );
         server.abort();
     }

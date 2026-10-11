@@ -14,6 +14,8 @@ pub struct Config {
     pub confirmations: u64,
     pub deployment_block: u64,
     pub batch_enabled: bool,
+    pub task_submission_enabled: bool,
+    pub envio_graphql_url: Option<String>,
     pub max_inflight: usize,
 }
 
@@ -49,10 +51,35 @@ impl Config {
                 .parse()
                 .context("DEPLOYMENT_BLOCK is a decimal block number")?,
             batch_enabled: env::var("BATCH_ENABLED").unwrap_or_else(|_| "false".into()) == "true",
+            task_submission_enabled: parse_switch(
+                "TASK_SUBMISSION_ENABLED",
+                env::var("TASK_SUBMISSION_ENABLED").ok(),
+                true,
+            )?,
+            envio_graphql_url: optional_indexer_url(env::var("ENVIO_GRAPHQL_URL").ok())?,
             confirmations,
             max_inflight,
         })
     }
+}
+
+fn parse_switch(name: &str, value: Option<String>, default: bool) -> Result<bool> {
+    match value.as_deref().map(str::trim) {
+        None => Ok(default),
+        Some("true") => Ok(true),
+        Some("false") => Ok(false),
+        _ => Err(anyhow!("{name} must be true or false")),
+    }
+}
+
+fn optional_indexer_url(value: Option<String>) -> Result<Option<String>> {
+    let Some(value) = value.filter(|value| !value.trim().is_empty()) else {
+        return Ok(None);
+    };
+    let url = reqwest::Url::parse(value.trim())
+        .map_err(|_| anyhow!("ENVIO_GRAPHQL_URL must be an HTTP(S) GraphQL endpoint"))?;
+    ensure!(matches!(url.scheme(), "http" | "https") && url.username().is_empty() && url.password().is_none() && url.fragment().is_none(), "ENVIO_GRAPHQL_URL must be an HTTP(S) GraphQL endpoint without embedded credentials or fragments");
+    Ok(Some(url.to_string()))
 }
 
 fn parse_router_address(value: &str) -> Result<Address> {
@@ -121,6 +148,14 @@ pub fn number(name: &str, fallback: u64) -> Result<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn submission_switch_defaults_on_but_rejects_ambiguous_values() {
+        assert!(parse_switch("TASK_SUBMISSION_ENABLED", None, true).unwrap());
+        assert!(!parse_switch("TASK_SUBMISSION_ENABLED", Some("false".into()), true).unwrap());
+        for value in ["", "1", "False", "yes"] {
+            assert!(parse_switch("TASK_SUBMISSION_ENABLED", Some(value.into()), true).is_err());
+        }
+    }
 
     #[test]
     fn malformed_router_reports_the_environment_variable() {

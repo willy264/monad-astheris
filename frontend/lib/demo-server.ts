@@ -30,6 +30,7 @@ export async function demoConfig(requestedAgentId?: string): Promise<DemoConfig>
   const agentId = requestedAgentId ?? (process.env.DEMO_AGENT_ID || '1');
   ensure(uint(agentId) > 0n, 'Agent ID must be positive.');
   const response = await daemonRequest('/v1/config'); ensure(response.ok, 'The task service is temporarily unavailable.'); const remote = object(await boundedJson(response));
+  ensure(remote.taskSubmissionEnabled === undefined || remote.taskSubmissionEnabled === true, 'The task service is being updated. Saved receipts remain available; try a new run after the update.');
   ensure(remote.chainId === 10143 && address(remote.router).toLowerCase() === contracts.router.toLowerCase(), 'The task service and dashboard use different deployments.');
   const authorization = object(remote.taskAuthorization); ensure(authorization.name === 'AetherisTask' && authorization.version === '1', 'The task service uses an unsupported authorization.');
   return parseConfig({ enabled: true, chainId: 10143, router: contracts.router, identity: contracts.identity, agentId, relayers: remote.relayers, policy, challenge: remote.payment });

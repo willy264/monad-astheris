@@ -7,7 +7,7 @@ mod x402;
 use alloy::primitives::B256;
 use alloy::providers::Provider;
 use axum::{
-    extract::{DefaultBodyLimit, Path, State},
+    extract::{DefaultBodyLimit, Path, Request, State},
     http::{header, HeaderMap, HeaderValue, Method, StatusCode},
     middleware,
     response::{IntoResponse, Response},
@@ -27,6 +27,7 @@ pub struct AppState {
     pub payments: Arc<x402::Payments>,
     pub store: store::Store,
     pub batch_health: Arc<RwLock<&'static str>>,
+    pub task_submission_enabled: bool,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -129,6 +130,7 @@ async fn main() -> anyhow::Result<()> {
         engine: engine.clone(),
         payments,
         store: store.clone(),
+        task_submission_enabled: config.task_submission_enabled,
         batch_health: Arc::new(RwLock::new(if config.batch_enabled {
             "running"
         } else {
@@ -138,9 +140,10 @@ async fn main() -> anyhow::Result<()> {
     if config.batch_enabled {
         let batch_engine = engine.clone();
         let deployment_block = config.deployment_block;
+        let envio_graphql_url = config.envio_graphql_url.clone();
         let batch_health = state.batch_health.clone();
         tokio::spawn(async move {
-            if merkle::run_worker(batch_engine, deployment_block)
+            if merkle::run_worker(batch_engine, deployment_block, envio_graphql_url)
                 .await
                 .is_err()
             {
@@ -162,13 +165,16 @@ async fn main() -> anyhow::Result<()> {
             header::HeaderName::from_static("payment-required"),
             header::HeaderName::from_static("payment-response"),
         ]);
-    let paid =
-        Router::new()
-            .route("/v1/tasks", post(submit))
-            .route_layer(middleware::from_fn_with_state(
-                state.clone(),
-                x402::require_payment,
-            ));
+    let paid = Router::new()
+        .route("/v1/tasks", post(submit))
+        .route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            x402::require_payment,
+        ))
+        .route_layer(middleware::from_fn_with_state(
+            config.task_submission_enabled,
+            submission_gate,
+        ));
     let app = Router::new()
         .route("/health", get(health))
         .route("/v1/config", get(public_config))
@@ -219,18 +225,34 @@ async fn health(State(state): State<AppState>) -> ApiResult {
     .map_err(|_| ApiError(StatusCode::SERVICE_UNAVAILABLE, "RPC unavailable".into()))?;
     let batch_health = *state.batch_health.read().await;
     let stopped = batch_health == "stopped";
+    let batch_progress = state
+        .store
+        .get::<merkle::Progress>(merkle::progress_key(state.engine.router))
+        .await
+        .map_err(internal)?;
     let code = if stopped {
         StatusCode::SERVICE_UNAVAILABLE
     } else {
         StatusCode::OK
     };
-    Ok((code,Json(json!({"status":if stopped { "degraded" } else { "ok" },"batchWorker":batch_health,"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"blockNumber":block}))).into_response())
+    Ok((code,Json(json!({"status":if stopped { "degraded" } else { "ok" },"batchWorker":batch_health,"batchProgress":batch_progress,"taskSubmissionEnabled":state.task_submission_enabled,"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"blockNumber":block}))).into_response())
 }
 
 async fn public_config(State(state): State<AppState>) -> Json<Value> {
     Json(
-        json!({"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"taskAuthorization":{"name":"AetherisTask","version":"1"},"payment":state.payments.required_payload()}),
+        json!({"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"taskSubmissionEnabled":state.task_submission_enabled,"taskAuthorization":{"name":"AetherisTask","version":"1"},"payment":state.payments.required_payload()}),
     )
+}
+
+async fn submission_gate(
+    State(enabled): State<bool>,
+    request: Request,
+    next: middleware::Next,
+) -> Response {
+    if !enabled {
+        return ApiError(StatusCode::SERVICE_UNAVAILABLE, "Task submission is paused for maintenance. Existing task status remains available; no new task or payment was accepted.".into()).into_response();
+    }
+    next.run(request).await
 }
 
 async fn job(State(state): State<AppState>, Path(id): Path<B256>) -> ApiResult {
@@ -428,6 +450,56 @@ fn internal(_error: anyhow::Error) -> ApiError {
 #[cfg(test)]
 mod command_tests {
     use super::*;
+
+    #[tokio::test]
+    async fn maintenance_gate_rejects_before_payment_or_task_handlers_and_preserves_status_reads() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        for enabled in [false, true] {
+            let called = Arc::new(AtomicUsize::new(0));
+            let captured = called.clone();
+            let paid = Router::new()
+                .route(
+                    "/v1/tasks",
+                    post(move || {
+                        let called = captured.clone();
+                        async move {
+                            called.fetch_add(1, Ordering::SeqCst);
+                            StatusCode::ACCEPTED
+                        }
+                    }),
+                )
+                .route_layer(middleware::from_fn_with_state(enabled, submission_gate));
+            let app = Router::new()
+                .route("/v1/tasks/known", get(|| async { "saved status" }))
+                .merge(paid);
+            let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let base = format!("http://{}", listener.local_addr().unwrap());
+            let server = tokio::spawn(async move {
+                axum::serve(listener, app).await.unwrap();
+            });
+            let client = reqwest::Client::new();
+            let response = client
+                .post(format!("{base}/v1/tasks"))
+                .body("not even parsed as a task")
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(response.status().as_u16(), if enabled { 202 } else { 503 });
+            assert_eq!(called.load(Ordering::SeqCst), usize::from(enabled));
+            assert_eq!(
+                client
+                    .get(format!("{base}/v1/tasks/known"))
+                    .send()
+                    .await
+                    .unwrap()
+                    .text()
+                    .await
+                    .unwrap(),
+                "saved status"
+            );
+            server.abort();
+        }
+    }
 
     #[test]
     fn commit_block_requires_one_decimal_number_and_preserves_server_default() {
