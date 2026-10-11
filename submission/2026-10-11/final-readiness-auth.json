@@ -59,9 +59,9 @@
     },
     {
       "issue": "Login accessibility",
-      "status": "NOT VERIFIED",
-      "evidence": "Production baseline failed. Local final production build passes 21 keyboard, pointer, accessible-name and delegation regression assertions at1440/390; provider patch uses its existing focus lock.",
-      "remaining": "Deploy and recheck actual production; human screen-reader announcement remains unverified."
+      "status": "PASS",
+      "evidence": "Deployed revision537fdef4f757cb4d45f9eb2807e2f44426637496 passes21/21 keyboard, pointer, accessibility-tree and native delegation regression checks at1440/390. No data replay or wallet authentication.",
+      "remaining": "Human screen-reader spoken announcement and authenticated multi-step/device interactions remain NOT VERIFIED; initial login keyboard defect resolved."
     }
   ],
   "productionKeyboardBaseline": {
@@ -1021,5 +1021,841 @@
     ],
     "scope": "Real rebuilt frontend/provider components. Local directory GET /api/agents replayed captured public production response to avoid local server missing configuration; no wallet/auth/passkey provider responses mocked. No authenticated users or transactions. Native dialog can yield to browser chrome at the cycle boundary but background controls remain excluded.",
     "screenReader": "Accessibility tree role/name verified; spoken human screen-reader output NOT VERIFIED"
+  },
+  "deployedBrowser": {
+    "status": "PASS",
+    "sourceRevision": "537fdef4f757cb4d45f9eb2807e2f44426637496",
+    "deployment": {
+      "provider": "Vercel via GitHub deployment status",
+      "id": 6997508301,
+      "createdAt": "2026-10-11T15:15:46Z",
+      "status": "success"
+    },
+    "startedAt": "2026-10-11T15:17:16.730Z",
+    "completedAt": "2026-10-11T15:18:27.382Z",
+    "command": "node .tools/final-auth-keyboard.mjs https://monad-astheris.vercel.app",
+    "exitStatus": 0,
+    "checks": 21,
+    "passed": 21,
+    "failed": 0,
+    "viewports": [
+      1440,
+      390
+    ],
+    "browser": "Isolated headless Microsoft Edge",
+    "physicalDevice": false,
+    "publicApiReplay": false,
+    "observations": [
+      {
+        "name": "Trusted pointer opens Dynamic login",
+        "width": 1440,
+        "passed": true,
+        "focusedInitially": {
+          "tag": "BUTTON",
+          "label": "Close wallet access",
+          "text": "",
+          "insideDialog": true
+        },
+        "tabOrder": [
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with Passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "MetaMask",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Coinbase",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "WalletConnect",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "View all wallets580+ available",
+            "insideDialog": true
+          },
+          {
+            "tag": "A",
+            "label": null,
+            "text": "Powered by",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with Passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          }
+        ],
+        "dialogRoles": [
+          "Wallet access"
+        ]
+      },
+      {
+        "name": "Tab and Shift+Tab stay inside existing provider dialog",
+        "width": 1440,
+        "passed": true,
+        "order": [
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with Passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "MetaMask",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Coinbase",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "WalletConnect",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "View all wallets580+ available",
+            "insideDialog": true
+          },
+          {
+            "tag": "A",
+            "label": null,
+            "text": "Powered by",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with Passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          }
+        ]
+      },
+      {
+        "name": "Accessible wallet dialog name",
+        "width": 1440,
+        "passed": true
+      },
+      {
+        "name": "Escape closes login overlay",
+        "width": 1440,
+        "passed": true
+      },
+      {
+        "name": "Keyboard Enter opens login and moves focus inside",
+        "width": 1440,
+        "passed": true
+      },
+      {
+        "name": "Named close control closes and restores invoking control",
+        "width": 1440,
+        "passed": true
+      },
+      {
+        "name": "Delegation dialog receives initial focus with its accessible heading",
+        "width": 1440,
+        "passed": true
+      },
+      {
+        "name": "Native delegation dialog excludes background controls during Tab and Shift+Tab",
+        "width": 1440,
+        "passed": true,
+        "order": [
+          {
+            "tag": "BUTTON",
+            "label": "Close agent access",
+            "text": "×",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Log in or sign up",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "SELECT",
+            "label": null,
+            "text": "1 hour6 hours24 hours7 daysRevoke access",
+            "insideDialog": true
+          },
+          {
+            "tag": "BODY",
+            "label": null,
+            "text": "Skip to content(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fragment\\\"\\n\"])self.__next_",
+            "insideDialog": false
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close agent access",
+            "text": "×",
+            "insideDialog": true
+          },
+          {
+            "tag": "BODY",
+            "label": null,
+            "text": "Skip to content(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fragment\\\"\\n\"])self.__next_",
+            "insideDialog": false
+          },
+          {
+            "tag": "SELECT",
+            "label": null,
+            "text": "1 hour6 hours24 hours7 daysRevoke access",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Log in or sign up",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close agent access",
+            "text": "×",
+            "insideDialog": true
+          },
+          {
+            "tag": "BODY",
+            "label": null,
+            "text": "Skip to content(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fragment\\\"\\n\"])self.__next_",
+            "insideDialog": false
+          }
+        ]
+      },
+      {
+        "name": "Delegation Escape returns focus to invoking control",
+        "width": 1440,
+        "passed": true
+      },
+      {
+        "name": "Reopening same delegation action resets edited agent target",
+        "width": 1440,
+        "passed": true
+      },
+      {
+        "name": "Trusted pointer opens Dynamic login",
+        "width": 390,
+        "passed": true,
+        "focusedInitially": {
+          "tag": "BUTTON",
+          "label": "Close wallet access",
+          "text": "",
+          "insideDialog": true
+        },
+        "tabOrder": [
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with Passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "MetaMask",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Coinbase",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "WalletConnect",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "View all wallets580+ available",
+            "insideDialog": true
+          },
+          {
+            "tag": "A",
+            "label": null,
+            "text": "Powered by",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with Passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          }
+        ],
+        "dialogRoles": [
+          "Wallet access"
+        ]
+      },
+      {
+        "name": "Tab and Shift+Tab stay inside existing provider dialog",
+        "width": 390,
+        "passed": true,
+        "order": [
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with Passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "MetaMask",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Coinbase",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "WalletConnect",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "View all wallets580+ available",
+            "insideDialog": true
+          },
+          {
+            "tag": "A",
+            "label": null,
+            "text": "Powered by",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with Passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close wallet access",
+            "text": "",
+            "insideDialog": true
+          }
+        ]
+      },
+      {
+        "name": "Accessible wallet dialog name",
+        "width": 390,
+        "passed": true
+      },
+      {
+        "name": "Escape closes login overlay",
+        "width": 390,
+        "passed": true
+      },
+      {
+        "name": "Keyboard Enter opens login and moves focus inside",
+        "width": 390,
+        "passed": true
+      },
+      {
+        "name": "Named close control closes and restores invoking control",
+        "width": 390,
+        "passed": true
+      },
+      {
+        "name": "Delegation dialog receives initial focus with its accessible heading",
+        "width": 390,
+        "passed": true
+      },
+      {
+        "name": "Native delegation dialog excludes background controls during Tab and Shift+Tab",
+        "width": 390,
+        "passed": true,
+        "order": [
+          {
+            "tag": "BUTTON",
+            "label": "Close agent access",
+            "text": "×",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Log in or sign up",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "SELECT",
+            "label": null,
+            "text": "1 hour6 hours24 hours7 daysRevoke access",
+            "insideDialog": true
+          },
+          {
+            "tag": "BODY",
+            "label": null,
+            "text": "Skip to content(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fragment\\\"\\n\"])self.__next_",
+            "insideDialog": false
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close agent access",
+            "text": "×",
+            "insideDialog": true
+          },
+          {
+            "tag": "BODY",
+            "label": null,
+            "text": "Skip to content(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fragment\\\"\\n\"])self.__next_",
+            "insideDialog": false
+          },
+          {
+            "tag": "SELECT",
+            "label": null,
+            "text": "1 hour6 hours24 hours7 daysRevoke access",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Sign in with passkey",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Log in or sign up",
+            "insideDialog": true
+          },
+          {
+            "tag": "BUTTON",
+            "label": "Close agent access",
+            "text": "×",
+            "insideDialog": true
+          },
+          {
+            "tag": "BODY",
+            "label": null,
+            "text": "Skip to content(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fragment\\\"\\n\"])self.__next_",
+            "insideDialog": false
+          }
+        ]
+      },
+      {
+        "name": "Delegation Escape returns focus to invoking control",
+        "width": 390,
+        "passed": true
+      },
+      {
+        "name": "Reopening same delegation action resets edited agent target",
+        "width": 390,
+        "passed": true
+      },
+      {
+        "name": "No unhandled browser exceptions",
+        "passed": true
+      }
+    ],
+    "unhandledExceptions": 0,
+    "directory": ".tools/final-auth-keyboard/2026-10-11T15-17-16-726Z",
+    "scope": "Actual deployed UI, actual public Dynamic configuration and actual public agent directory; no response replay or synthetic authentication. No wallet connection, authentication, signature, payment or transaction.",
+    "screenReader": "Accessible role/name independently observed in browser accessibility tree; spoken human screen-reader output remains NOT VERIFIED."
   }
 }

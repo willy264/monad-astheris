@@ -25,7 +25,7 @@
 
 ## 2. Prepare your wallet after security clearance
 
-Your existing wallet is `0xce77b053D322ae8380aD2D0458f3605966EBDD22`. At the audit it owned **Agent #2**, with **5.907197238 MON + 20.979 USDC**: enough for another run. Another faucet request is unnecessary for this wallet. Its latest daemon executor permission expired at **2026-10-11 02:20:01 UTC**. Renew only after clearance and explicit approval. Recheck current balances and permission in the app.
+Your existing wallet is `0xce77b053D322ae8380aD2D0458f3605966EBDD22`. At the audit it owned **Agent #2**, with **5.907197238 MON + 20.979 USDC**: enough for another run. Another faucet request is unnecessary for this wallet. The latest service check also found recurring daemon health/config 503; operator recovery is required before live runs. Its latest daemon executor permission expired at **2026-10-11 02:20:01 UTC**. Renew only after clearance and explicit approval. Recheck current balances and permission in the app.
 
 For a new wallet, obtain testnet MON from the [Monad faucet](https://faucet.monad.xyz/) and USDC from the [Circle faucet](https://faucet.circle.com/), selecting **USDC → Monad Testnet** and the same connected address. At current policy each task costs **0.001 testnet USDC**, five cost **0.005**, and registration/delegation also need MON gas. Use a personal test wallet, distinct from daemon relayers.
 

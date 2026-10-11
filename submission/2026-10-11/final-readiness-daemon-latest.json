@@ -1,0 +1,536 @@
+{
+  "startedAt": "2026-10-11T15:19:59.998Z",
+  "completedAt": "2026-10-11T15:20:04.263Z",
+  "readOnly": true,
+  "service": {
+    "observedAt": "2026-10-11T15:20:00.000Z",
+    "id": "srv-db0pe2vavr4c738pa9h0",
+    "name": "monad-astheris-daemon",
+    "suspended": "not_suspended",
+    "plan": "free",
+    "disk": null,
+    "autoDeploy": "no",
+    "branch": "main",
+    "updatedAt": "2026-10-11T00:50:01.694311Z"
+  },
+  "deploys": {
+    "status": 200,
+    "deployments": [
+      {
+        "id": "dep-db5dqap42hec738jogl0",
+        "status": "live",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:49:47.688818Z",
+        "finishedAt": "2026-10-11T00:50:01.58024Z"
+      },
+      {
+        "id": "dep-db5dn0flot8c73ejkc3g",
+        "status": "deactivated",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:42:41.58591Z",
+        "finishedAt": "2026-10-11T00:46:54.377949Z"
+      },
+      {
+        "id": "dep-db21n1ugekts739gmegg",
+        "status": "deactivated",
+        "commit": "80570af5181de3727383f709d944cfd476f34e50",
+        "createdAt": "2026-10-05T21:49:59.975004Z",
+        "finishedAt": "2026-10-05T21:54:44.431111Z"
+      },
+      {
+        "id": "dep-db0qqevavr4c738us520",
+        "status": "deactivated",
+        "commit": "c446a9105703464ba164c19b5fa8bc3e2ebf1ccd",
+        "createdAt": "2026-10-04T01:34:51.15369Z",
+        "finishedAt": "2026-10-04T01:38:48.716131Z"
+      },
+      {
+        "id": "dep-db0q8s6gekts73ararr0",
+        "status": "update_failed",
+        "commit": "59083048fed8d52c5a484b788986122313fac30b",
+        "createdAt": "2026-10-04T00:57:20.11678Z",
+        "finishedAt": "2026-10-04T01:01:04.942937Z"
+      }
+    ]
+  },
+  "endpoints": [
+    {
+      "url": "https://monad-astheris-daemon.onrender.com/health",
+      "at": "2026-10-11T15:20:00.148Z",
+      "status": 503,
+      "ms": 3095,
+      "bytes": 0,
+      "contentType": null
+    },
+    {
+      "url": "https://monad-astheris-daemon.onrender.com/v1/config",
+      "at": "2026-10-11T15:20:00.151Z",
+      "status": 503,
+      "ms": 3097,
+      "bytes": 0,
+      "contentType": null
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config",
+      "at": "2026-10-11T15:20:00.154Z",
+      "status": 503,
+      "ms": 3188,
+      "bytes": 164,
+      "contentType": "application/json",
+      "body": {
+        "enabled": false,
+        "error": "The testnet task service or its payment configuration is unavailable. Check the connection again shortly, or explore the guided preview."
+      }
+    }
+  ],
+  "logs": {
+    "status": 200,
+    "startTime": "2026-10-11T14:45:00Z",
+    "maxRows": 100,
+    "returned": 79,
+    "entries": [
+      {
+        "timestamp": "2026-10-11T15:14:21.355302666Z",
+        "message": "==> Running './target/release/aetheris-daemon'"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:21.994478277Z",
+        "message": "2026-10-11T15:14:21.993877Z  INFO aetheris_daemon: Aetheris daemon ready address=0.0.0.0:10000 chain_id=10143"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:22.816850712Z",
+        "message": "2026-10-11T15:14:22.816636Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885224 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:22.943897072Z",
+        "message": "2026-10-11T15:14:22.943649Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884353 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:23.055158234Z",
+        "message": "2026-10-11T15:14:23.053972Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884380 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:23.199547556Z",
+        "message": "2026-10-11T15:14:23.199414Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858120 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:23.314686802Z",
+        "message": "2026-10-11T15:14:23.314530Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69982643 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:23.444163467Z",
+        "message": "2026-10-11T15:14:23.443882Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884408 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:23.563862135Z",
+        "message": "2026-10-11T15:14:23.563527Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885197 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:23.568560731Z",
+        "message": "2026-10-11T15:14:23.568445Z  WARN aetheris_daemon::merkle::worker: Merkle discovery read failed; retrying without advancing failed range attempt=1"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:26.253076356Z",
+        "message": "2026-10-11T15:14:26.252540Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885142 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:26.374411983Z",
+        "message": "2026-10-11T15:14:26.374216Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884325 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:26.538640106Z",
+        "message": "2026-10-11T15:14:26.538544Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858203 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:26.650563692Z",
+        "message": "2026-10-11T15:14:26.650473Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885170 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:26.75542918Z",
+        "message": "2026-10-11T15:14:26.755330Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69982671 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:26.869773249Z",
+        "message": "2026-10-11T15:14:26.869649Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858175 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:27.018838054Z",
+        "message": "2026-10-11T15:14:27.018696Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69984178 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:27.144702261Z",
+        "message": "2026-10-11T15:14:27.144521Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69982616 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:29.871373692Z",
+        "message": "2026-10-11T15:14:29.871161Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69982728 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:30.00313015Z",
+        "message": "2026-10-11T15:14:30.002976Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69982700 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:30.124222262Z",
+        "message": "2026-10-11T15:14:30.124129Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69066769 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:30.229651338Z",
+        "message": "2026-10-11T15:14:30.229535Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858148 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:30.338137157Z",
+        "message": "2026-10-11T15:14:30.337954Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858093 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:30.461279396Z",
+        "message": "2026-10-11T15:14:30.461189Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884435 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:30.589501656Z",
+        "message": "2026-10-11T15:14:30.589384Z ERROR aetheris_daemon: Merkle worker stopped; inspect canonical chain and restart after reconciliation category=\"merkle_worker_failed\""
+      },
+      {
+        "timestamp": "2026-10-11T15:14:33.891142566Z",
+        "message": "2026-10-11T15:14:33.890747Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:38.887127842Z",
+        "message": "2026-10-11T15:14:38.886779Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=2 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:38.890021602Z",
+        "message": "2026-10-11T15:14:38.889068Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:43.889539828Z",
+        "message": "2026-10-11T15:14:43.889458Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:43.894922812Z",
+        "message": "2026-10-11T15:14:43.894817Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:48.895240451Z",
+        "message": "2026-10-11T15:14:48.895111Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:53.895829503Z",
+        "message": "2026-10-11T15:14:53.895689Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:14:58.894917621Z",
+        "message": "2026-10-11T15:14:58.894715Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:03.897276024Z",
+        "message": "2026-10-11T15:15:03.895916Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=2 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:08.884652687Z",
+        "message": "2026-10-11T15:15:08.884510Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:08.893813545Z",
+        "message": "2026-10-11T15:15:08.892917Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=2 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:09.017195579Z",
+        "message": "2026-10-11T15:15:09.016504Z  INFO aetheris_daemon: Shutdown requested; HTTP listener draining active requests"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:49.402430176Z",
+        "message": "==> Running './target/release/aetheris-daemon'"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:53.370998264Z",
+        "message": "2026-10-11T15:15:53.370235Z  INFO aetheris_daemon: Aetheris daemon ready address=0.0.0.0:10000 chain_id=10143"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:54.113988454Z",
+        "message": "2026-10-11T15:15:54.113748Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885224 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:54.244369034Z",
+        "message": "2026-10-11T15:15:54.229473Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884353 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:54.349496311Z",
+        "message": "2026-10-11T15:15:54.348545Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884380 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:54.492924673Z",
+        "message": "2026-10-11T15:15:54.492580Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858120 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:54.612710835Z",
+        "message": "2026-10-11T15:15:54.612447Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69982643 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:54.741419811Z",
+        "message": "2026-10-11T15:15:54.740694Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884408 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:54.9147719Z",
+        "message": "2026-10-11T15:15:54.914642Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885197 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:55.028510148Z",
+        "message": "2026-10-11T15:15:55.027486Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885142 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:57.875948248Z",
+        "message": "2026-10-11T15:15:57.875831Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884325 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:57.989879859Z",
+        "message": "2026-10-11T15:15:57.989734Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858203 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:58.100614054Z",
+        "message": "2026-10-11T15:15:58.100490Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885170 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:58.251408269Z",
+        "message": "2026-10-11T15:15:58.213505Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69982671 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:58.337388439Z",
+        "message": "2026-10-11T15:15:58.337091Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858175 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:58.464597264Z",
+        "message": "2026-10-11T15:15:58.462479Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69984178 status=\"already_committed\" transaction=None"
+      },
+      {
+        "timestamp": "2026-10-11T15:15:58.649061949Z",
+        "message": "2026-10-11T15:15:58.612836Z ERROR aetheris_daemon: Merkle worker stopped; inspect canonical chain and restart after reconciliation category=\"merkle_worker_failed\""
+      },
+      {
+        "timestamp": "2026-10-11T15:15:58.920362675Z",
+        "message": "2026-10-11T15:15:58.920168Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=6 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:16:08.885917337Z",
+        "message": "2026-10-11T15:16:08.885776Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=2 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:16:18.925568664Z",
+        "message": "2026-10-11T15:16:18.886639Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:16:28.884399089Z",
+        "message": "2026-10-11T15:16:28.884238Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:16:38.910455381Z",
+        "message": "2026-10-11T15:16:38.910363Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=2 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:16:48.882886074Z",
+        "message": "2026-10-11T15:16:48.882741Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:16:58.883505242Z",
+        "message": "2026-10-11T15:16:58.883333Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:17:08.884450656Z",
+        "message": "2026-10-11T15:17:08.884099Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=2 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:17:18.88373039Z",
+        "message": "2026-10-11T15:17:18.883595Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:17:28.883839438Z",
+        "message": "2026-10-11T15:17:28.883693Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:17:38.883071309Z",
+        "message": "2026-10-11T15:17:38.882943Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:17:48.884409471Z",
+        "message": "2026-10-11T15:17:48.883186Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:17:58.883331421Z",
+        "message": "2026-10-11T15:17:58.883097Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:18:08.88572102Z",
+        "message": "2026-10-11T15:18:08.885110Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:18:18.884121307Z",
+        "message": "2026-10-11T15:18:18.883883Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:18:28.887535002Z",
+        "message": "2026-10-11T15:18:28.887351Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=3 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:18:38.883032286Z",
+        "message": "2026-10-11T15:18:38.882894Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:18:48.88303247Z",
+        "message": "2026-10-11T15:18:48.882905Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:18:58.883251495Z",
+        "message": "2026-10-11T15:18:58.883125Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:19:08.883694946Z",
+        "message": "2026-10-11T15:19:08.883555Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:19:18.882886112Z",
+        "message": "2026-10-11T15:19:18.882764Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:19:28.883853364Z",
+        "message": "2026-10-11T15:19:28.883546Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:19:38.883424261Z",
+        "message": "2026-10-11T15:19:38.883266Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:19:48.884845553Z",
+        "message": "2026-10-11T15:19:48.884405Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=2 ms"
+      },
+      {
+        "timestamp": "2026-10-11T15:19:58.88445441Z",
+        "message": "2026-10-11T15:19:58.884334Z ERROR tower_http::trace::on_failure: response failed classification=Status code: 503 Service Unavailable latency=1 ms"
+      }
+    ]
+  },
+  "events": {
+    "status": 200,
+    "entries": [
+      {
+        "id": "evt-db5qgo6417fc73eib1c0",
+        "type": "server_failed",
+        "timestamp": "2026-10-11T15:16:48.443712Z",
+        "details": {
+          "instanceID": "srv-db0pe2vavr4c738pa9h0-6vbrm",
+          "reason": {
+            "evicted": false,
+            "unhealthy": "HTTP health check failed with status code 503"
+          }
+        }
+      },
+      {
+        "id": "evt-db5qflajnfac73dc26i0",
+        "type": "server_available",
+        "timestamp": "2026-10-11T15:14:29.085169Z",
+        "details": {}
+      },
+      {
+        "id": "evt-db5ppne417fc73ehijs0",
+        "type": "server_failed",
+        "timestamp": "2026-10-11T14:27:41.324859Z",
+        "details": {
+          "instanceID": "srv-db0pe2vavr4c738pa9h0-wrvrf",
+          "reason": {
+            "evicted": false,
+            "unhealthy": "HTTP health check failed with status code 503"
+          }
+        }
+      },
+      {
+        "id": "evt-db5pp3qjnfac73dc1trg",
+        "type": "server_available",
+        "timestamp": "2026-10-11T14:26:23.551693Z",
+        "details": {}
+      },
+      {
+        "id": "evt-db5pmme417fc73ehg2a0",
+        "type": "server_failed",
+        "timestamp": "2026-10-11T14:21:13.628457Z",
+        "details": {
+          "instanceID": "srv-db0pe2vavr4c738pa9h0-wrvrf",
+          "reason": {
+            "evicted": false,
+            "unhealthy": "HTTP health check failed with status code 503"
+          }
+        }
+      },
+      {
+        "id": "evt-db5pjfqjnfac73dc1rm0",
+        "type": "server_available",
+        "timestamp": "2026-10-11T14:14:23.61468Z",
+        "details": {}
+      },
+      {
+        "id": "evt-db5p1e6417fc73egqg10",
+        "type": "server_failed",
+        "timestamp": "2026-10-11T13:35:52.844574Z",
+        "details": {
+          "instanceID": "srv-db0pe2vavr4c738pa9h0-ddxtt",
+          "reason": {
+            "evicted": false,
+            "unhealthy": "HTTP health check failed with status code 503"
+          }
+        }
+      },
+      {
+        "id": "evt-db5p14qjnfac73dc1kmg",
+        "type": "server_available",
+        "timestamp": "2026-10-11T13:35:15.316104Z",
+        "details": {}
+      },
+      {
+        "id": "evt-db5opvm417fc73eghjtg",
+        "type": "server_failed",
+        "timestamp": "2026-10-11T13:19:58.710515Z",
+        "details": {
+          "instanceID": "srv-db0pe2vavr4c738pa9h0-ddxtt",
+          "reason": {
+            "evicted": false,
+            "unhealthy": "HTTP health check failed with status code 503"
+          }
+        }
+      },
+      {
+        "id": "evt-db5ggjajnfac73dbuh2g",
+        "type": "server_available",
+        "timestamp": "2026-10-11T03:53:49.872225Z",
+        "details": {}
+      }
+    ],
+    "returnedBeforePublicTruncation": 20,
+    "published": 10
+  },
+  "limits": [
+    "Read-only HTTP GET inspection only; no restart, deployment, environment update, disk change, signature or transaction requested.",
+    "Service/deployment status alone does not establish application health or retained journal durability.",
+    "Logs are a bounded recent window; absence of an error in this window does not establish a cause."
+  ],
+  "annotatedAt": "2026-10-11T15:27:29.645Z",
+  "availability": "FAIL: both direct daemon endpoints and frontend live configuration returned HTTP 503",
+  "diagnosis": {
+    "observedFailureCategory": "merkle_worker_failed",
+    "terminalLog": "Merkle worker stopped; inspect canonical chain and restart after reconciliation",
+    "failureTimesUTC": [
+      "2026-10-11T15:14:30.589384Z",
+      "2026-10-11T15:15:58.612836Z"
+    ],
+    "platformReason": "HTTP health check failed with status code 503",
+    "currentDeployment": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+    "noNewDaemonDeployment": true,
+    "exactUnderlyingFailure": "UNKNOWN: the deployed worker wrapper discards the error chain and logs only a static category",
+    "causeBoundary": "One retry warning preceded the first terminal error; the captured sequence does not establish five-retry exhaustion, a cold start, an RPC outage, a canonical mismatch or ambiguous publication as the root cause.",
+    "sourceReview": [
+      "worker.rs retries tagged prepublication ReadUnavailable errors at most five times, then returns an error.",
+      "Canonical integrity mismatches and errors classified as PublicationError stop the worker.",
+      "Existing-batch contract reads and existing-commitment verification also receive PublicationError classification; a transport error there can stop the worker, but this specific cause is unproven.",
+      "The stopped worker makes health return 503; Render recorded failed HTTP health checks and later startup events."
+    ],
+    "admissionBoundary": "The deployed submission_gate checks TASK_SUBMISSION_ENABLED only, independently of batch_health. A failed health check does not prove paid admission is disabled. Public routing is currently unavailable; no POST was sent to test paid admission.",
+    "recovery": "Keep wallet/live submission unavailable. Preserve the current journal and arrange operator maintenance admission/exclusive signer handoff. Reconcile known transaction nonces, finalized receipts, commitments and facilitator settlement records read-only before any approved restart or migration. Do not clear state or retry ambiguous publication.",
+    "applicationCodeChangedForIncident": false
+  }
+}

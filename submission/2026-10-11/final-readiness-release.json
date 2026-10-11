@@ -1,11 +1,231 @@
 {
-  "recordedAt": "2026-10-11T15:08:15.357Z",
+  "recordedAt": "2026-10-11T15:22:03.855Z",
   "baselineRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
-  "sourceScope": "All application changes in the same commit as this initial record; subsequent evidence follow-up pins the exact commit.",
-  "gitPush": "PENDING",
-  "frontendDeployment": "NOT VERIFIED for remediation; GitHub deployment6995947246 at baseline was observed",
-  "daemonDeployment": "NOT PERFORMED; free service has no persistent disk; autoDeploy=no",
-  "externalRequests": "NONE",
+  "remediationCommit": "537fdef4f757cb4d45f9eb2807e2f44426637496",
+  "gitPush": {
+    "status": "PASS",
+    "branch": "main",
+    "remote": "https://github.com/willy264/monad-astheris",
+    "commit": "537fdef4f757cb4d45f9eb2807e2f44426637496"
+  },
+  "frontendDeployment": {
+    "status": "success",
+    "deploymentId": 6997508301,
+    "commit": "537fdef4f757cb4d45f9eb2807e2f44426637496",
+    "completedAt": "2026-10-11T15:15:47Z",
+    "url": "https://monad-astheris-e5dikkfu9-willy264s-projects.vercel.app",
+    "productionAlias": "https://monad-astheris.vercel.app",
+    "deployedBrowserChecks": 13,
+    "deployedKeyboardChecks": 21
+  },
+  "ci": {
+    "observedAt": "2026-10-11T15:21:57.208Z",
+    "sha": "537fdef4f757cb4d45f9eb2807e2f44426637496",
+    "statuses": [
+      {
+        "context": "Vercel",
+        "state": "success",
+        "description": "Deployment has completed",
+        "target_url": "https://vercel.com/willy264s-projects/monad-astheris/BiuH9mHJiviMX188NzAQgibzJ6eo",
+        "updated_at": "2026-10-11T15:15:46Z"
+      }
+    ],
+    "checks": [
+      {
+        "name": "Contracts and shared ABIs",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-11T15:10:15Z",
+        "completed_at": "2026-10-11T15:10:45Z",
+        "details_url": "https://github.com/willy264/monad-astheris/actions/runs/38150153424/job/114501743651"
+      },
+      {
+        "name": "Rust daemon",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-11T15:10:15Z",
+        "completed_at": "2026-10-11T15:10:58Z",
+        "details_url": "https://github.com/willy264/monad-astheris/actions/runs/38150153424/job/114501743560"
+      },
+      {
+        "name": "Frontend tests and production build",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-11T15:10:15Z",
+        "completed_at": "2026-10-11T15:13:00Z",
+        "details_url": "https://github.com/willy264/monad-astheris/actions/runs/38150153424/job/114501743554"
+      },
+      {
+        "name": "Task and operation scripts",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-11T15:10:15Z",
+        "completed_at": "2026-10-11T15:10:37Z",
+        "details_url": "https://github.com/willy264/monad-astheris/actions/runs/38150153424/job/114501743414"
+      }
+    ],
+    "openDependabotAlerts": [
+      {
+        "number": 101,
+        "package": "stream-json",
+        "manifest": "frontend/pnpm-lock.yaml",
+        "severity": "medium",
+        "advisory": "GHSA-hqr4-qq8f-hg3x"
+      },
+      {
+        "number": 100,
+        "package": "stream-json",
+        "manifest": "frontend/pnpm-lock.yaml",
+        "severity": "medium",
+        "advisory": "GHSA-mjw6-4jj6-33hc"
+      },
+      {
+        "number": 68,
+        "package": "stream-json",
+        "manifest": "frontend/pnpm-lock.yaml",
+        "severity": "medium",
+        "advisory": "GHSA-528h-pc64-c93x"
+      },
+      {
+        "number": 28,
+        "package": "bigint-buffer",
+        "manifest": "frontend/pnpm-lock.yaml",
+        "severity": "high",
+        "advisory": "GHSA-3gc7-fjrx-p6mg"
+      }
+    ],
+    "summaryLines": [
+      "Rust daemon\tRun daemon tests\t2026-10-11T15:10:55.1110042Z test result: ok. 55 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.46s",
+      "Rust daemon\tRun daemon tests\t2026-10-11T15:10:55.5569329Z test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s",
+      "Contracts and shared ABIs\tRun contract and fuzz tests\t2026-10-11T15:10:43.0154522Z Ran 3 test suites in 38.97ms (84.17ms CPU time): 38 tests passed, 0 failed, 0 skipped (38 total tests)",
+      "Contracts and shared ABIs\tCheck consumer declarations against compiled ABIs\t2026-10-11T15:10:43.0728964Z Verified 72 frontend, Rust, indexer and operation-script ABI declarations against compiled Solidity artifacts."
+    ],
+    "workflow": "https://github.com/willy264/monad-astheris/actions/runs/38150153424"
+  },
+  "applicationGitBlobs": {
+    "daemon/.env.example": "4464abbf69a6139028e5b48a8a1b607425d35eab",
+    "daemon/src/access.rs": "4792c4d481e3b93ce8899c323b6ef1181cc8d7b1",
+    "daemon/src/config.rs": "c1854b3737063cd5cfbcc98825c7afb4d88f160a",
+    "daemon/src/main.rs": "5d81628c00f3d018d010a44580d62ae06f6ec6fc",
+    "daemon/src/merkle.rs": "8ab44d827fd591bbd2f31da65840383c9111037a",
+    "daemon/src/merkle/worker.rs": "54b0e7b5a5f9aa6de805416903b0a1ccce3ecc5f",
+    "daemon/src/store.rs": "d4f38fcfecfc5ee83f5ebd586f89f32decb749de",
+    "daemon/tests/journal_restart.rs": "98930ed861466cbf06a32cc2f3b7841489bcba36",
+    "frontend/components/AccessContext.tsx": "7790668f7b586ef60c23f2f745fdf7533d91c330",
+    "frontend/components/AgentOnboarding.module.css": "d8b36f949fabb15576a63b717d74ffd9cdae52da",
+    "frontend/components/AgentOnboarding.tsx": "02ed8e81569c7a05d390a59d017749820a4a1433",
+    "frontend/components/DemoWallet.tsx": "95dbb234995386326c775270d7fcf356795b4d51",
+    "frontend/components/InteractiveDemo.tsx": "66bbd44283f3618531955707e55e1eba1f24ffc3",
+    "frontend/components/PasskeyAuth.tsx": "28c13dbbc978c35af2b060c60e47ec55419edbec",
+    "frontend/components/WalletAccess.tsx": "eccdcba81e20597782126494a62c6157168c9689",
+    "frontend/components/WalletSession.tsx": "210cd21cb39b1586d9d9f19d64571046ac96299d",
+    "frontend/lib/delegation.ts": "7b3ea18ddfa237cfc24dc1969dd876558ebb6391",
+    "frontend/package.json": "d736d244ba1564e24cb5a23a5360f2ca64b50227",
+    "frontend/patches/@dynamic-labs__sdk-react-core@5.9.2.patch": "db7ab97ae599b6657ccd50bc6d99800169535f1c",
+    "frontend/patches/stream-json@1.9.1.patch": "133ae01cbd51455115a71185328de24124f6d3fd",
+    "frontend/pnpm-lock.yaml": "67f222d62edd6447131138ef7ef835f039f39c2d",
+    "frontend/test/delegation.test.ts": "757da857789374245652f8a867448a56ab3ae430",
+    "frontend/test/dependency-security.test.mjs": "b1050fe0801989c4896cfa1bdcf55b45553bf337",
+    "frontend/test/self-service-client.test.ts": "eacdd46e6c839289049a6cf59d149a1e083d5e6b",
+    "frontend/test/self-service-server.test.ts": "893a40c331e1ddecab04f4931d9a5c0ddf9097b7",
+    "scripts/prepare-source-verification.mjs": "8c715aabd067438bb16d632521ad3e5f49e39c12"
+  },
+  "dns": {
+    "checkedAt": "2026-10-11T15:12:05.659Z",
+    "name": "monad-astheris.vercel.app",
+    "queries": [
+      {
+        "type": "A",
+        "httpStatus": 200,
+        "dnsStatus": 0,
+        "answer": [
+          {
+            "name": "monad-astheris.vercel.app.",
+            "type": 1,
+            "TTL": 300,
+            "data": "64.29.17.195"
+          },
+          {
+            "name": "monad-astheris.vercel.app.",
+            "type": 1,
+            "TTL": 300,
+            "data": "216.198.79.195"
+          }
+        ],
+        "authority": []
+      },
+      {
+        "type": "CNAME",
+        "httpStatus": 200,
+        "dnsStatus": 0,
+        "answer": [],
+        "authority": [
+          {
+            "name": "vercel.app.",
+            "type": 6,
+            "TTL": 900,
+            "data": "ns1.vercel-dns-3.com. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+          }
+        ]
+      }
+    ]
+  },
+  "latestClassification": {
+    "observedAt": "2026-10-11T15:22:03.844Z",
+    "httpStatus": 200,
+    "body": {
+      "hostname": "monad-astheris.vercel.app",
+      "recommendedAction": "BLOCK"
+    }
+  },
+  "daemonDeployment": "NOT PERFORMED. Retained-journal migration required; see final-readiness-daemon-latest.json for service observations.",
+  "externalRequests": "NONE submitted to support or hackathon portal",
   "newSignaturesOrTransactions": "NONE",
-  "walletJudging": "BLOCKED"
+  "walletJudging": "BLOCKED",
+  "evidenceCommit": "This record is a documentation/evidence-only follow-up to the deployed remediation commit. No further application changes.",
+  "finalWorkingTreeScope": "Documentation and sanitized evidence only after537fdef; all recorded application blob hashes unchanged.",
+  "latestServices": [
+    {
+      "url": "https://monad-astheris.vercel.app/",
+      "checkedAt": "2026-10-11T15:14:06.342Z",
+      "status": 200
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/agents",
+      "checkedAt": "2026-10-11T15:14:06.325Z",
+      "status": 200
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/visualizer",
+      "checkedAt": "2026-10-11T15:14:06.345Z",
+      "status": 200
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config?agentId=2",
+      "checkedAt": "2026-10-11T15:14:17.188Z",
+      "status": 503,
+      "body": {
+        "enabled": false,
+        "error": "The testnet task service or its payment configuration is unavailable. Check the connection again shortly, or explore the guided preview."
+      }
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/access-requests/config",
+      "checkedAt": "2026-10-11T15:14:19.149Z",
+      "status": 503,
+      "body": {
+        "error": "Access requests are not available yet. The task service must be updated and configured for this dashboard."
+      }
+    },
+    {
+      "url": "https://monad-astheris-daemon.onrender.com/health",
+      "checkedAt": "2026-10-11T15:14:29.036Z",
+      "status": 200
+    },
+    {
+      "url": "https://dapp-scanning.api.cx.metamask.io/v2/scan?url=monad-astheris.vercel.app",
+      "checkedAt": "2026-10-11T15:14:07.078Z",
+      "status": 200
+    }
+  ]
 }

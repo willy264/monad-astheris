@@ -1,6 +1,6 @@
 {
-  "startedAt": "2026-10-11T14:25:37.656Z",
-  "revision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+  "startedAt": "2026-10-11T15:17:36.022Z",
+  "revision": "537fdef4f757cb4d45f9eb2807e2f44426637496",
   "base": "https://monad-astheris.vercel.app",
   "checks": [
     {
@@ -12,7 +12,7 @@
       "name": "New visitor can open wallet authentication",
       "width": 1440,
       "passed": true,
-      "dialogText": "server\nERC-8004 #1\n\nPublishes live Monad Testnet block metadata through a read-only MCP tool for agent workflows.\n\nOwner 0x5d8853…e02f57\nUnrated\nView agent\nAetheris Checksum Agent\nERC-8004 #2\n\nRuns deterministic browser checksum tasks through Aetheris on Monad Testnet. No AI model or external MCP service is provided.\n\nOwner 0xce77b0…ebdd22\nUnrated\nView agent\nAgent stats\nSyncing network\nTask activity\nCompleted task lanes\n22\n22\nIndexed total\nAll indexed completions · through block 70134897\n2\nAgent #1\n20\nAgent #2\nIndexed completions · agents shown above\nNetwork activity\n\nTransactions per block on Monad Testnet\n\n0\n2\n4\n#70134890\n#70134901\nRPC sample · 12 blocks · network-wide transactions\nView block samples\nExplore task lanes\nAt a glance\nRegistered agents\n2\n2\nLive registry\nPublic on-chain agent identities\nObserved Monad TPS\n8.7\n8.7\nLive data\nNetwork transactions / second · 3s sample\nMicropayments settled\n—\nNo demo result\nConfirmed payments from the live task run\nData source & freshness\n+\nYOUR FIRST LIVE RUN\nFrom sign-in to settlement.\n\nCreate your own agent, authorize its executor, and run five tasks.\n\nGuided preview\nLive testnet\n\nMonad Testnet · real signatures, real testnet token payments.\n\nYOUR WALLET · YOUR AGENT\nGet ready for a live run\nSetup needed\n1\nConnect\nCurrent step\n2\nRegister\nNext\n3\nAuthorize\nNext\n4\nFund\nNext\n5\nRun\nNext\nConnect the wallet that will own your agent.\n\nChoose email, a wallet, or an existing passkey in the sign-in window. Registration and executor approval happen after you connect.\n\nConnect wallet to begin\nIndependent tasks. Verifiable receipts.\nERC-8004 identity · Built for parallel execution ↗\n\nSandbox\nLog in or sign up\nEnter your email\nContinue\n\nOR\n\nSign in with Passkey\n\nOR\n\nMetaMask\nCoinbase\nWalletConnect\nView all wallets\n580+ available\nPowered by",
+      "dialogText": "sks and inspect their on-chain receipts.\n\n+\nSet up your agent\nRegistered agents\nView directory\nAetheris Monad Observer\nERC-8004 #1\n\nPublishes live Monad Testnet block metadata through a read-only MCP tool for agent workflows.\n\nOwner 0x5d8853…e02f57\nUnrated\nView agent\nAetheris Checksum Agent\nERC-8004 #2\n\nRuns deterministic browser checksum tasks through Aetheris on Monad Testnet. No AI model or external MCP service is provided.\n\nOwner 0xce77b0…ebdd22\nUnrated\nView agent\nAgent stats\nBlock 70,145,034\nTask activity\nCompleted task lanes\n22\n22\nIndexed total\nAll indexed completions · through block 70145030\n2\nAgent #1\n20\nAgent #2\nIndexed completions · agents shown above\nNetwork activity\n\nTransactions per block on Monad Testnet\n\n0\n3\n6\n#70145023\n#70145034\nRPC sample · 12 blocks · network-wide transactions\nView block samples\nExplore task lanes\nAt a glance\nRegistered agents\n2\n2\nLive registry\nPublic on-chain agent identities\nObserved Monad TPS\n5.5\n5.5\nLive data\nNetwork transactions / second · 4s sample\nMicropayments settled\n—\nNo demo result\nConfirmed payments from the live task run\nData source & freshness\n+\nYOUR FIRST LIVE RUN\nFrom sign-in to settlement.\n\nCreate your own agent, authorize its executor, and run five tasks.\n\nGuided preview\nLive testnet\n\nMonad Testnet · real signatures, real testnet token payments.\n\nLive demo is not available yet\n\nThe testnet task service could not be reached or its payment settings are unavailable. It may be waking up. Check the connection again shortly, or explore the guided preview.\n\nCheck connection again\nIndependent tasks. Verifiable receipts.\nERC-8004 identity · Built for parallel execution ↗\n\nSandbox\nLog in or sign up\nEnter your email\nContinue\n\nOR\n\nSign in with Passkey\n\nOR\n\nMetaMask\nCoinbase\nWalletConnect\nView all wallets\n580+ available\nPowered by",
       "semantics": []
     },
     {
@@ -44,7 +44,7 @@
       "name": "New visitor can open wallet authentication",
       "width": 390,
       "passed": true,
-      "dialogText": "d Observer\nERC-8004 #1\n\nPublishes live Monad Testnet block metadata through a read-only MCP tool for agent workflows.\n\nOwner 0x5d8853…e02f57\nUnrated\nView agent\nAetheris Checksum Agent\nERC-8004 #2\n\nRuns deterministic browser checksum tasks through Aetheris on Monad Testnet. No AI model or external MCP service is provided.\n\nOwner 0xce77b0…ebdd22\nUnrated\nView agent\nAgent stats\nBlock 70,135,164\nTask activity\nCompleted task lanes\n22\n22\nIndexed total\nAll indexed completions · through block 70135161\n2\nAgent #1\n20\nAgent #2\nIndexed completions · agents shown above\nNetwork activity\n\nTransactions per block on Monad Testnet\n\n0\n3\n6\n#70135153\n#70135164\nRPC sample · 12 blocks · network-wide transactions\nView block samples\nExplore task lanes\nAt a glance\nRegistered agents\n2\n2\nLive registry\nPublic on-chain agent identities\nObserved Monad TPS\n9.3\n9.3\nLive data\nNetwork transactions / second · 3s sample\nMicropayments settled\n—\nNo demo result\nConfirmed payments from the live task run\nData source & freshness\n+\nYOUR FIRST LIVE RUN\nFrom sign-in to settlement.\n\nCreate your own agent, authorize its executor, and run five tasks.\n\nGuided preview\nLive testnet\n\nMonad Testnet · real signatures, real testnet token payments.\n\nYOUR WALLET · YOUR AGENT\nGet ready for a live run\nSetup needed\n1\nConnectCurrent step\n2\nRegisterNext\n3\nAuthorizeNext\n4\nFundNext\n5\nRunNext\nConnect the wallet that will own your agent.\n\nChoose email, a wallet, or an existing passkey in the sign-in window. Registration and executor approval happen after you connect.\n\nConnect wallet to begin\nIndependent tasks. Verifiable receipts.\nERC-8004 identity · Built for parallel execution ↗\n\nSandbox\nLog in or sign up\nEnter your email\nContinue\n\nOR\n\nSign in with Passkey\n\nOR\n\nMetaMask\nCoinbase\nWalletConnect\nView all wallets\n580+ available\nPowered by",
+      "dialogText": "sks and inspect their on-chain receipts.\n\n+\nSet up your agent\nRegistered agents\nView directory\nAetheris Monad Observer\nERC-8004 #1\n\nPublishes live Monad Testnet block metadata through a read-only MCP tool for agent workflows.\n\nOwner 0x5d8853…e02f57\nUnrated\nView agent\nAetheris Checksum Agent\nERC-8004 #2\n\nRuns deterministic browser checksum tasks through Aetheris on Monad Testnet. No AI model or external MCP service is provided.\n\nOwner 0xce77b0…ebdd22\nUnrated\nView agent\nAgent stats\nBlock 70,145,143\nTask activity\nCompleted task lanes\n22\n22\nIndexed total\nAll indexed completions · through block 70145139\n2\nAgent #1\n20\nAgent #2\nIndexed completions · agents shown above\nNetwork activity\n\nTransactions per block on Monad Testnet\n\n0\n2\n4\n#70145132\n#70145143\nRPC sample · 12 blocks · network-wide transactions\nView block samples\nExplore task lanes\nAt a glance\nRegistered agents\n2\n2\nLive registry\nPublic on-chain agent identities\nObserved Monad TPS\n5.5\n5.5\nLive data\nNetwork transactions / second · 4s sample\nMicropayments settled\n—\nNo demo result\nConfirmed payments from the live task run\nData source & freshness\n+\nYOUR FIRST LIVE RUN\nFrom sign-in to settlement.\n\nCreate your own agent, authorize its executor, and run five tasks.\n\nGuided preview\nLive testnet\n\nMonad Testnet · real signatures, real testnet token payments.\n\nLive demo is not available yet\n\nThe testnet task service could not be reached or its payment settings are unavailable. It may be waking up. Check the connection again shortly, or explore the guided preview.\n\nCheck connection again\nIndependent tasks. Verifiable receipts.\nERC-8004 identity · Built for parallel execution ↗\n\nSandbox\nLog in or sign up\nEnter your email\nContinue\n\nOR\n\nSign in with Passkey\n\nOR\n\nMetaMask\nCoinbase\nWalletConnect\nView all wallets\n580+ available\nPowered by",
       "semantics": []
     },
     {
@@ -75,6 +75,18 @@
   "fonts": [
     {
       "url": "https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap",
+      "status": 200
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/josefinsans/v34/Qw3aZQNVED7rKGKxtqIqX5EUDXx4.woff2",
+      "status": 200
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap",
+      "status": 200
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/josefinsans/v34/Qw3aZQNVED7rKGKxtqIqX5EUDXx4.woff2",
       "status": 200
     },
     {
@@ -161,6 +173,36 @@
     }
   ],
   "exceptions": [],
+  "httpErrors": [
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config",
+      "status": 503
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config",
+      "status": 503
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config?agentId=1",
+      "status": 503
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config",
+      "status": 503
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config",
+      "status": 503
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config",
+      "status": 503
+    },
+    {
+      "url": "https://monad-astheris.vercel.app/api/demo/config?agentId=1",
+      "status": 503
+    }
+  ],
   "steps": [
     {
       "name": "overview-first-view",
@@ -175,7 +217,8 @@
         "Task activity",
         "Network activity",
         "At a glance",
-        "From sign-in to settlement."
+        "From sign-in to settlement.",
+        "Live demo is not available yet"
       ],
       "alerts": [
         ""
@@ -197,7 +240,8 @@
         "Task activity",
         "Network activity",
         "At a glance",
-        "From sign-in to settlement."
+        "From sign-in to settlement.",
+        "Live demo is not available yet"
       ],
       "alerts": [
         ""
@@ -270,8 +314,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent.",
+        "Live demo is not available yet",
         "Log in or sign up"
       ],
       "alerts": [
@@ -295,8 +338,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent.",
+        "Live demo is not available yet",
         "Log in or sign up"
       ],
       "alerts": [
@@ -320,8 +362,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent."
+        "Live demo is not available yet"
       ],
       "alerts": [
         ""
@@ -344,8 +385,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent.",
+        "Live demo is not available yet",
         "Log in or sign up"
       ],
       "alerts": [
@@ -444,7 +484,8 @@
         "Aetheris Monad Observer",
         "Request Observer access",
         "Indexed task history",
-        "Passkeys & task authority"
+        "Passkeys & task authority",
+        "Your wallet. Your agents."
       ],
       "alerts": [
         ""
@@ -455,12 +496,12 @@
           "modal": null,
           "label": null,
           "labelledBy": "access-title",
-          "text": "YOUR AGENT. YOUR PERMISSION.\nPasskeys & task authority\n\nConnect your wallet, then choose who can execute tasks and for how long.\n\n×\n\nLoading wallet access…",
+          "text": "YOUR AGENT. YOUR PERMISSION.\nPasskeys & task authority\n\nConnect your wallet, then choose who can execute tasks and for how long.\n\n×\nYour wallet. Your agents.\n\nSign in with email or a wallet, then manage your agent's execution permissions.\n\nSign in with passkey\nUse a passkey previously registered on this site. New here? Sign in with email or a wallet first.\nAgent ID\nExecutor wallet\nAuthorization\n1 hour\n6 hours\n24 hours\n7 days\nRevoke access\nAuthorize executor\n\nThe executor may create and execute tasks for this agent until expiry. This permission does not transfer the agent identity or grant access to wallet funds.",
           "box": {
             "left": 332.5,
             "right": 1092.5,
-            "top": 407.65625,
-            "bottom": 592.328125
+            "top": 237.71875,
+            "bottom": 762.265625
           }
         }
       ],
@@ -665,8 +706,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent."
+        "Live demo is not available yet"
       ],
       "alerts": [
         ""
@@ -689,8 +729,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent."
+        "Live demo is not available yet"
       ],
       "alerts": [
         ""
@@ -763,8 +802,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent.",
+        "Live demo is not available yet",
         "Log in or sign up"
       ],
       "alerts": [
@@ -788,8 +826,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent.",
+        "Live demo is not available yet",
         "Log in or sign up"
       ],
       "alerts": [
@@ -813,8 +850,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent."
+        "Live demo is not available yet"
       ],
       "alerts": [
         ""
@@ -835,8 +871,7 @@
         "Network activity",
         "At a glance",
         "From sign-in to settlement.",
-        "Get ready for a live run",
-        "Connect the wallet that will own your agent.",
+        "Live demo is not available yet",
         "Log in or sign up"
       ],
       "alerts": [
@@ -1144,7 +1179,7 @@
       "ethereumProvider": false
     }
   ],
-  "completedAt": "2026-10-11T14:28:44.519Z",
+  "completedAt": "2026-10-11T15:18:43.234Z",
   "passed": true,
-  "scope": "Production baseline, isolated Edge without wallet extension; 13 no-wallet route/preview/search/shard checks. Auth focus acceptance is separate."
+  "scope": "Deployed remediation frontend; isolated Edge at 1440/390, no wallet extension, no authentication/signing/paid requests. Actual APIs, no replay. Separate auth evidence tests keyboard behavior."
 }

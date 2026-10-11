@@ -4,6 +4,16 @@ The daemon already records task, payment, signer and Merkle state in one ACID re
 
 **Production status, October 11, 2026 at 13:09 UTC: BLOCKED.** A read-only Render management query still reports plan `free`, no attached disk, and automatic deployment disabled. Local recovery tests and the new configuration guards do not establish durable production storage. No Render setting or running process was changed for this work.
 
+## Latest service outage, October 11 at 15:20 UTC
+
+**Live task availability: FAIL.** Direct daemon `/health` and `/v1/config` returned empty HTTP 503 responses; the frontend `/api/demo/config` also returned 503 with `enabled: false`. The [sanitized management/log evidence](../submission/2026-10-11/final-readiness-daemon-latest.json) still identifies deployment `59b115336da2c9e5dedb79d7c17eb72d5f761a1c`, deployed at 00:50 UTC. The frontend release did not deploy the daemon.
+
+The daemon logged `merkle_worker_failed` at 15:14:30 and 15:15:58 UTC. Render recorded a failed HTTP health check with status 503 at 15:16:48, with similar failures earlier in the day. One discovery-read retry warning preceded the first captured terminal error. The deployed wrapper discards the underlying error and logs only the static category, so the exact terminal cause is **unknown**. This evidence does not establish a cold start or exhaustion of the five-read-retry budget. Canonical-chain mismatches and uncertain publication outcomes must continue to stop the worker; they cannot be reclassified as harmless network failures without evidence.
+
+The submission middleware on the deployed revision checks `TASK_SUBMISSION_ENABLED` separately from worker health. Health 503 is not proof that paid admission is disabled. Public Render routing was unavailable during this check; no task POST, signature, payment, restart or configuration change was attempted. The source was left unchanged for this incident.
+
+Before recovery, the operator must establish maintenance admission and exclusive signer ownership, preserve the current journal, and inspect known request IDs, sender nonces, canonical transaction receipts, batch commitments and facilitator settlement records using read-only queries. Resolve uncertain outcomes before an approved restart or migration. Keep original records and backups; do not delete a cursor, replay reservation or broadcast intent to make startup succeed. The migration procedure below applies even if Render reports a deployment as `live`, because that label does not establish healthy execution or retained data.
+
 ## State that must survive
 
 | Journal key family | Purpose |
