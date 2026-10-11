@@ -10,7 +10,8 @@
 .workspace :global(.visualizer-stats strong) { font-size: 27px; }
 .workspace :global(.visualizer-stats strong.small-stat) { font-size: 19px; }
 .workspace :global(.visualizer-stats .muted-text) { margin-bottom: 10px; }
-.workspace :global(.execution-canvas) { background: #242427; padding: 24px; }
+.workspace :global(.execution-canvas) { background: #242427; padding: 24px; max-height: clamp(240px, 55dvh, 560px); overflow: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; scrollbar-color: #717177 #242427; scroll-padding: 16px; }
+.workspace :global(.execution-canvas:focus-visible) { outline: 2px solid var(--accent); outline-offset: -3px; }
 .workspace :global(.router-node) { background: #303033; border-color: #55555b; border-radius: 9px; font-size: 16px; padding: 15px 20px; }
 .workspace :global(.router-node small) { color: #b2b2b8; }
 .workspace :global(.shard-node) { background: #303033; color: #cfcfd3; border-color: #4b4b50; border-radius: 9px; padding: 16px; }

@@ -1,0 +1,473 @@
+{
+  "startedAt": "2026-10-11T16:14:58.033Z",
+  "base": "http://127.0.0.1:3012",
+  "revision": "6fb5b024b42799e39baab291a39ab35cc56acda5",
+  "workingTree": "UI scroll and sticky-header changes under test",
+  "viewportHeight": 1000,
+  "checks": [
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 1440,
+      "route": "/",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 166,
+        "height": 166,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 1425,
+        "width": 1440,
+        "padding": 182,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 1440,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 1440,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 1440,
+      "route": "/",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 1440,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 166,
+        "height": 166,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 607,
+        "scrollWidth": 1425,
+        "width": 1440,
+        "padding": 182,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 166,
+        "height": 166,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 1425,
+        "width": 1440,
+        "padding": 182,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Task records anchor stays visible below sticky header",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "headerBottom": 166,
+        "targetTop": 201.8125,
+        "targetBottom": 283.5,
+        "hash": "#task-history"
+      }
+    },
+    {
+      "name": "Shard map is bounded and labeled for keyboard scrolling",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "height": 550,
+        "clientHeight": 549,
+        "scrollHeight": 1104,
+        "tabIndex": 0,
+        "role": "region",
+        "label": "Every lane has an address",
+        "overflow": "auto",
+        "outline": "none",
+        "shards": 22,
+        "pageY": 1653,
+        "top": 182.421875
+      }
+    },
+    {
+      "name": "PageDown scrolls shard map without scrolling page",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "pageY": 1653,
+        "innerY": 452,
+        "focused": "execution-canvas"
+      }
+    },
+    {
+      "name": "Tab reaches interactive shard from scrolling region",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "inShard": true,
+        "outline": "solid"
+      }
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 390,
+      "route": "/",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 205,
+        "height": 205,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 375,
+        "width": 390,
+        "padding": 221,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 390,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 390,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 390,
+      "route": "/",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 390,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 390,
+      "route": "/agents",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 205,
+        "height": 205,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 375,
+        "width": 390,
+        "padding": 221,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 390,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 390,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 390,
+      "route": "/agents",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 390,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 205,
+        "height": 205,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 375,
+        "width": 390,
+        "padding": 221,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Task records anchor stays visible below sticky header",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "headerBottom": 205,
+        "targetTop": 240.65625,
+        "targetBottom": 362.046875,
+        "hash": "#task-history"
+      }
+    },
+    {
+      "name": "Shard map is bounded and labeled for keyboard scrolling",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "height": 550,
+        "clientHeight": 549,
+        "scrollHeight": 3336,
+        "tabIndex": 0,
+        "role": "region",
+        "label": "Every lane has an address",
+        "overflow": "auto",
+        "outline": "none",
+        "shards": 22,
+        "pageY": 2641,
+        "top": 220.890625
+      }
+    },
+    {
+      "name": "PageDown scrolls shard map without scrolling page",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "pageY": 2641,
+        "innerY": 452,
+        "focused": "execution-canvas"
+      }
+    },
+    {
+      "name": "Tab reaches interactive shard from scrolling region",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "inShard": true,
+        "outline": "solid"
+      }
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "No unhandled browser exceptions",
+      "passed": true
+    }
+  ],
+  "blockedWrites": [
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    }
+  ],
+  "exceptions": [],
+  "screenshots": [
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/sticky-overview-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/sticky-agents-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/sticky-visualizer-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/bounded-shard-map-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/notification-over-header-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/sticky-overview-390.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/sticky-agents-390.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/sticky-visualizer-390.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/bounded-shard-map-390.png",
+    ".tools/bounty-layout-checks/2026-10-11T16-14-58-028Z/notification-over-header-390.png"
+  ],
+  "observations": [],
+  "completedAt": "2026-10-11T16:15:27.394Z",
+  "passed": true
+}

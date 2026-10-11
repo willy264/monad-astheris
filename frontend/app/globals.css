@@ -22,10 +22,11 @@
   --jam: #ef4444;
   --card-radius: 12px;
   --card-gap: 14px;
+  --app-header-height: 168px;
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--app-header-height) + 16px); }
 [id] { scroll-margin-top: 24px; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans), Arial, sans-serif; font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 button, input, select { font: inherit; }
@@ -234,7 +235,6 @@ tr:last-child td { border-bottom: 0; }
   .pagination-count { text-align: left; }
 }
 @media (max-width: 640px) {
-  html { scroll-padding-top: 20px; }
   .page-heading { gap: 18px; }
   .page-heading p { font-size: 13px; }
   .eyebrow { font-size: 10px; letter-spacing: .11em; }

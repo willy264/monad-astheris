@@ -1,4 +1,4 @@
-.header { color: #f4f4f5; background: #171719; }
+.header { position: sticky; top: 0; z-index: 50; color: #f4f4f5; background: #171719; box-shadow: 0 8px 18px #0002; }
 .topRow, .navigationRow { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 40px; border-bottom: 1px solid #414146; }
 .topRow { min-height: 88px; }
 .brand { display: inline-flex; align-items: center; gap: 12px; color: #f4f4f5; font-family: var(--font-display), sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -.025em; line-height: 1; text-decoration: none; white-space: nowrap; }

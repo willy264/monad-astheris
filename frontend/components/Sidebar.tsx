@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSnapshot } from '@/lib/queries';
 import { networkStatus } from '@/lib/network-status';
 import { Icon } from './Icon';
@@ -17,16 +17,29 @@ const navigation = [
 ] as const;
 
 export default function Sidebar() {
+  const header = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const snapshot = useSnapshot();
   const [now, setNow] = useState(0);
+  useEffect(() => {
+    const element = header.current;
+    if (!element) return;
+    const updateHeight = () => document.documentElement.style.setProperty('--app-header-height', `${element.getBoundingClientRect().height}px`);
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.removeProperty('--app-header-height');
+    };
+  }, []);
   useEffect(() => {
     setNow(Date.now());
     const timer = setInterval(() => setNow(Date.now()), 12000);
     return () => clearInterval(timer);
   }, []);
   const network = networkStatus(snapshot.data, snapshot.isError, now || Date.now());
-  return <header className={styles.header} data-testid="app-header">
+  return <header ref={header} className={styles.header} data-testid="app-header">
     <div className={styles.topRow}>
       <Link href="/" className={styles.brand} aria-label="Aetheris home" title="Aetheris home"><Image src="/brand/aetheris-logo.svg" alt="" width={38} height={38} priority /><span>Aetheris</span></Link>
       <div className={styles.account}>
