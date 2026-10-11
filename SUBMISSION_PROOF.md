@@ -1,5 +1,7 @@
 # Aetheris live evidence
 
+Evidence files identified as local files below are retained only in the verification workspace and are not published in this repository. Existing linked transaction evidence remains available in the repository.
+
 Updated **2026-10-11**. Agent #2 has **15 indexed task completions** on **Monad Testnet, chain 10143**. The hosted worker has now automatically published the ten latest outstanding batches; together with earlier evidence, all **16 task batches** across Agents #1 and #2 have verified commitments. The original five-task self-service run includes independently checked registration, delegation, task and payment receipts. The additional batch evidence verifies canonical tasks and commitments without reconstructing original browser signatures or payment linkage. Physical passkey enrollment and explicit delegation revocation remain unverified.
 
 ## Automatic batch publication, October 11
@@ -132,10 +134,16 @@ pnpm verify-mcp https://monad-astheris.vercel.app/api/mcp
 
 Use Node 24+ for the whole repository and pnpm 10.32.1. The [October 7 MCP report](submission/2026-10-07/mcp.json) passed 11 checks. The [generated live checks](submission/LIVE_CHECKS.md) and [verification record](VERIFICATION.md) retain reproducibility details. Preserve the completed private task journal when using the client again; a new run is a new paid operation, not a way to regenerate this receipt.
 
+## October 11 readiness audit
+
+The fresh browser audit (local file: `submission/2026-10-11/readiness-browser-audit.json`) exercised the public site on desktop and mobile. The backend audit (local file: `submission/2026-10-11/readiness-backend-audit.json`) confirmed 16 completed tasks, 16 verified roots, matching deployed runtime code, funded Agent #2 ownership and an expired daemon grant. The live MCP check (local file: `submission/2026-10-11/readiness-mcp-protocol.json`) passed all 11 checks. This was read-only verification, with no new user authentication, signatures or paid run.
+
+MetaMask's current scan still returns `BLOCK`, Dynamic's display name remains `uiriamuzu`, and all four Monadscan contract pages still invite source-code verification. The runtime checks above are distinct from accepted explorer source verification. See the [prioritized readiness report](docs/submission-readiness.md) and [manual test guide](frontend/docs/manual-test-guide.md) for closure criteria.
+
 ## Remaining scope
 
 - **Website security classification:** earlier user screenshots show MetaMask classifying the production domain as malicious. Investigation and provider review remain unresolved; later successful user transactions do not clear the classification. Dynamic's configured name `uiriamuzu` explains the unexpected sign-in wording; it does not establish the classification's cause. See the [review record and unsent support request](submission/2026-10-07/wallet-security-review.md). No clearance or completed device ceremony is claimed.
-- **Physical passkey enrollment/sign-in:** the user reported that the registration button did not open a prompt. [PR #40](https://github.com/willy264/monad-astheris/pull/40) passed 61 frontend tests, builds and CI and merged as `4d8222d`. Vercel deployed it successfully at 21:00:54 UTC. The [production check](submission/2026-10-07/passkey-production-smoke.json) verified its assets and page/dialog rendering, then hit Dynamic settings HTTP 429 during fresh-session initialization. The complete authentication smoke and actual device ceremony remain unverified; retries stopped.
+- **Physical passkey enrollment/sign-in:** the user reported that registration did not open a prompt. PR #40 deployed a fix; its October 7 check subsequently encountered Dynamic HTTP 429. The fresh October 11 browser audit can open the login choices, but no physical enrollment or subsequent authenticated passkey sign-in has been verified. Resolve the website classification before the device test.
 - **Explicit delegation revocation:** the grant and authorized execution are verified. Revocation was requested but is not yet verified. The saved grant expires at `2026-10-07T21:26:38Z`; scheduled expiry is not a recorded revoke transaction or a verified post-revocation rejection.
 - **Browser authorization evidence:** the original five paid browser checksum tasks include independent payment-receipt evidence; all fifteen Agent #2 tasks now have canonical batch commitments. Preserve the browser journal to permit independent per-task payment/signature reconstruction; the batch publication does not reconstruct those original authorizations.
 - **Durable hosting/recovery:** Render's free ephemeral filesystem does not establish durable payment-journal retention. Backups, restart recovery and exclusive signer handoff need production-grade operation.

@@ -1,0 +1,16 @@
+.pageHeading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 4px 0 25px; margin-bottom: 26px; border-bottom: 1px solid #414146; }
+.pageHeading h1 { color: #f4f4f5; font-size: clamp(25px, 2.4vw, 32px); line-height: 1.25; font-weight: 650; letter-spacing: -.02em; }
+.pageHeading p { color: #b2b2b8; font-size: 13px; line-height: 1.7; margin-top: 6px; }
+.pageHeading > a { flex-shrink: 0; }
+.directory { min-width: 0; border: 1px solid #414146; border-radius: 12px; padding: 22px; background: #212124; }
+.directory :global(.directory-toolbar) { gap: 16px; margin-bottom: 18px; }
+.directory :global(.search-input) { max-width: 480px; min-height: 42px; background: #303033; border-color: #414146; border-radius: 7px; }
+.directory :global(.search-input input) { font-size: 13px; }
+.directory :global(.notice) { margin-bottom: 18px; }
+.directory :global(.pagination) { border-top: 1px solid #414146; padding-top: 18px; margin: 22px 0 0; gap: 16px; }
+.directory :global(.pagination-controls) { gap: 10px; }
+@media (max-width: 700px) {
+  .pageHeading { align-items: flex-start; flex-direction: column; gap: 16px; padding-bottom: 20px; margin-bottom: 20px; }
+  .directory { padding: 16px; }
+  .directory :global(.search-input) { max-width: none; }
+}

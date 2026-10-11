@@ -24,3 +24,4 @@ contracts/deployments/*.candidate.json
 
 # Local browser profiles and screenshots are never source artifacts.
 frontend/.smoke/
+**/submission/

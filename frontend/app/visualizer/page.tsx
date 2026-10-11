@@ -6,7 +6,7 @@ import { shardDisplay } from '@/lib/shard-history';
 import { activityMetrics } from '@/lib/activity-metrics';
 import { explorerAddress, truncate } from '@/lib/contracts';
 import { Icon } from '@/components/Icon';
-import { EmptyState, LiveStatus, Notice, PageHeading } from '@/components/Shared';
+import { EmptyState, LiveStatus, Notice } from '@/components/Shared';
 import { ShardTable } from '@/components/ShardTable';
 import { SequenceNonce } from '@/components/SequenceNonce';
 import { MerkleBatches, SourceNotice } from '@/components/IndexedData';
@@ -21,9 +21,9 @@ export default function Visualizer() {
   const metrics = activityMetrics(data);
   const shards = history.shards.filter((shard) => filter === 'all' || shard.status === filter);
   const detail = shards.find((shard) => shard.address === selected);
-  return <><PageHeading eyebrow="THE TRAFFIC JAM, EXPLAINED" title="One checkout. Or a lane for every task." description="Switch modes to see the idea. Then follow the actual task records on Monad Testnet below."><LiveStatus /></PageHeading>
+  return <div className={styles.workspace}><header className={styles.pageHeading}><div><h1>Execution & settlement</h1><p>Compare task isolation, then inspect the on-chain record.</p></div><div className={styles.headingActions}><LiveStatus /><a href="#task-history" className="button button-primary">View task records <Icon name="arrow" size={15} /></a></div></header>
     <ExecutionComparison />
-    <div className={styles.liveHeading}><div><span className="eyebrow">ACTUAL TESTNET EVENTS</span><h2>From the idea to the public record.</h2><p>These counts and addresses come from the configured data source.</p></div><span className="tag">{error && data ? 'LAST OBSERVED' : data?.eventsAvailable ? history.indexedHistory ? 'INDEXED TASK HISTORY' : 'LIVE EVENT DATA' : 'WAITING FOR DATA'}</span></div>
+    <div id="task-history" className={styles.liveHeading}><div><h2>Task activity</h2><p>Actual Monad Testnet events and settlement receipts.</p></div><span className="tag">{error && data ? 'LAST OBSERVED' : data?.eventsAvailable ? history.indexedHistory ? 'INDEXED TASK HISTORY' : 'LIVE EVENT DATA' : 'WAITING FOR DATA'}</span></div>
     {error && <Notice error>{error.message} Cached records remain visible if available. <button className="inline-button" onClick={() => void refetch()}>Refresh live data</button></Notice>}{data?.errors.map((message) => <Notice error key={message}>{message}</Notice>)}
     <SourceNotice source={data?.source} />
     {data?.eventsAvailable && <Notice>{history.indexedHistory ? <>Showing the latest indexed task lanes, including earlier runs{history.resultsLimited ? ' (latest 200)' : ''}. </> : <>Task lanes cover the recent block window. </>}{metrics.indexedTotal && <>Total counts include all indexed records through block {metrics.indexedThrough}. </>}Recent execution counts cover blocks {data.fromBlock}–{data.source.indexedThrough ?? data.blockNumber}.</Notice>}
@@ -35,6 +35,6 @@ export default function Visualizer() {
     {detail && <section className="panel shard-detail"><div className="panel-heading"><div><h2>Shard commitment</h2><p>Agent #{detail.agentId}</p></div><button className="button button-small" onClick={() => setSelected(undefined)}>Close</button></div><dl><dt>Contract</dt><dd><a href={explorerAddress(detail.address)} target="_blank" rel="noreferrer">{detail.address} ↗</a></dd><dt>Task ID</dt><dd>{detail.taskId}</dd><dt>Sequence nonce</dt><dd><SequenceNonce value={detail.sequenceNonce} /></dd><dt>Executor</dt><dd>{detail.executor}</dd><dt>Input hash</dt><dd>{detail.inputHash}</dd><dt>Output hash</dt><dd>{detail.outputHash || (history.indexedHistory ? 'No execution indexed yet' : 'No execution observed in this window')}</dd><dt>Proof hash</dt><dd>{detail.proofHash || (history.indexedHistory ? 'No execution indexed yet' : 'No execution observed in this window')}</dd></dl></section>}
     <Notice>Shard isolation separates task storage. Onchain events do not reveal Monad scheduler concurrency or quantify avoided conflicts. {history.indexedHistory ? 'History shows each task’s state through the displayed indexed block.' : 'A created shard may have executed outside the current observation window.'}</Notice>
     <section className="panel"><div className="panel-heading"><div><h2>Shard ledger</h2><p>{history.indexedHistory ? 'Latest indexed task lanes, including earlier runs' : 'Created shards in the recent block window'} · {filter === 'all' ? 'All statuses' : filter === 'created' ? 'Created only' : 'Executed only'}</p></div><span className="tag">{data?.eventsAvailable ? shards.length + ' EVENTS' : 'UNAVAILABLE'}</span></div>{(error && !data) || (data?.routerConfigured && !data.eventsAvailable) ? <EmptyState title="Shard ledger unavailable" description="Reconnect to Monad Testnet to read the event ledger." /> : <ShardTable shards={shards} configured={data?.routerConfigured || false} filtered={filter !== 'all'} indexedHistory={history.indexedHistory} />}</section>
-    {data && <MerkleBatches batches={data.batches} source={data.source} />}
-  </>;
+    {data && <div id="merkle-commitments"><MerkleBatches batches={data.batches} source={data.source} /></div>}
+  </div>;
 }

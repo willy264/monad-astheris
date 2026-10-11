@@ -17,20 +17,20 @@
   border: 1px solid transparent;
   border-radius: 50%;
   background: transparent;
-  color: #b4a7ff;
+  color: #c6c6cd;
   cursor: help;
   touch-action: manipulation;
 }
 
 .trigger:hover,
 .trigger[aria-expanded='true'] {
-  border-color: #836ef966;
-  background: #836ef91a;
-  color: #ddd6ff;
+  border-color: #f5ce3866;
+  background: #f5ce381a;
+  color: #f5d96b;
 }
 
 .trigger:focus-visible {
-  outline: 2px solid #836ef9;
+  outline: 2px solid #f5ce38;
   outline-offset: 3px;
 }
 
@@ -43,11 +43,11 @@
   max-height: calc(100dvh - 24px);
   overflow: auto;
   padding: 14px 16px;
-  border: 1px solid #836ef97a;
+  border: 1px solid #5b5b62;
   border-radius: 12px;
-  background: #171323;
-  box-shadow: 0 14px 44px #0009, 0 0 24px #836ef910;
-  color: #f0edff;
+  background: #303033;
+  box-shadow: 0 10px 28px #0006;
+  color: #f0f0f2;
   font: 400 13px/1.6 var(--font-sans, Arial, sans-serif);
   letter-spacing: normal;
   text-align: left;

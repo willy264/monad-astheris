@@ -1,16 +1,22 @@
 # Understand the Aetheris dashboard
 
+Evidence files identified as local files below are retained only in the verification workspace and are not published in this repository. Existing linked transaction evidence remains available in the repository.
+
 Aetheris gives AI agents an identity and gives each task a separate place to write its result. Imagine five drivers reaching the same narrow junction: updates that need the same storage can get in each other's way. Separate task lanes reduce that shared-storage problem, and public receipts make the recorded results inspectable.
 
 The dashboard explains this idea and shows available blockchain evidence. It does not measure how Monad schedules transactions internally, and separate storage does not guarantee a particular execution speed.
 
 ## A short tour
 
-1. **Overview (`/`):** read the express-lane introduction, check four live metrics, then try the guided demo. In **Live testnet**, use **Get ready for a live run** to connect a wallet, register your own checksum agent, authorize its executors and check funds. Expand **Data source & freshness** to inspect the source. The registry count shows registered identities, not necessarily agents that have completed tasks.
-2. **Agent Directory (`/agents`):** inspect the featured Aetheris Monad Observer, token #1, its IPFS card, published MCP endpoint, reputation and recent task history. Registered identities appear in compact cards; expand **Agent Card & endpoints** for their full description and service details. **Delegate task authority** opens wallet access. **Trigger paid x402 task** becomes available when the real payment service is configured.
+For a complete rehearsal with expected results, see the [manual testing guide](manual-test-guide.md) and [current readiness audit](../../docs/submission-readiness.md).
+
+The [dashboard design notes](dashboard-redesign.md) map the inspected reference to these pages. The [redesign verification](design-redesign-verification.md) records build, interaction and responsive checks separately from the deployed-site audit.
+
+1. **Overview (`/`):** inspect the compact **Registered agents** cards and **Agent stats** panels, then choose **Set up your agent**. Task activity uses indexed completion counts; Network activity plots actual transactions per sampled Monad block; At a glance shows registry, throughput and browser-session payment metrics. In **Live testnet**, use **Get ready for a live run** to connect a wallet, register your own checksum agent, authorize its executors and check funds. Expand **Data source & freshness** to inspect the source. The registry count shows registered identities, not necessarily agents that have completed tasks.
+2. **Agent Directory (`/agents`):** browse registered identities in compact cards; expand **Agent Card & endpoints** for their full description and service details. Below the directory, inspect the featured Aetheris Monad Observer, token #1, its IPFS card, published MCP endpoint, reputation and task history. **Delegate task authority** opens wallet access. **Trigger paid x402 task** becomes available when the real payment service is configured.
 3. **Shard Visualizer (`/visualizer`):** switch between the red shared-storage example and five green isolated lanes. Below the illustration, the actual topology and ledger show recorded task events. Select a real shard to inspect its commitments.
 
-The global sidebar provides **Passkey sign-in** on all three pages. One Dynamic wallet session is shared across navigation and both paid workflows. The connected-wallet button opens the access dialog for passkey registration and expiring delegation. Its Monad Testnet badge reports the latest RPC reading's status, not network finality.
+The two-row header keeps the Aetheris home link, network status and **Passkey sign-in** above the **Overview**, **Agent directory** and **Visualizer** navigation. Its search opens and filters the first directory page by agent name, token ID or capability; the directory's own search filters its current page. The same controls are available on all three pages and reflow on mobile. One Dynamic wallet session is shared across navigation and both paid workflows. The connected-wallet button opens the access dialog for passkey registration and expiring delegation. Its Monad Testnet badge reports the latest RPC reading's status, not network finality.
 
 The comparison supports keyboard controls and a pause button. Explanations open by hover, keyboard focus or touch; Escape closes them. Animations respect reduced-motion preferences, and layouts work on mobile.
 
@@ -25,7 +31,8 @@ The comparison supports keyboard controls and a pause button. Explanations open 
 | **Live data** | A reading from the configured source within the displayed observation window. Zero is a valid live reading. |
 | **Last observed** | Previously fetched data retained after a refresh failed. It is not a newly confirmed reading. |
 | **This browser session** on micropayments | Payments verified in the homepage's five-task demo, rather than a network-wide total. The preview and directory task do not increment this card. |
-| **RPC Active** in the sidebar | A recent overview sample reports Monad Testnet chain `10143` and a nonzero block. Failed or stale readings change the status; this is not a `300ms` finality measurement. |
+| **RPC Active** in the header | A recent overview sample reports Monad Testnet chain `10143` and a nonzero block. Failed or stale readings change the status; this is not a `300ms` finality measurement. |
+| **Network activity** | Actual network-wide transactions in the sampled Monad blocks, not Aetheris revenue or a synthetic performance series. Expand **View block samples** for exact values. |
 | **RPC fallback** | Direct contract/event reads are being used because Envio is not configured. |
 | **Root matched** | The indexed task-log batch agrees with its indexed on-chain commitment. This checks recorded hashes, not whether an AI answer is correct. |
 | A green **Verified on Monad** demo lane | Matching task and payment receipts were checked on-chain with two confirmations. The link opens the real execution transaction. |
@@ -55,6 +62,6 @@ The deployed identity and MCP service are recorded in the submission proof. A fu
 
 Agent #1 remains the separately owned **Aetheris Monad Observer**. Its directory action requires that identity's owner or an active delegate. Creating a personal checksum agent does not grant rights to the Observer. Setup receipts and task recovery are kept with the original wallet, deployment and agent; recovery reads existing records and does not automatically send another transaction or payment.
 
-The October 10 [wallet security review](../../submission/2026-10-07/wallet-security-review.md) still recorded a MetaMask website block. Resolve that classification before browser signing; do not bypass the wallet warning. Wallet connection alone does not establish a physical passkey ceremony or a completed live demo.
+The October 11 live audit (local file: `submission/2026-10-11/readiness-backend-audit.json`) still returns a MetaMask website block. Resolve the [classification](../../submission/2026-10-07/wallet-security-review.md) before browser signing; do not bypass the warning. Agent #2's browser tasks have live receipt evidence, but wallet connection alone does not establish a physical passkey ceremony.
 
 Use the repository's [submission proof](../../SUBMISSION_PROOF.md) to distinguish completed live evidence from remaining work. The [verification record](../../VERIFICATION.md) records local checks. More detail is available in the [architecture](../../docs/architecture.md), [protocol](../../docs/protocol.md), and [data/API reference](data-and-api.md).

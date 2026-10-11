@@ -32,7 +32,7 @@ export default function FeaturedAgent() {
   const recent = [...tasks].sort((a, b) => BigInt(a.createdBlock) < BigInt(b.createdBlock) ? 1 : BigInt(a.createdBlock) > BigInt(b.createdBlock) ? -1 : 0).slice(0, 3);
   const historyAvailable = snapshot?.eventsAvailable && !historyError;
   return <section id="agent-1" className={styles.feature} aria-labelledby="featured-agent-title">
-    <div className={styles.featureTop}><span className={styles.eyebrow}>MEET YOUR FIRST AGENT</span><span className={styles.identity}><i />On-chain identity · Monad Testnet</span></div>
+    <div className={styles.featureTop}><span className={styles.eyebrow}>Observer workspace</span><span className={styles.identity}><i />On-chain identity · Monad Testnet</span></div>
     <div className={styles.featureLayout}>
       <div className={styles.profile}>
         <div className={styles.profileHeader}><div className={styles.avatar}><Icon name="agents" size={32} /></div><div><span className={styles.token}>ERC-721 TOKEN #1</span><h2 id="featured-agent-title">{agent.name}</h2></div></div>

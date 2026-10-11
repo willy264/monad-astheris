@@ -1,5 +1,7 @@
 # Verification record
 
+Evidence files identified as local files below are retained only in the verification workspace and are not published in this repository. Existing linked transaction evidence remains available in the repository.
+
 Updated **2026-10-11**. Agent #2 has 15 indexed task completions. Automatic hosted publication added ten finalized Merkle commitments, bringing the deployment total to 16 verified roots across both agents. The original self-service run's registration, delegation, task and payment receipts remain documented separately. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links exact receipts and states the limits of browser authorization evidence. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
 
 **Wallet finding:** earlier user screenshots show a malicious-site classification for the production domain. The [review record](submission/2026-10-07/wallet-security-review.md) documents the unresolved warning and separately confirmed Dynamic display-name mismatch. Automated source checks and later successful user transactions do not clear this classification. Provider review and the physical passkey demonstration remain outstanding.
@@ -98,9 +100,25 @@ The 592-check run covered all three routes at 1440px, 768px, 390px and 320px, th
 
 Earlier feature logs remain available in Git history. Dependency mitigations are documented in the [frontend security notes](frontend/docs/dependency-security.md); these checks are not an independent security audit.
 
+## October 11 submission-readiness audit
+
+A fresh production walkthrough passed **13 functional checks** across 1440px desktop and 390px mobile, with 42 captured stages. It covered navigation, the simulated five-task preview, live setup entry, Dynamic login choices, directory search, agent details, delegation dialog and real shard/batch history. A separate trusted-pointer keyboard check found that Dynamic's login overlay leaves initial focus on the underlying page and does not expose a dialog role; Escape works. The application's own delegation dialog handles focus correctly. Browser audit and screenshots (local file: `submission/2026-10-11/readiness-browser-audit.json`).
+
+Read-only production checks returned 200 for the overview, directory and both paid-demo configurations, confirmed **16 completed task lanes / 16 verified batches**, and matched all four deployed runtime hashes to the manifest. **11 fresh MCP protocol checks passed.** The existing Agent #2 owner held 5.91381612 MON and 20.985 USDC, but its daemon grant had expired. MetaMask's current scan still returned `BLOCK`; Dynamic still advertised `uiriamuzu`. All four explorer pages invited source verification with no verified-source marker. Backend audit (local file: `submission/2026-10-11/readiness-backend-audit.json`), MCP report (local file: `submission/2026-10-11/readiness-mcp-protocol.json`).
+
+No new wallet authentication, physical passkey ceremony, signature, payment, transaction, deployment or external configuration change was performed for this audit. Existing transaction evidence remains separately documented. The [manual testing guide](frontend/docs/manual-test-guide.md) gives the pending user-device and transaction tests.
+
+## October 11 reference-led dashboard redesign
+
+The inspected Dribbble image guided the two-row header, compact agent cards, grouped statistics, charcoal surfaces and yellow actions. The actual local production render was compared alongside the reference. Josefin Sans and Aetheris branding remain; charts use actual indexed task completions and RPC block samples.
+
+Frontend `pnpm test` passed **173 tests**, `pnpm typecheck` passed, and `pnpm build` passed after the mobile fixes. There is no standalone lint script. Browser checks covered Overview, Agent Directory and Visualizer at 1440, 1024, 768, 390 and 320px; the final build was rechecked at 320, 390 and 1440px. A clipped 320px navigation tab and narrow mobile comparison labels were fixed. See the [redesign verification](frontend/docs/design-redesign-verification.md) for actual interaction results, fixture boundaries, screenshots and external-service observations.
+
+These are local redesign checks, not a deployment or new wallet/transaction evidence. The live task configuration was intermittently unavailable; the UI retained explicit unavailable states. An early browser harness blocked Dynamic's public settings POST request; that test restriction must not be treated as evidence of a provider outage. The earlier submission-readiness findings remain separate.
+
 ## Open verification work
 
-- Complete supported-device passkey enrollment/sign-in on the deployed fix after Dynamic's observed settings rate limit clears. The user's last report was that registration opened no prompt.
+- Resolve the current MetaMask domain classification and Dynamic display-name discrepancy, then complete supported-device passkey enrollment/sign-in. Fresh login UI initialization now works; it does not establish a device ceremony or security clearance.
 - Verify explicit delegation revocation and rejected new use afterward. Scheduled expiry alone is not the requested revoke transaction.
 - Retain the original five-task browser journal/request IDs for independent per-task EIP-712/payment linkage; the user-submitted Agent #2 tasks, five matching payments and five finalized Merkle commitments now have canonical receipt evidence.
 - Move Render's journal to persistent storage; test backup, restart and ambiguous-outcome reconciliation. The service has resumed, but free ephemeral hosting is not production-durable.

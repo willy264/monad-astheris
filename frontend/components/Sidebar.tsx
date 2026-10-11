@@ -15,7 +15,7 @@ const navigation = [
   { href: '/visualizer', label: 'Visualizer', icon: 'activity' },
 ] as const;
 
-export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle(): void }) {
+export default function Sidebar() {
   const pathname = usePathname();
   const snapshot = useSnapshot();
   const [now, setNow] = useState(0);
@@ -25,19 +25,24 @@ export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; o
     return () => clearInterval(timer);
   }, []);
   const network = networkStatus(snapshot.data, snapshot.isError, now || Date.now());
-  return <aside className={styles.sidebar} data-testid="app-sidebar" data-collapsed={collapsed} aria-label="Aetheris navigation">
-    <div className={styles.top}>
-      <Link href="/" className={styles.brand} aria-label="Aetheris home" title="Aetheris home"><Image src="/brand/aetheris-logo.svg" alt="" width={38} height={38} priority /><span>AETHERIS<small>AGENT EXPRESS LANES</small></span></Link>
-      <button type="button" className={styles.toggle} data-testid="sidebar-toggle" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!collapsed} aria-controls="sidebar-navigation" onClick={onToggle} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" /><path d="M9 4v16" /><path className={styles.toggleArrow} d="m16 9-3 3 3 3" /></svg></button>
+  return <header className={styles.header} data-testid="app-header">
+    <div className={styles.topRow}>
+      <Link href="/" className={styles.brand} aria-label="Aetheris home" title="Aetheris home"><Image src="/brand/aetheris-logo.svg" alt="" width={38} height={38} priority /><span>Aetheris</span></Link>
+      <div className={styles.account}>
+        <button type="button" className={styles.network} data-state={network.state} onClick={() => void snapshot.refetch()} title={`Monad Testnet 10143 · ${network.label}. Refresh connection.`} aria-label={`Monad Testnet 10143, ${network.label}. Refresh connection.`}><span className={styles.dot} /><span className={styles.networkText}>Monad Testnet<small>{network.label}</small></span><span className={styles.networkRefresh}><Icon name="refresh" size={15} /></span></button>
+        <PasskeyAuth variant="sidebar" />
+      </div>
     </div>
-    <div className={styles.sectionLabel}>WORKSPACE</div>
-    <nav className={styles.nav} id="sidebar-navigation" aria-label="Main navigation">
-      {navigation.map(item => <Link key={item.href} href={item.href} aria-label={item.label} title={item.label} aria-current={pathname === item.href ? 'page' : undefined} className={styles.navLink}><span className={styles.navIcon}><Icon name={item.icon} size={21} /></span><span className={styles.navLabel}>{item.label}</span><span className={styles.activeMark} aria-hidden="true" /></Link>)}
-    </nav>
-    <div className={styles.bottom}>
-      <button type="button" className={styles.network} data-state={network.state} onClick={() => void snapshot.refetch()} title={`Monad Testnet 10143 · ${network.label}. Refresh connection.`} aria-label={`Monad Testnet 10143, ${network.label}. Refresh connection.`}><span className={styles.networkIcon}><Icon name="layers" size={20} /><span className={styles.dot} /></span><span className={styles.networkText}><span>Monad Testnet <b>10143</b></span><small>{network.label}</small></span></button>
-      <PasskeyAuth variant="sidebar" collapsed={collapsed} />
-      <p className={styles.footerNote}>Your agent. Your authority.</p>
+    <div className={styles.navigationRow}>
+      <nav className={styles.nav} aria-label="Main navigation">
+        {navigation.map(item => <Link key={item.href} href={item.href} aria-label={item.label} aria-current={pathname === item.href ? 'page' : undefined} className={styles.navLink}><Icon name={item.icon} size={17} /><span>{item.label}</span></Link>)}
+      </nav>
+      <form className={styles.search} action="/agents" method="get" role="search" aria-label="Search the agent directory">
+        <Icon name="search" size={19} />
+        <label className={styles.searchLabel} htmlFor="global-agent-search">Search agents on the first directory page by name, ID, or capability</label>
+        <input id="global-agent-search" name="q" type="search" placeholder="Search the first directory page…" autoComplete="off" />
+        <button type="submit" aria-label="Search agents" title="Search agents"><Icon name="arrow" size={18} /></button>
+      </form>
     </div>
-  </aside>;
+  </header>;
 }

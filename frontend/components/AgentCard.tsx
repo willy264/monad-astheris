@@ -18,12 +18,11 @@ function metadataLink(uri: string) {
 export default function AgentCard({ agent }: { agent: Agent }) {
   const cardUrl = metadataLink(agent.uri);
   const description = agent.description || 'This agent has not provided a description.';
-  return <article className={styles.card} data-testid={`directory-agent-${agent.id}`} aria-labelledby={`directory-agent-title-${agent.id}`}>
+  return <article id={`registered-agent-${agent.id}`} className={styles.card} data-testid={`directory-agent-${agent.id}`} aria-labelledby={`directory-agent-title-${agent.id}`}>
     <div className={styles.top}>
       <span className={styles.avatar}><Icon name="agents" size={25} /></span>
-      <Tooltip content={glossary.identity} label={`Explain agent ${agent.id} identity`}><span className={styles.identity}>ERC-8004 #{agent.id}</span></Tooltip>
+      <div className={styles.title}><h2 id={`directory-agent-title-${agent.id}`}>{agent.name}</h2><Tooltip content={glossary.identity} label={`Explain agent ${agent.id} identity`}><span className={styles.identity}>ERC-8004 #{agent.id}</span></Tooltip></div>
     </div>
-    <h2 id={`directory-agent-title-${agent.id}`}>{agent.name}</h2>
     <a className={styles.owner} href={explorerAddress(agent.owner)} target="_blank" rel="noreferrer" title={agent.owner} aria-label={`View owner ${agent.owner} on Monad explorer`}>
       <span>Owner</span><code>{truncate(agent.owner)}</code><Icon name="external" size={12} />
     </a>

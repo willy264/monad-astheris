@@ -1,6 +1,6 @@
 # Live testnet and submission workflow
 
-This guide covers the combined task client, contract, dashboard and observer implementation. **Four contracts and agent #1 are already receipt-verified on Monad Testnet; the public observer MCP tool is live.** See [SUBMISSION_PROOF.md](../SUBMISSION_PROOF.md) for the actual addresses, registration transaction, IPFS card and tool output. Paid completion still requires funded authorized wallets, a compatible payment service, actual authentication/delegation checks and hosted indexing. No paid task is claimed.
+This operator guide covers the task client, contracts, dashboard and observer. **As of October 11, 2026, four deployed contracts, two agents, 16 completed tasks and 16 verified batches have live evidence.** See [SUBMISSION_PROOF.md](../SUBMISSION_PROOF.md) for addresses, receipts, Agent #1's IPFS card, MCP output and Agent #2's self-service run. Production Envio and automatic batch publication are active. These setup instructions are for reproducing/configuring the system, not a statement that completed steps must be repeated. Resolve the current wallet-domain classification before new browser signing; consult the [readiness audit](submission-readiness.md) and [manual test guide](../frontend/docs/manual-test-guide.md).
 
 Use Node **24 or newer** for the complete workspace because the Mera package requires it. The scripts package itself supports Node 22+. The [runbook](runbook.md) covers component startup and the [scripts README](../scripts/README.md) describes all client settings and recovery behavior.
 
@@ -68,11 +68,11 @@ The daemon retains its custom Graph Tally mode, but this new client implements t
 
 | Integration | Implemented | Live evidence still needed |
 | --- | --- | --- |
-| Dynamic | Existing passkey actions, wallet connection and expiring executor delegation | Configured Dynamic environment/origin, actual enrollment/sign-in and funded grant/revoke receipts |
+| Dynamic | Wallet connection and expiring executor grants have live evidence; passkey actions are implemented | Correct display name/domain classification, actual physical enrollment/sign-in and explicit revoke/rejected-use evidence |
 | Monad Mera | Separate PRF-backed passkey account and scoped delegation flow; enabled with `NEXT_PUBLIC_MERA_ENABLED=true` | PRF-capable authenticator, stable secure origin, funded derived EOA and a successful delegation ceremony |
-| Envio | Deployment-scoped entities, sync progress, GraphQL reads, independent roots and commitment comparisons | Hosted/local-running indexer with the actual deployment and task events |
+| Envio | Hosted indexer returns actual task events and all 16 matching commitments; automatic publication is evidenced | Ongoing availability and complete historical RPC catch-up are separate operational checks |
 | Chainlink CRE | ERC-165 `onReport` receiver with forwarder/workflow authorization, request/output/domain/time binding and replay protection | Supported target network and official forwarder, real workflow deployment and a delivery transaction |
-| Reputation | Automatic completion record and explicitly reviewed feedback through the task client | Real completion/feedback receipts and directory result |
+| Reputation | A real completion record; support for explicitly reviewed feedback through the task client | Genuine independent reviewed feedback and its directory result; completion alone is not a rating |
 
 Mera derives a secp256k1 EOA through passkey PRF; Dynamic and Mera are separate authentication paths. Neither integration means this application accepts arbitrary raw P-256 signatures in the daemon. See the [frontend README](../frontend/README.md) for the actual SDK behavior and [CRE.md](../contracts/CRE.md) for the exact report ABI, workflow metadata and trust configuration.
 
@@ -101,6 +101,6 @@ pnpm submission-proof
 
 Proof export rechecks receipts and performs no additional reputation/feedback transactions. It never exports payment credentials or active task signatures. The proof collector writes the generated report `submission/LIVE_CHECKS.md`, with actual explorer links, typed task data, and the GraphQL output when present. Root `SUBMISSION_PROOF.md` remains a curated record of the independently verified deployment, registration and MCP evidence. Review the generated report before adding new results to that record; a missing service remains an explicit blocker. It checks the registration/task identity, canonical receipts, token transfer/authorization nonce, complete task-block Merkle tree and on-chain batch. Missing evidence stays marked blocked/unverified. It does not create a fake live manifest.
 
-The GitHub repository is public, so the review email can read it without an invitation. If organizers require collaborator access, obtain their actual GitHub username and required role; an email alone cannot identify the account. No invitation has been sent. The feature branches are being integrated under the current request to synchronize the repository. Cite the final checked commit in the submission; do not treat an earlier branch preview as proof of the integrated release.
+The GitHub repository is public, so reviewers can read it without an invitation. If organizers require collaborator access, obtain their actual GitHub username and required role; an email alone cannot identify the account. No invitation has been sent. Cite the final checked and deployed commit in the submission; do not treat an earlier branch preview as proof of the integrated release.
 
 Primary integration references: [Monad Testnet](https://docs.monad.xyz/developer-essentials/testnet), [Pinata public upload API](https://github.com/PinataCloud/pinata/blob/main/ai-instructions), [Chainlink CRE consumer contracts](https://docs.chain.link/cre/guides/workflow/using-evm-client/onchain-write/building-consumer-contracts). SDK-specific primary links are recorded in the component READMEs.

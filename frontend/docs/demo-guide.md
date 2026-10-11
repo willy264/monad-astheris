@@ -2,13 +2,17 @@
 
 The homepage separates a **Guided preview** from **Live testnet**. Preview works immediately. Live setup lets a visitor register and run their own checksum agent. The directory separately offers one real MCP observation task for Agent #1, which still requires that identity's owner or delegate. Both paid paths need deployed contracts, funded wallets and a running payment-enabled daemon. Neither substitutes invented receipts for a failed live request.
 
+Use the header to move between **Overview**, **Agent directory** and **Visualizer**. Header search opens the first directory page filtered by agent name, ID or capability; **View agent** on an Overview card opens that identity in the directory.
+
+For a concise test checklist with current wallet status and remaining blockers, use the [manual testing guide](manual-test-guide.md). The October 11 live scan still flags the production domain; resolve the [website classification](../../submission/2026-10-07/wallet-security-review.md) before wallet connection/signing. The instructions below describe the intended workflow, not permission to bypass that warning.
+
 ## Run the guided preview
 
-1. [Start the frontend](../README.md#run-locally) and open the homepage.
+1. [Start the frontend](../README.md#run-locally) and open the homepage. Inspect **Registered agents** and **Agent stats**, then select **Set up your agent** to reach the demonstration.
 2. In **From sign-in to settlement**, select **Guided preview**. The homepage opens in **Live testnet** setup by default.
 3. Select **Preview passkey sign-in**, then **Preview 5 Autonomous Tasks**.
 4. Watch the five progress bars finish. Their labels say **Simulated**; there are no transaction links or charges.
-5. Follow **See how parallel lanes work** to `/visualizer` and switch between **Standard EVM Mode** and **Aetheris Parallel Mode**. Explain shared storage versus isolated task lanes, and use **Pause animation** when describing the graph.
+5. Select **Visualizer** in the header, or **Explore task lanes** below Network activity, to open `/visualizer` and switch between **Standard EVM Mode** and **Aetheris Parallel Mode**. Explain shared storage versus isolated task lanes, and use **Pause animation** when describing the graph.
 
 Preview sign-in does not authenticate a wallet. The comparison's collision/delay/efficiency/timing numbers are explicitly illustrative, including `12 re-executions`, `+1,200ms`, `100%` and `300ms`. They do not measure network finality, and shared router state may still contend. The live ledger below the comparison remains a separate view of real events.
 
@@ -49,15 +53,15 @@ The browser client supports x402 v2 `exact` EIP-3009 on Monad Testnet, with one 
 
 ## Run five real testnet tasks
 
-1. Select **Live testnet**, then **Connect wallet to begin** in **Get ready for a live run**. Choose a personal EVM wallet, email wallet or existing passkey through Dynamic. Use **Switch network in wallet** if necessary to select Monad Testnet (`10143`). A daemon relayer cannot also be this task wallet.
+1. From Overview, choose **Set up your agent**, select **Live testnet**, then **Connect wallet to begin** in **Get ready for a live run**. Choose a personal EVM wallet, email wallet or existing passkey through Dynamic. Use **Switch network in wallet** if necessary to select Monad Testnet (`10143`). A daemon relayer cannot also be this task wallet.
 2. Copy the connected address and obtain testnet MON from the [Monad faucet](https://faucet.monad.xyz/). Registration and executor approval each consume gas. Select **Check balances & status** after funding; no private key is requested by the app.
 3. Select **Register my agent** and approve the registration transaction. The new identity belongs to your wallet. Its inline ERC-8004 JSON card describes **Aetheris Checksum Agent**, the browser workload and wallet endpoint; no IPFS upload, external AI model or MCP service is claimed. If you already own an identity, open **Already own an agent? Use its token ID.** and choose **Check ownership** instead.
-4. Select **Authorize for 1 hour**. Review and approve a separate delegation transaction for each listed executor needing authority. Setup checks the receipts and current permissions. It refreshes grants with less than ten minutes remaining before the demo. The identity stays yours; this grants task execution, not access to wallet funds.
+4. Select **Authorize for 1 hour**. Review and approve a separate delegation transaction for each listed executor needing authority. Setup checks the receipts and current permissions. Grants with less than ten minutes remaining require user-approved renewal before the demo. The identity stays yours; this grants task execution, not access to wallet funds.
 5. Fund the same connected wallet with the exact payment token shown. For the configured Circle asset, use the [Circle faucet](https://faucet.circle.com/), choose **USDC → Monad Testnet**, and paste your address. At the recorded price, five tasks require **5,000 base units = 0.005 testnet USDC**; setup gas is separate. Select **Check balances & status** and wait for **Ready to run**.
 6. Check the selected agent, token and recipient, then select **Spawn 5 Autonomous Tasks**. Approve **five task authorizations and five EIP-3009 payment authorizations**. Sign-in does not make the full paid run a single interaction. If the wallet/account/agent changes or the signing window expires, signing stops before dispatch.
 7. After all signatures and the recovery journal are ready, the client dispatches five requests concurrently. Wait for **Verified on Monad** on each lane and inspect its execution receipt. Progress follows service state and receipt checks, not an animation timer.
 
-The recorded October 10 MetaMask scan still classified the deployment domain as blocked. Resolve the [website classification](../../submission/2026-10-07/wallet-security-review.md) before signing; these steps do not advise bypassing a wallet warning. A connected wallet is not evidence of a physical passkey ceremony. The new setup flow is implemented code, not a claim that a visitor has completed a live five-task run.
+The October 11 MetaMask scan still classifies the deployment domain as blocked. Resolve the [website classification](../../submission/2026-10-07/wallet-security-review.md) before signing; these steps do not advise bypassing a warning. A connected wallet is not evidence of a physical passkey ceremony. Agent #2's [original self-service run](../../submission/2026-10-10/self-service-agent2.json) now has registration, delegation, task and payment receipts; all 15 of its indexed tasks have canonical batch commitments. Original browser signatures were not reconstructed by the later batch verification.
 
 The browser computes a small deterministic document/checksum result for each task and commits its hashes. The task labels are presentation labels; no external model or MCP endpoint runs in this five-task flow. The directory workflow below invokes the actual observer MCP service. The [MCP submission client](../../scripts/README.md) is also available for command-line execution. Hardware attestation is not produced by either browser workflow.
 
@@ -65,7 +69,7 @@ The browser computes a small deterministic document/checksum result for each tas
 
 1. Open `/agents#agent-1` on the same origin published in Agent #1's MCP endpoint. Inspect its IPFS card, token ID, owner and reputation. The endpoint is read from the card; the UI does not substitute an invented Render URL.
 2. The directory requests the configured payment service for Agent #1 explicitly. The action remains disabled with **Setup pending** while service configuration is missing or incompatible. A preview on another hostname cannot dispatch the registered service's task. New visitors should use the homepage setup to register their own checksum identity; this does not authorize them for Agent #1.
-3. Connect an authorized EVM wallet using the global sidebar. If needed, the agent owner uses **Delegate task authority** to grant this signer an expiry. The signer must differ from the daemon's relayer accounts and hold the configured payment token.
+3. Connect an authorized EVM wallet using the header wallet control. If needed, the agent owner uses **Delegate task authority** to grant this signer an expiry. The signer must differ from the daemon's relayer accounts and hold the configured payment token.
 4. Select **Trigger paid x402 task**. The client calls the same-origin `/api/mcp` endpoint using the MCP SDK and `get_monad_block`, validates the response, and derives the input/output hashes. This observation is read-only; no payment has been submitted yet.
 5. Approve one EIP-712 task authorization and one EIP-3009 payment authorization. After saving its public journal, the client submits once and follows task and payment receipts.
 6. Wait for **Verified on Monad Testnet**, then open the execution transaction. Use **Recover saved status** after an interrupted or unresolved request.
@@ -88,7 +92,7 @@ New homepage paid journals extend `aetheris:judge-demo:v1` with chain, identity 
 
 Each prepared task is POSTed once. A timeout or ambiguous response leads to **status GET requests only**; the UI does not automatically re-sign, resend a paid request or create a replacement payment. A Web Locks lease and a fresh journal read coordinate tabs so an unfinished run is not overwritten.
 
-Return to the original wallet, deployment and selected agent in **Live testnet**, or the featured directory task, and select **Recover saved status**. Task recovery uses status GETs and RPC reads only, with no new signatures, automatic paid POST or replacement payment. Previously completed lanes are checked on-chain again after a reload. Leaving a page stops its polling; return and recover the existing request.
+Return to the original wallet, deployment and selected agent in **Live testnet**. Saved homepage runs recheck automatically; **Recover saved status** remains a manual fallback and is also available for the featured directory task. Recovery uses status GETs and RPC reads only, with no new signatures, automatic paid POST or replacement payment. Previously completed lanes are checked on-chain again after a reload. Leaving a page stops its polling; return and recover the existing request.
 
 | State | Next action |
 | --- | --- |
@@ -103,7 +107,7 @@ Wallet rejection and ordinary preflight errors can be corrected and retried when
 
 ## Dynamic sign-in and expiring delegation
 
-The global **Passkey sign-in** button uses one Dynamic session shared by the overview, directory and visualizer. After connecting, select the sidebar wallet button to open **Passkeys & task authority**. The directory's **Delegate task authority** opens the same dialog. Homepage setup's **Change wallet** opens the Dynamic profile to manage the task signer. Configure Dynamic's EVM wallets, allowed origin, embedded-wallet/passkey authentication and recovery, then set `NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID` if using a project other than the default Aetheris sandbox. SDK 5.9.2 provides authentication and explicit passkey sign-in/registration actions. Available choices depend on the environment and wallet provider.
+The header **Passkey sign-in** button uses one Dynamic session shared by the overview, directory and visualizer. After connecting, select the header wallet button to open **Passkeys & task authority**. The directory's **Delegate task authority** opens the same dialog. Homepage setup's **Change wallet** opens the Dynamic profile to manage the task signer. Configure Dynamic's EVM wallets, allowed origin, embedded-wallet/passkey authentication and recovery, then set `NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID` if using a project other than the default Aetheris sandbox. SDK 5.9.2 provides authentication and explicit passkey sign-in/registration actions. Available choices depend on the environment and wallet provider.
 
 Dynamic handles WebAuthn challenges, origins and credentials. This application does not extract a P-256 private key or claim to verify raw P-256 signatures on-chain; credential algorithms are selected by the provider. A Dynamic account session alone grants no router permission.
 
