@@ -15,6 +15,7 @@
 | Guided preview | **Set up your agent** → **From sign-in to settlement** → **Guided preview** → **Preview passkey sign-in** → **Preview 5 Autonomous Tasks**. | Five lanes finish as **Simulated**, without transaction links, signatures or charges. |
 | Directory | Open `/agents`. Search `Checksum`, clear the search, then expand **Agent Card & endpoints**. | Agent #2 matches; clearing shows both agents at audit time. Cards show actual identity/capability data. `Unrated` is valid without reviews. |
 | Observer | Inspect Agent #1's owner, IPFS card, MCP endpoint and indexed task history. | The Observer has separate ownership and permissions. A new user's wallet is not automatically authorized for it. |
+| Access notifications | Open the header bell and the Observer’s **Request Observer access** panel. | The private inbox requires a connected wallet and message signature. It must not display invented requests or claim a delegation before approval. See the [two-wallet access-request test](access-requests.md#two-wallet-acceptance-test). |
 | Illustration | Open `/visualizer`; switch **Standard EVM Mode** / **Aetheris Parallel Mode**, then **Pause animation**. | The explanatory animation changes and pauses. Its timing/collision figures are illustrative. |
 | Real history | Scroll below the illustration; use **All / Created / Executed**, select a shard and open a transaction. | Real agent, task, shard and hashes appear. All 16 tasks were executed at audit time, so an empty Created filter is expected. |
 | Commitments | Scroll to **Merkle commitments**. | Known batches show **Root matched** with explorer links. The latest-12 table can contain fewer rows than the total. |
@@ -58,7 +59,7 @@ Perform these after the successful run. Record the selected agent/network, visib
 
 | Test | Expected result |
 | --- | --- |
-| Your Agent #2 wallet opens Observer #1 | Its paid action stays disabled and points to your own agent. This is correct permission isolation. |
+| A wallet without Agent #1 authority opens Observer #1 | Its paid action stays disabled. The wallet can request expiring access from the owner or continue with its own agent. Sending the request alone does not grant authority. |
 | Wrong network | Setup requests switching to 10143; no task is submitted on the other network. |
 | Reject registration/delegation | Show rejection or unresolved-transaction recovery instructions; never show confirmed permission without a receipt. |
 | Reject task/payment signing before dispatch | Do not dispatch the five-task run. Preserve any uncertain state for reconciliation. |
@@ -83,7 +84,7 @@ Authentication does not grant executor permission. Raw P-256 verification on the
 
 ## 7. Optional Observer, feedback and validation checks
 
-- **Trigger paid x402 task** requires Observer #1's owner/active delegate, using a signer distinct from daemon relayers. Your Agent #2 wallet is not currently authorized. Judges can inspect the existing Observer receipt; owner approval for Agent #1 is not the default new-user path.
+- **Trigger paid x402 task** requires Observer #1's owner/active delegate, using a signer distinct from daemon relayers. To obtain access, follow the [access-request guide](access-requests.md): send a request, review it from the owner’s inbox, then verify the approved or denied notification from the requester’s wallet. Recheck current authority rather than relying on an earlier wallet status. Judges can also inspect the existing Observer receipt; running their own agent does not depend on this owner approval.
 - To test live MCP without any wallet, run `pnpm verify-mcp https://monad-astheris.vercel.app/api/mcp` from `scripts` with dependencies installed. Expect 11 passing checks. This is a free read, not another paid task.
 - For reputation, an eligible independent reviewer must assess the actual output and supply a rating. Verify its transaction and directory result. Completion alone must not create a quality score.
 - Inspect the existing validation request/response in [SUBMISSION_PROOF.md](../../SUBMISSION_PROOF.md). It is project-controlled byte/RPC integrity validation, not independent AI-quality approval or a TEE result.

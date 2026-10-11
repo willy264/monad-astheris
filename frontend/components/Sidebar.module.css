@@ -52,6 +52,7 @@
   .search { min-width: 0; min-height: 42px; }
   .search input { min-height: 42px; font-size: 12px; }
 }
+@media (max-width: 480px) { .brand span { display: none; } }
 @media (max-width: 380px) {
   .topRow, .navigationRow { padding-right: 14px; padding-left: 14px; }
   .brand { gap: 6px; font-size: 20px; }

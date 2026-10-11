@@ -6,6 +6,7 @@ import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import { dynamicEnvironmentId } from '@/lib/dynamic-config';
 import { monadTestnet } from '@/lib/contracts';
 import { AccessContext, type AccessSession } from './AccessContext';
+import AccessRequestsProvider from './AccessRequestsProvider';
 import styles from './PasskeyAuth.module.css';
 
 const WalletAccess = dynamic(() => import('./WalletAccess'), { ssr: false, loading: () => <p>Loading wallet access…</p> });
@@ -54,7 +55,7 @@ function AccessController({ children }: { children: ReactNode }) {
     ready: sdkHasLoaded, address: primaryWallet?.address,
     openSignIn: () => setShowAuthFlow(true), openAccess, withWalletPrompt,
   }), [sdkHasLoaded, primaryWallet?.address, setShowAuthFlow, openAccess, withWalletPrompt]);
-  return <AccessContext.Provider value={session}>{children}
+  return <AccessContext.Provider value={session}><AccessRequestsProvider>{children}</AccessRequestsProvider>
     <dialog ref={dialog} className={styles.dialog} aria-labelledby="access-title" onCancel={event => { event.preventDefault(); close(); }} onClick={event => {
       if (event.target !== event.currentTarget) return;
       const bounds = event.currentTarget.getBoundingClientRect();

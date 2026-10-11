@@ -7,6 +7,7 @@ import { useSnapshot } from '@/lib/queries';
 import { networkStatus } from '@/lib/network-status';
 import { Icon } from './Icon';
 import PasskeyAuth from './PasskeyAuth';
+import AccessNotifications from './AccessNotifications';
 import styles from './Sidebar.module.css';
 
 const navigation = [
@@ -29,6 +30,7 @@ export default function Sidebar() {
     <div className={styles.topRow}>
       <Link href="/" className={styles.brand} aria-label="Aetheris home" title="Aetheris home"><Image src="/brand/aetheris-logo.svg" alt="" width={38} height={38} priority /><span>Aetheris</span></Link>
       <div className={styles.account}>
+        <AccessNotifications />
         <button type="button" className={styles.network} data-state={network.state} onClick={() => void snapshot.refetch()} title={`Monad Testnet 10143 · ${network.label}. Refresh connection.`} aria-label={`Monad Testnet 10143, ${network.label}. Refresh connection.`}><span className={styles.dot} /><span className={styles.networkText}>Monad Testnet<small>{network.label}</small></span><span className={styles.networkRefresh}><Icon name="refresh" size={15} /></span></button>
         <PasskeyAuth variant="sidebar" />
       </div>

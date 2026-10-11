@@ -1,3 +1,4 @@
+mod access;
 mod config;
 mod merkle;
 mod router;
@@ -73,6 +74,7 @@ fn command(args: impl Iterator<Item = String>) -> anyhow::Result<Command> {
     }
 }
 
+#[derive(Debug)]
 pub struct ApiError(StatusCode, String);
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
@@ -179,6 +181,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/health", get(health))
         .route("/v1/config", get(public_config))
         .route("/v1/tasks/{request_id}", get(job))
+        .merge(access::routes())
         .merge(paid)
         .layer(DefaultBodyLimit::max(32 * 1024))
         .layer(cors)

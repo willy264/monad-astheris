@@ -6,6 +6,7 @@ import { Icon } from './Icon';
 import PasskeyAuth from './PasskeyAuth';
 import Tooltip from './Tooltip';
 import AgentTaskAction from './AgentTaskAction';
+import AccessRequestPanel from './AccessRequestPanel';
 import styles from './FeaturedAgent.module.css';
 
 function serviceLink(value: string) {
@@ -53,7 +54,7 @@ export default function FeaturedAgent() {
         <p className={styles.note}>The published MCP endpoint uses JSON-RPC over HTTP POST. Opening its URL in a browser shows protocol instructions.</p>
         <div className={styles.delegate}><PasskeyAuth variant="button" agentId="1" /><span>Delegate task authority with an expiry you control.</span></div>
       </div>
-      <aside className={styles.execution}><AgentTaskAction agentId={agent.id} mcpEndpoint={endpointUrl} /><div className={styles.history}>
+      <aside className={styles.execution}><AgentTaskAction agentId={agent.id} mcpEndpoint={endpointUrl} /><AccessRequestPanel owner={agent.owner} agentId={agent.id} /><div className={styles.history}>
         <div className={styles.historyHeading}><h3>{history.indexedHistory ? 'Indexed task history' : 'Recent task history'}</h3><span>{snapshot?.source.kind === 'envio' ? 'Envio indexed' : 'RPC events'}</span></div>
         {!historyAvailable ? <p className={styles.note}>{historyError || snapshot ? 'Task history is unavailable. The agent’s identity is shown independently.' : 'Checking the latest execution events…'}</p> : recent.length ? <ul>{recent.map(task => <li key={task.address}><div><span>{task.status === 'executed' ? 'Executed' : 'Shard created'}</span><small>Block {task.createdBlock}</small></div><a href={explorerTx(task.executionTransactionHash || task.transactionHash)} target="_blank" rel="noreferrer">{truncate(task.taskId, 5)}<Icon name="external" size={13} /></a></li>)}</ul> : <p className={styles.note}>{history.indexedHistory ? 'No tasks for this agent among the latest indexed task lanes.' : 'No tasks observed in the current event window. A confirmed paid run will leave an explorer receipt here.'}</p>}
         {historyAvailable && <p className={styles.note}>{history.indexedHistory ? <>Latest indexed records through block {history.toBlock}{history.resultsLimited ? ' · Within the latest 200 task lanes' : ''}.</> : <>Blocks {history.fromBlock}–{history.toBlock}{history.resultsLimited ? ' · Results limited' : ''}. This window is not a lifetime total.</>}</p>}

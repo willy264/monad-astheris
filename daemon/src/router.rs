@@ -1,5 +1,6 @@
 use crate::{config::Config, store::Store};
 use alloy::{
+    eips::{BlockId, BlockNumberOrTag},
     network::{EthereumWallet, TransactionBuilder},
     primitives::{keccak256, Address, Bytes, Signature, B256, U256},
     providers::{DynProvider, Provider, ProviderBuilder},
@@ -22,6 +23,8 @@ pub const CHAIN_ID: u64 = 10143;
 sol! {
     #[sol(rpc)]
     interface AetherisRouter {
+        function identityRegistry() external view returns (address);
+        function setDelegate(uint256 agentId, address delegate, uint64 expiresAt) external;
         function createShard(uint256 agentId, bytes32 taskId, uint256 sequenceNonce, address executor, bytes32 inputHash) external returns (address);
         function executeTask(address shard, bytes32 outputHash, bytes32 proofHash) external;
         function predictShardAddress(uint256 agentId, bytes32 taskId, uint256 sequenceNonce, address executor, bytes32 inputHash) external view returns (address);
@@ -32,6 +35,12 @@ sol! {
         event ShardCreated(address indexed shard, uint256 indexed agentId, bytes32 indexed taskId, uint256 sequenceNonce, address executor, bytes32 inputHash);
         event TaskExecuted(address indexed shard, uint256 indexed agentId, bytes32 indexed taskId, bytes32 inputHash, bytes32 outputHash, bytes32 proofHash);
         event MerkleBatchCommitted(bytes32 indexed batchId, bytes32 root, uint256 leafCount, uint256 fromBlock, uint256 toBlock);
+    }
+
+    #[sol(rpc)]
+    interface AccessIdentityRegistry {
+        function ownerOf(uint256 agentId) external view returns (address);
+        function ownershipEpoch(uint256 agentId) external view returns (uint256);
     }
 
     struct TaskAuthorization {
@@ -228,6 +237,17 @@ impl Engine {
 
     /// Persist the tx hash before waiting. A timeout never triggers a replacement submission.
     async fn send(&self, relayer: &Relayer, data: Vec<u8>, journal_key: String) -> Result<B256> {
+        self.send_with_deadline(relayer, data, journal_key, None)
+            .await
+    }
+
+    async fn send_with_deadline(
+        &self,
+        relayer: &Relayer,
+        data: Vec<u8>,
+        journal_key: String,
+        deadline: Option<u64>,
+    ) -> Result<B256> {
         let signer_state_key = format!("relayer:{}:broadcast-state", relayer.address);
         if let Some(Some(previous)) = self
             .store
@@ -255,8 +275,37 @@ impl Engine {
             .get_transaction_count(relayer.address)
             .await?;
         ensure!(nonce == confirmed_nonce, "relayer has an unjournaled pending transaction; reconcile the signer before any new broadcast");
+        let calldata_hash = keccak256(&data);
+        let mut tx = TransactionRequest::default()
+            .with_to(self.router)
+            .with_input(Bytes::from(data))
+            .with_chain_id(CHAIN_ID)
+            .with_nonce(nonce)
+            .with_from(relayer.address);
+        if let Some(deadline) = deadline {
+            ensure!(
+                unix_seconds()? <= deadline,
+                "access approval deadline expired before broadcast"
+            );
+            // Fill RPC-dependent fields before the final deadline check. All
+            // remaining provider fillers use these explicit values and the
+            // local signer; none can defer the deadline check behind another
+            // fee estimate, pending nonce lookup or previous receipt wait.
+            let (gas, fees) = tokio::try_join!(
+                async { relayer.provider.estimate_gas(tx.clone()).await },
+                relayer.provider.estimate_eip1559_fees(),
+            )?;
+            tx = tx
+                .with_gas_limit(gas)
+                .with_max_fee_per_gas(fees.max_fee_per_gas)
+                .with_max_priority_fee_per_gas(fees.max_priority_fee_per_gas);
+            ensure!(
+                unix_seconds()? <= deadline,
+                "access approval deadline expired before broadcast"
+            );
+        }
         let broadcast_key = format!("{journal_key}:broadcast-intent");
-        let intent = serde_json::json!({"nonce":nonce,"sender":relayer.address,"router":self.router,"calldataHash":keccak256(&data)});
+        let intent = serde_json::json!({"nonce":nonce,"sender":relayer.address,"router":self.router,"calldataHash":calldata_hash});
         ensure!(self.store.reserve(broadcast_key,&intent).await?, "prior broadcast intent has no durable transaction hash; reconcile signer nonce before any retry");
         self.store
             .put(
@@ -264,12 +313,17 @@ impl Engine {
                 &Some(serde_json::json!({"nonce":nonce,"journalKey":journal_key,"hash":null})),
             )
             .await?;
-        let tx = TransactionRequest::default()
-            .with_to(self.router)
-            .with_input(Bytes::from(data))
-            .with_chain_id(CHAIN_ID)
-            .with_nonce(nonce)
-            .with_from(relayer.address);
+        if let Some(deadline) = deadline {
+            if unix_seconds()? > deadline {
+                // No send has been attempted on this branch. Preserve the
+                // request's reservation, but do not strand every later task
+                // behind an ambiguous signer state for a known unsent grant.
+                self.store
+                    .put(signer_state_key.clone(), &Option::<serde_json::Value>::None)
+                    .await?;
+                bail!("access approval deadline expired before broadcast");
+            }
+        }
         let pending = relayer.provider.send_transaction(tx).await?;
         let hash = *pending.tx_hash();
         self.store.put(journal_key, &hash).await?;
@@ -397,6 +451,110 @@ impl Engine {
         .await
     }
 
+    /// The access API must verify the owner's exact EIP-712 AccessApproval before
+    /// calling this method. A login/session signature alone is never a grant.
+    /// Use the existing signer queue for shared owner/relayer keys, so a browser
+    /// approval cannot race task or batch transactions for the same nonce.
+    #[allow(clippy::too_many_arguments)]
+    pub async fn approve_access(
+        &self,
+        owner: Address,
+        agent_id: U256,
+        requester: Address,
+        expires_at: u64,
+        ownership_epoch: U256,
+        deadline: u64,
+        request_id: B256,
+    ) -> Result<B256> {
+        ensure!(
+            owner != Address::ZERO
+                && requester != Address::ZERO
+                && requester != owner
+                && agent_id != U256::ZERO
+                && request_id != B256::ZERO,
+            "invalid access approval target"
+        );
+        let relayer = self
+            .relayers
+            .iter()
+            .find(|relayer| relayer.address == owner)
+            .context("owner does not use a coordinated daemon signer")?;
+        let _lock = relayer.lock.lock().await;
+        let key = access_grant_journal_key(request_id);
+        let intent_key = format!("{key}:approval-intent");
+        let intent = serde_json::json!({
+            "router":self.router,"chainId":CHAIN_ID,"owner":owner,"agentId":agent_id,
+            "requester":requester,"expiresAt":expires_at,"ownershipEpoch":ownership_epoch,
+            "deadline":deadline,"requestId":request_id,
+        });
+        if let Some(previous) = self
+            .store
+            .get::<serde_json::Value>(intent_key.clone())
+            .await?
+        {
+            ensure!(
+                previous == intent,
+                "access approval differs from its durable intent"
+            );
+        }
+        // Recovery is read-only even after the signature expires or ownership
+        // changes. The access API independently verifies the resulting receipt
+        // and current grant before publishing the approval notification.
+        if let Some(hash) = self.store.get::<B256>(key.clone()).await? {
+            return self.confirm(relayer, hash).await;
+        }
+        let now = unix_seconds()?;
+        ensure!(
+            deadline >= now && deadline <= now.saturating_add(600),
+            "access approval has expired or its deadline is too distant"
+        );
+        let block = self
+            .provider
+            .get_block_by_number(BlockNumberOrTag::Latest)
+            .await?
+            .context("access approval needs a mined chain head")?;
+        let block_id = BlockId::number(block.header.number);
+        ensure!(
+            deadline >= block.header.timestamp
+                && expires_at > block.header.timestamp
+                && expires_at <= block.header.timestamp.saturating_add(7 * 24 * 3600),
+            "access approval expiry is outside the permitted interval"
+        );
+        let router = AetherisRouter::new(self.router, &self.provider);
+        let identity = router.identityRegistry().block(block_id).call().await?;
+        ensure!(
+            identity != Address::ZERO,
+            "access identity registry is missing"
+        );
+        let registry = AccessIdentityRegistry::new(identity, &self.provider);
+        let owner_call = registry.ownerOf(agent_id).block(block_id);
+        let epoch_call = registry.ownershipEpoch(agent_id).block(block_id);
+        let (current_owner, current_epoch) =
+            tokio::try_join!(owner_call.call(), epoch_call.call())?;
+        ensure!(
+            current_owner == owner && current_epoch == ownership_epoch,
+            "access request ownership has changed"
+        );
+        if !self.store.reserve(intent_key.clone(), &intent).await? {
+            ensure!(
+                self.store.get::<serde_json::Value>(intent_key).await? == Some(intent),
+                "access approval differs from its durable intent"
+            );
+        }
+        self.send_with_deadline(
+            relayer,
+            AetherisRouter::setDelegateCall {
+                agentId: agent_id,
+                delegate: requester,
+                expiresAt: expires_at,
+            }
+            .abi_encode(),
+            key,
+            Some(deadline),
+        )
+        .await
+    }
+
     pub async fn rpc(&self, method: &str, params: serde_json::Value) -> Result<serde_json::Value> {
         let response: serde_json::Value = self
             .http
@@ -418,6 +576,10 @@ impl Engine {
     }
 }
 
+pub fn access_grant_journal_key(request_id: B256) -> String {
+    format!("access-grant:{request_id}")
+}
+
 pub fn storage_salt(agent: U256, task: B256, nonce: U256) -> B256 {
     let mut encoded = Vec::with_capacity(96);
     encoded.extend(agent.to_be_bytes::<32>());
@@ -433,6 +595,276 @@ pub fn unix_seconds() -> Result<u64> {
 mod tests {
     use super::*;
     use alloy::signers::SignerSync;
+
+    #[derive(Clone, Copy)]
+    enum AccessFault {
+        OwnerChanged,
+        EpochChanged,
+        AmbiguousBroadcast,
+        DelayedEstimate(u64),
+    }
+
+    async fn access_fixture(
+        fault: AccessFault,
+    ) -> (
+        Arc<Engine>,
+        Arc<Mutex<Vec<serde_json::Value>>>,
+        tokio::task::JoinHandle<()>,
+        tempfile::TempDir,
+    ) {
+        use alloy::sol_types::SolValue;
+        use axum::{routing::post, Json, Router};
+        use serde_json::{json, Value};
+        let _ = rustls::crypto::ring::default_provider().install_default();
+        let calls = Arc::new(Mutex::new(Vec::<Value>::new()));
+        let captured = calls.clone();
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let endpoint = format!("http://{}", listener.local_addr().unwrap());
+        let app = Router::new().route(
+            "/",
+            post(move |Json(request): Json<Value>| {
+                let calls = captured.clone();
+                async move {
+                    calls.lock().await.push(request.clone());
+                    let result = match request["method"].as_str().unwrap() {
+                        "eth_getTransactionCount" if matches!(fault, AccessFault::DelayedEstimate(_)) => json!("0x0"),
+                        "eth_feeHistory" if matches!(fault, AccessFault::DelayedEstimate(_)) => json!({
+                            "oldestBlock":"0x1","baseFeePerGas":["0x1","0x1"],"gasUsedRatio":[0.5],"reward":[["0x1"]]
+                        }),
+                        "eth_estimateGas" if matches!(fault, AccessFault::DelayedEstimate(_)) => {
+                            if let AccessFault::DelayedEstimate(deadline) = fault {
+                                while unix_seconds().unwrap() <= deadline {
+                                    tokio::time::sleep(Duration::from_millis(20)).await;
+                                }
+                            }
+                            json!("0x186a0")
+                        }
+                        "eth_getBlockByNumber" => {
+                            let mut block = alloy::rpc::types::Block::<
+                                alloy::rpc::types::Transaction,
+                            >::default();
+                            block.header.number = 42;
+                            block.header.timestamp = unix_seconds().unwrap();
+                            block.header.hash = B256::repeat_byte(42);
+                            serde_json::to_value(block).unwrap()
+                        }
+                        "eth_call" => {
+                            assert_eq!(
+                                request["params"][1], "0x2a",
+                                "ownership reads must share a pinned head"
+                            );
+                            let data = request["params"][0]["input"]
+                                .as_str()
+                                .or_else(|| request["params"][0]["data"].as_str())
+                                .unwrap();
+                            let bytes = hex::decode(data.trim_start_matches("0x")).unwrap();
+                            let output = if bytes[..4]
+                                == AetherisRouter::identityRegistryCall::SELECTOR
+                            {
+                                Address::repeat_byte(3).abi_encode()
+                            } else if bytes[..4] == AccessIdentityRegistry::ownerOfCall::SELECTOR {
+                                if matches!(fault, AccessFault::OwnerChanged) {
+                                    Address::repeat_byte(9)
+                                } else {
+                                    Address::repeat_byte(1)
+                                }
+                                .abi_encode()
+                            } else if bytes[..4]
+                                == AccessIdentityRegistry::ownershipEpochCall::SELECTOR
+                            {
+                                U256::from(if matches!(fault, AccessFault::EpochChanged) {
+                                    2
+                                } else {
+                                    1
+                                })
+                                .abi_encode()
+                            } else {
+                                panic!("unexpected access read")
+                            };
+                            json!(format!("0x{}", hex::encode(output)))
+                        }
+                        other => panic!("access preflight must not broadcast: {other}"),
+                    };
+                    Json(json!({"jsonrpc":"2.0","id":request["id"],"result":result}))
+                }
+            }),
+        );
+        let server = tokio::spawn(async move {
+            axum::serve(listener, app).await.unwrap();
+        });
+        let dir = tempfile::tempdir().unwrap();
+        let store = Store::open(dir.path().join("state.redb")).unwrap();
+        if matches!(fault, AccessFault::AmbiguousBroadcast) {
+            store
+                .put(
+                    format!("relayer:{}:broadcast-state", Address::repeat_byte(1)),
+                    &Some(json!({"nonce":7,"hash":null})),
+                )
+                .await
+                .unwrap();
+        }
+        let provider = ProviderBuilder::new()
+            .connect_http(endpoint.parse().unwrap())
+            .erased();
+        let engine = Arc::new(Engine {
+            provider: provider.clone(),
+            router: Address::repeat_byte(2),
+            relayers: vec![Relayer {
+                address: Address::repeat_byte(1),
+                provider,
+                lock: Mutex::new(()),
+            }],
+            permits: Arc::new(Semaphore::new(1)),
+            confirmations: 2,
+            store,
+            http: reqwest::Client::new(),
+            rpc_url: endpoint,
+        });
+        (engine, calls, server, dir)
+    }
+
+    async fn fixture_approval(engine: &Engine) -> Result<B256> {
+        let now = unix_seconds()?;
+        engine
+            .approve_access(
+                Address::repeat_byte(1),
+                U256::from(1),
+                Address::repeat_byte(4),
+                now + 3600,
+                U256::from(1),
+                now + 300,
+                B256::repeat_byte(5),
+            )
+            .await
+    }
+
+    #[tokio::test]
+    async fn access_grant_rechecks_owner_and_transfer_epoch_before_reserving_broadcast() {
+        for fault in [AccessFault::OwnerChanged, AccessFault::EpochChanged] {
+            let (engine, calls, server, _dir) = access_fixture(fault).await;
+            let error = fixture_approval(&engine).await.unwrap_err();
+            assert!(
+                error.to_string().contains("ownership has changed"),
+                "{error:#}"
+            );
+            assert!(engine
+                .store
+                .get::<serde_json::Value>(format!(
+                    "{}:approval-intent",
+                    access_grant_journal_key(B256::repeat_byte(5))
+                ))
+                .await
+                .unwrap()
+                .is_none());
+            assert_eq!(calls.lock().await.len(), 4);
+            server.abort();
+        }
+    }
+
+    #[tokio::test]
+    async fn access_grant_joins_the_task_and_batch_signer_lock() {
+        let (engine, calls, server, _dir) = access_fixture(AccessFault::EpochChanged).await;
+        let guard = engine.relayers[0].lock.lock().await;
+        let shared = engine.clone();
+        let mut approval = tokio::spawn(async move { fixture_approval(&shared).await });
+        assert!(
+            tokio::time::timeout(Duration::from_millis(50), &mut approval)
+                .await
+                .is_err()
+        );
+        assert!(
+            calls.lock().await.is_empty(),
+            "approval read state before acquiring the signer"
+        );
+        drop(guard);
+        let error = approval.await.unwrap().unwrap_err();
+        assert!(error.to_string().contains("ownership has changed"));
+        server.abort();
+    }
+
+    #[tokio::test]
+    async fn access_grant_preserves_ambiguous_signer_journal_and_rejects_changed_intent() {
+        let (engine, calls, server, _dir) = access_fixture(AccessFault::AmbiguousBroadcast).await;
+        let error = fixture_approval(&engine).await.unwrap_err();
+        assert!(
+            error.to_string().contains("ambiguous prior broadcast"),
+            "{error:#}"
+        );
+        let intent_key = format!(
+            "{}:approval-intent",
+            access_grant_journal_key(B256::repeat_byte(5))
+        );
+        let intent = engine
+            .store
+            .get::<serde_json::Value>(intent_key)
+            .await
+            .unwrap()
+            .unwrap();
+        let error = engine
+            .approve_access(
+                Address::repeat_byte(1),
+                U256::from(1),
+                Address::repeat_byte(4),
+                intent["expiresAt"].as_u64().unwrap() + 1,
+                U256::from(1),
+                intent["deadline"].as_u64().unwrap(),
+                B256::repeat_byte(5),
+            )
+            .await
+            .unwrap_err();
+        assert!(error
+            .to_string()
+            .contains("differs from its durable intent"));
+        assert_eq!(
+            calls.lock().await.len(),
+            4,
+            "changed intent must fail before RPC"
+        );
+        server.abort();
+    }
+
+    #[tokio::test]
+    async fn access_grant_deadline_is_rechecked_after_nonce_and_fee_reads() {
+        let deadline = unix_seconds().unwrap() + 2;
+        let (engine, calls, server, _dir) =
+            access_fixture(AccessFault::DelayedEstimate(deadline)).await;
+        let error = engine
+            .send_with_deadline(
+                &engine.relayers[0],
+                vec![1, 2, 3],
+                "expired-approval".into(),
+                Some(deadline),
+            )
+            .await
+            .unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("deadline expired before broadcast"),
+            "{error:#}"
+        );
+        assert!(calls
+            .lock()
+            .await
+            .iter()
+            .any(|call| call["method"] == "eth_estimateGas"));
+        assert!(engine
+            .store
+            .get::<serde_json::Value>("expired-approval:broadcast-intent".into())
+            .await
+            .unwrap()
+            .is_none());
+        assert!(engine
+            .store
+            .get::<serde_json::Value>(format!(
+                "relayer:{}:broadcast-state",
+                Address::repeat_byte(1)
+            ))
+            .await
+            .unwrap()
+            .is_none());
+        server.abort();
+    }
 
     #[tokio::test]
     async fn unknown_broadcast_blocks_a_new_task_before_any_rpc_call() {

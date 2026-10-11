@@ -11,6 +11,7 @@ import { explorerTx, truncate } from '@/lib/contracts';
 import { userErrorMessage } from '@/lib/user-error';
 import { Icon } from './Icon';
 import { useAccessSession } from './AccessContext';
+import { useAccessRequests } from './AccessRequestsContext';
 import styles from './FeaturedAgent.module.css';
 
 const progress = { submitted: 25, accepted: 50, verifying: 80, verified: 100, unresolved: 25 };
@@ -20,6 +21,9 @@ interface TaskProps { config: DemoConfig; mcpEndpoint: string }
 function ObserverSession({ config, mcpEndpoint, walletAddress }: TaskProps & { walletAddress?: Address }) {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { withWalletPrompt } = useAccessSession();
+  const { requests: accessRequests } = useAccessRequests();
+  const accessRevision = accessRequests.filter(request => request.agentId === config.agentId && request.requester.toLowerCase() === walletAddress?.toLowerCase())
+    .map(request => `${request.id}:${request.status}:${request.currentAuthority}`).join(',');
   const [journal, setJournal] = useState<DemoJournal>(); const current = useRef<DemoJournal>();
   const [busy, setBusy] = useState(false); const busyRef = useRef(false);
   const [ready, setReady] = useState(false); const [unreadable, setUnreadable] = useState(false);
@@ -48,7 +52,7 @@ function ObserverSession({ config, mcpEndpoint, walletAddress }: TaskProps & { w
       if (!abort.signal.aborted) setAccess({ allowed: false, message: userErrorMessage(cause, 'Observer access could not be checked. Check access again when Monad Testnet responds.') });
     }).finally(() => { if (!abort.signal.aborted) setChecking(false); });
     return () => abort.abort();
-  }, [config, walletAddress, refresh]);
+  }, [config, walletAddress, refresh, accessRevision]);
   const recoverCurrent = useRef(() => {});
   recoverCurrent.current = () => { void run(true, true); };
   const savedRequest = journal?.records[0].requestId;

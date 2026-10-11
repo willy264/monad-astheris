@@ -8,6 +8,8 @@ The audit covered the deployed [Overview](https://monad-astheris.vercel.app/), [
 
 Use the [manual testing guide](../frontend/docs/manual-test-guide.md) for exact buttons, expected results and evidence to save. [SUBMISSION_PROOF.md](../SUBMISSION_PROOF.md) contains transaction proofs; [VERIFICATION.md](../VERIFICATION.md) records automated checks and their scope.
 
+**Local implementation added after this audit:** Observer #1 now has wallet-authenticated access requests and an owner/requester notification inbox. The owner receives the requester address, reason and duration, can deny with a note, or approve an exact expiring on-chain delegation. This is not yet a deployed two-wallet acceptance result. Deploy the updated daemon and frontend with persistent journal storage, then follow the [access-request testing guide](../frontend/docs/access-requests.md). The earlier live-site findings below remain dated audit evidence.
+
 ## What is already working
 
 | Area | Observed state | Boundary |

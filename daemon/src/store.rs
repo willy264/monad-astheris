@@ -74,6 +74,79 @@ impl Store {
         .await?
     }
 
+    /// Read a bounded, lexically ordered index without exposing unrelated records.
+    pub async fn scan_prefix<T: DeserializeOwned + Send + 'static>(
+        &self,
+        prefix: String,
+        limit: usize,
+    ) -> Result<Vec<T>> {
+        self.scan_prefix_after(prefix, None, limit).await
+    }
+
+    pub async fn scan_prefix_after<T: DeserializeOwned + Send + 'static>(
+        &self,
+        prefix: String,
+        after: Option<String>,
+        limit: usize,
+    ) -> Result<Vec<T>> {
+        let db = self.0.clone();
+        tokio::task::spawn_blocking(move || -> Result<Vec<T>> {
+            let tx = db.begin_read()?;
+            let table = tx.open_table(RECORDS)?;
+            let mut values = Vec::new();
+            let start = after.as_deref().unwrap_or(&prefix);
+            ensure!(
+                start.starts_with(&prefix),
+                "index cursor is outside its prefix"
+            );
+            for entry in table.range(start..)? {
+                let (key, value) = entry?;
+                if after.is_some() && key.value() == start {
+                    continue;
+                }
+                if !key.value().starts_with(&prefix) || values.len() == limit {
+                    break;
+                }
+                values
+                    .push(serde_json::from_slice(value.value()).context("stored index corrupted")?);
+            }
+            Ok(values)
+        })
+        .await?
+    }
+
+    /// Compare all guards and publish all replacements in one ACID transaction.
+    /// Access decisions and their inbox copies must never diverge under concurrent requests.
+    pub async fn compare_and_put(
+        &self,
+        guards: Vec<(String, Option<serde_json::Value>)>,
+        records: Vec<(String, serde_json::Value)>,
+    ) -> Result<bool> {
+        let db = self.0.clone();
+        tokio::task::spawn_blocking(move || -> Result<bool> {
+            let tx = db.begin_write()?;
+            {
+                let mut table = tx.open_table(RECORDS)?;
+                for (key, expected) in &guards {
+                    let current = table
+                        .get(key.as_str())?
+                        .map(|value| serde_json::from_slice::<serde_json::Value>(value.value()))
+                        .transpose()?;
+                    if &current != expected {
+                        return Ok(false);
+                    }
+                }
+                for (key, value) in records {
+                    let bytes = serde_json::to_vec(&value)?;
+                    table.insert(key.as_str(), bytes.as_slice())?;
+                }
+            }
+            tx.commit()?;
+            Ok(true)
+        })
+        .await?
+    }
+
     /// Atomically reserve a request/payment ID; persisted before any external side effect.
     pub async fn reserve<T: Serialize>(&self, key: String, value: &T) -> Result<bool> {
         let db = self.0.clone();

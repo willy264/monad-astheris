@@ -116,6 +116,18 @@ Frontend `pnpm test` passed **173 tests**, `pnpm typecheck` passed, and `pnpm bu
 
 These are local redesign checks, not a deployment or new wallet/transaction evidence. The live task configuration was intermittently unavailable; the UI retained explicit unavailable states. An early browser harness blocked Dynamic's public settings POST request; that test restriction must not be treated as evidence of a provider outage. The earlier submission-readiness findings remain separate.
 
+## October 11 Observer access requests
+
+The [access-request guide](frontend/docs/access-requests.md) documents the private, wallet-authenticated inbox backed by the existing redb journal. Requests include a wallet, reason and duration; the owner can deny with a note or approve an expiring delegation. Inbox authentication does not authorize a grant. For the shared owner/relayer key, a separate exact `AccessApproval` signature is required and the existing daemon signer queue submits the transaction.
+
+Local verification passed **185 frontend tests**, frontend type checking and the production build, plus **51 daemon tests**, strict Clippy and Rust formatting checks. Coverage includes private inbox access, durable decisions/read state, stale notification acknowledgements, request deduplication, ownership epochs, exact calldata/events/canonical receipts, delayed confirmation, signer queue exclusion, approval deadlines and ambiguous broadcast recovery. Frontend and Rust EIP-712 digests match fixed compatibility vectors.
+
+The actual request/inbox components and CSS passed **61 controlled browser fixture checks** at 1440, 390 and 320px. The fixture covers pending/approved/denied/expired access, owner decisions, request details, pagination, wallet-dialog yielding, keyboard focus and recovery after an ownership change. These used synthetic wallet/API adapters; no real wallet signature or transaction was sent. The ignored local report is `.tools/access-ui-verification/2026-10-11T04-01-36-063Z/report.json`.
+
+The rebuilt local production app also passed **22 integration smoke checks** on Overview and Agent Directory at 1440 and 320px, using the real providers without wallet authentication. Inbox opening/closing, keyboard focus, request-panel availability and layout passed with zero runtime exceptions or console errors. No access request, signature or transaction was sent. The ignored report is `.tools/access-production-smoke/2026-10-11T04-13-43-119Z/report.json`.
+
+The rebuilt local API rejects foreign-origin writes and returns an explicit 503 when the configured daemon lacks the new access endpoints. Deploy the updated daemon and frontend together with persistent `DATABASE_PATH` storage, then run the guide's two-wallet acceptance test. Local tests do not establish a deployed request/approval ceremony, a passkey ceremony, or resolution of earlier site-security findings.
+
 ## Open verification work
 
 - Resolve the current MetaMask domain classification and Dynamic display-name discrepancy, then complete supported-device passkey enrollment/sign-in. Fresh login UI initialization now works; it does not establish a device ceremony or security clearance.
