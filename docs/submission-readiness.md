@@ -1,5 +1,7 @@
 # Submission readiness: live-site audit
 
+**October 12 presentation update:** the sticky navbar and bounded shard map are deployed. See the [bounty selection audit and paste-ready answers](bounty-submission-answers.md) and [two completed silent sponsor videos](../submission/2026-10-11/bounty-videos/README.md). Upload to Loom/Vimeo remains outstanding. This presentation work does not clear the wallet/service readiness gates below.
+
 **Later October 11 remediation:** use the [final readiness report](../submission/2026-10-11/final-readiness.md) for current statuses, 22 tasks/22 roots, repaired code, fresh test counts and exact next actions. The report below remains the earlier live-site snapshot. Wallet-based judging is still blocked.
 
 Evidence files identified as local files below are retained only in the verification workspace and are not published in this repository. Existing linked transaction evidence remains available in the repository.

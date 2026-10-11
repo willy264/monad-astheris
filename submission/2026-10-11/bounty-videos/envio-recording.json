@@ -1,0 +1,140 @@
+{
+  "sponsor": "envio",
+  "startedAt": "2026-10-11T23:09:40.033Z",
+  "site": "https://monad-astheris.vercel.app",
+  "capture": "Real production browser, with cuts and caption bar; source/evidence cards explicitly labeled.",
+  "newTransactions": 0,
+  "walletAuthenticationPerformed": false,
+  "scenes": [
+    {
+      "name": "live-indexed-totals",
+      "caption": "ENVIO | Real Monad Testnet history, served by HyperIndex GraphQL.\nThe page identifies its indexed block and distinguishes history from recent activity.",
+      "startedAt": "2026-10-11T23:09:52.689Z",
+      "requestedSeconds": 9,
+      "location": "https://monad-astheris.vercel.app/visualizer",
+      "recordedSeconds": 9.006,
+      "frames": 35,
+      "seconds": 9
+    },
+    {
+      "name": "scrollable-task-lanes",
+      "caption": "Each indexed task has its own shard address and recorded execution state.\nThe map scrolls independently; this is recorded history, not simulated throughput.",
+      "startedAt": "2026-10-11T23:10:08.767Z",
+      "requestedSeconds": 12,
+      "location": "https://monad-astheris.vercel.app/visualizer",
+      "recordedSeconds": 12.211,
+      "frames": 47,
+      "seconds": 12.208333
+    },
+    {
+      "name": "inspect-indexed-shard",
+      "caption": "Select a real shard to inspect the task, executor, input and output commitments.\nThe zero proof hash is displayed honestly; no hardware or AI proof is claimed.",
+      "startedAt": "2026-10-11T23:10:24.623Z",
+      "requestedSeconds": 10,
+      "location": "https://monad-astheris.vercel.app/visualizer",
+      "recordedSeconds": 10.01,
+      "frames": 44,
+      "seconds": 10
+    },
+    {
+      "name": "matched-merkle-roots",
+      "caption": "HyperIndex rebuilds task batches and matches the router commitment.\nRoot matched links to the actual commitment transaction on Monad Testnet.",
+      "startedAt": "2026-10-11T23:10:37.405Z",
+      "requestedSeconds": 10,
+      "location": "https://monad-astheris.vercel.app/visualizer",
+      "recordedSeconds": 10.013,
+      "frames": 47,
+      "seconds": 10
+    },
+    {
+      "name": "directory-uses-indexed-data",
+      "caption": "The same indexed registrations and executions power the agent directory.\nCounts and agent identities come from the configured chain and registry.",
+      "startedAt": "2026-10-11T23:10:58.973Z",
+      "requestedSeconds": 9,
+      "location": "https://monad-astheris.vercel.app/agents",
+      "recordedSeconds": 9.008,
+      "frames": 45,
+      "seconds": 9
+    },
+    {
+      "name": "live-api-provenance",
+      "caption": "The production API reports Envio as its source and returns the same task records.\nThe accompanying JSON preserves the full response for review.",
+      "startedAt": "2026-10-11T23:11:10.897Z",
+      "requestedSeconds": 12,
+      "location": "Labeled evidence/source card",
+      "recordedSeconds": 12.015,
+      "frames": 60,
+      "seconds": 12
+    },
+    {
+      "name": "hyperindex-handler",
+      "caption": "This registered HyperIndex handler consumes TaskExecuted from the router.\nThe integration drives real application data; it is more than an installed dependency.",
+      "startedAt": "2026-10-11T23:11:26.406Z",
+      "requestedSeconds": 10,
+      "location": "Labeled evidence/source card",
+      "recordedSeconds": 10.01,
+      "frames": 47,
+      "seconds": 10
+    },
+    {
+      "name": "direct-graphql-record",
+      "caption": "Direct HyperIndex GraphQL returns the same shard and transaction shown in the app.\nThis recorded response is timestamped and independently checked against Monad.",
+      "startedAt": "2026-10-11T23:11:39.616Z",
+      "requestedSeconds": 12,
+      "location": "Labeled evidence/source card",
+      "recordedSeconds": 12.004,
+      "frames": 57,
+      "seconds": 12
+    },
+    {
+      "name": "independent-chain-match",
+      "caption": "End to end: router events -> HyperIndex -> GraphQL -> dashboard -> chain verification.\nThe saved evidence includes the exact explorer links and verification results.",
+      "startedAt": "2026-10-11T23:11:55.081Z",
+      "requestedSeconds": 12,
+      "location": "Labeled evidence/source card",
+      "recordedSeconds": 12.011,
+      "frames": 59,
+      "seconds": 12
+    }
+  ],
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    }
+  ],
+  "exceptions": [],
+  "media": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1440,
+        "height": 1000,
+        "r_frame_rate": "24/1"
+      }
+    ],
+    "format": {
+      "duration": "96.208333",
+      "size": "1186178"
+    }
+  },
+  "sha256": "01b7f6854fcfaa9331362efdb326fd2268a116392fd1f7f27b6e87815ac7ac49",
+  "file": "envio-demo.mp4",
+  "hostedUrl": null,
+  "passed": true,
+  "completedAt": "2026-10-11T23:12:10.489Z"
+}

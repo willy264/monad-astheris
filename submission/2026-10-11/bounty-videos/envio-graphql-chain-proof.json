@@ -1,0 +1,276 @@
+{
+  "capturedAt": "2026-10-11T16:36:51.980Z",
+  "revision": "f1e97db252aaf85d03b0b74e5bbe7d87b8eb79a4",
+  "readOnly": true,
+  "chainId": 10143,
+  "source": "envio",
+  "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+  "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+  "checks": [
+    {
+      "name": "Envio returns one task for the deployed chain, router and registry",
+      "passed": true
+    },
+    {
+      "name": "RPC chain is Monad Testnet 10143",
+      "passed": true
+    },
+    {
+      "name": "Task execution: successful finalized canonical receipt",
+      "passed": true
+    },
+    {
+      "name": "Indexed task exactly matches its on-chain execution event",
+      "passed": true
+    },
+    {
+      "name": "Full canonical execution block reconstructs the indexed leaf, root, count and batch identity",
+      "passed": true
+    },
+    {
+      "name": "Envio commitment record matches the reconstructed batch",
+      "passed": true
+    },
+    {
+      "name": "Merkle commitment: successful finalized canonical receipt",
+      "passed": true
+    },
+    {
+      "name": "Commitment calldata and event match the indexed batch exactly",
+      "passed": true
+    },
+    {
+      "name": "Finalized router storage matches the indexed root and leaf count",
+      "passed": true
+    }
+  ],
+  "graphql": [
+    {
+      "endpoint": "https://indexer.dev.hyperindex.xyz/635fbf6/v1/graphql",
+      "observedAt": "2026-10-11T16:36:55.308Z",
+      "query": "query BountyLatestTask($router: String!, $registry: String!) {\n    SyncStatus(where: {chainId: {_eq: 10143}, router: {_eq: $router}, registry: {_eq: $registry}}, limit: 1) {chainId router registry blockNumber}\n    TaskExecution(where: {chainId: {_eq: 10143}, router: {_eq: $router}, agent: {registry: {_eq: $registry}}}, limit: 1, order_by: [{blockNumber: desc}, {logIndex: desc}]) {\n      chainId router agentId taskId inputHash outputHash proofHash leaf blockNumber blockHash transactionHash logIndex\n      agent {chainId registry agentId owner agentURI tasksCompleted shardsCreated}\n      shard {address sequenceNonce executor creationTx}\n      batch {chainId router batchId blockNumber blockHash root leafCount status committedRoot committedLeafCount commitmentTx commitmentBlock}\n    }\n  }",
+      "variables": {
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231"
+      },
+      "response": {
+        "data": {
+          "SyncStatus": [
+            {
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+              "blockNumber": "70160755"
+            }
+          ],
+          "TaskExecution": [
+            {
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "agentId": "1",
+              "taskId": "0x46da11b4cede5d6dec2248563747d37cd9a4ae83ee1defb0e612ef190bdf8639",
+              "inputHash": "0xe7634ba3a8d13e86f2a83497e7d8a65da07e027c39446ff93be027ffb92a5b46",
+              "outputHash": "0x078cb485392b96cd52932d51d8feefad33ff74c1f2a854ba4bd5882dbaec9b7b",
+              "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "leaf": "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5",
+              "blockNumber": "69984178",
+              "blockHash": "0x76f1c6faa42c9f3a5be8a0c7d9f34768cc4d0320cb7ac57108a3a074cd7f2e75",
+              "transactionHash": "0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66",
+              "logIndex": 20,
+              "agent": {
+                "chainId": 10143,
+                "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+                "agentId": "1",
+                "owner": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+                "agentURI": "ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea",
+                "tasksCompleted": "2",
+                "shardsCreated": "2"
+              },
+              "shard": {
+                "address": "0x4201f3d9f79f399dbc35dda9ee271951a6f284cf",
+                "sequenceNonce": "48546944601833072635699557053514035643063460412527126170134796767990619653408",
+                "executor": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+                "creationTx": "0xbe86e08442aa19b26a5dde05db129ed187fbdef523acdf89c2221fb95b4f03bb"
+              },
+              "batch": {
+                "chainId": 10143,
+                "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+                "batchId": "0x07f1b7dad8aed7a3063146e47e1e15b51a597e6c0968e0e0632d073d4da92e19",
+                "blockNumber": "69984178",
+                "blockHash": "0x76f1c6faa42c9f3a5be8a0c7d9f34768cc4d0320cb7ac57108a3a074cd7f2e75",
+                "root": "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5",
+                "leafCount": "1",
+                "status": "committed",
+                "committedRoot": "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5",
+                "committedLeafCount": "1",
+                "commitmentTx": "0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0",
+                "commitmentBlock": "69984191"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "endpoint": "https://indexer.dev.hyperindex.xyz/635fbf6/v1/graphql",
+      "observedAt": "2026-10-11T16:36:59.315Z",
+      "query": "query BountyCommitment($router: String!, $batchId: String!) {\n    BatchCommitment(where: {chainId: {_eq: 10143}, router: {_eq: $router}, batchId: {_eq: $batchId}}, limit: 2) {chainId router batchId root leafCount fromBlock toBlock verified transactionHash}\n  }",
+      "variables": {
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "batchId": "0x07f1b7dad8aed7a3063146e47e1e15b51a597e6c0968e0e0632d073d4da92e19"
+      },
+      "response": {
+        "data": {
+          "BatchCommitment": [
+            {
+              "chainId": 10143,
+              "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+              "batchId": "0x07f1b7dad8aed7a3063146e47e1e15b51a597e6c0968e0e0632d073d4da92e19",
+              "root": "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5",
+              "leafCount": "1",
+              "fromBlock": "69984178",
+              "toBlock": "69984178",
+              "verified": true,
+              "transactionHash": "0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "receipts": [
+    {
+      "label": "Task execution",
+      "hash": "0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66",
+      "blockNumber": "69984178",
+      "blockHash": "0x76f1c6faa42c9f3a5be8a0c7d9f34768cc4d0320cb7ac57108a3a074cd7f2e75",
+      "to": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+      "explorer": "https://testnet.monadscan.com/tx/0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66",
+      "logs": [
+        {
+          "address": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+          "topics": [
+            "0x80cf2927c4cd68d127ea8a48f9a4c2805602112ca473d905717bc95f6fea2c26",
+            "0x0000000000000000000000004201f3d9f79f399dbc35dda9ee271951a6f284cf",
+            "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "0x46da11b4cede5d6dec2248563747d37cd9a4ae83ee1defb0e612ef190bdf8639"
+          ],
+          "data": "0xe7634ba3a8d13e86f2a83497e7d8a65da07e027c39446ff93be027ffb92a5b46078cb485392b96cd52932d51d8feefad33ff74c1f2a854ba4bd5882dbaec9b7b0000000000000000000000000000000000000000000000000000000000000000",
+          "blockHash": "0x76f1c6faa42c9f3a5be8a0c7d9f34768cc4d0320cb7ac57108a3a074cd7f2e75",
+          "blockNumber": "69984178",
+          "blockTimestamp": "1791683294",
+          "transactionHash": "0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66",
+          "transactionIndex": 2,
+          "logIndex": 20,
+          "removed": false
+        }
+      ]
+    },
+    {
+      "label": "Merkle commitment",
+      "hash": "0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0",
+      "blockNumber": "69984191",
+      "blockHash": "0xb6035fee0bbfe487d053f96baa9ae4ddfa3d84fd2a9c614b71d85a511c2f3914",
+      "to": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+      "explorer": "https://testnet.monadscan.com/tx/0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0",
+      "logs": [
+        {
+          "address": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+          "topics": [
+            "0xf569ba350a75e4ee617b81a0e47b6971718ceb8d508a1ccfa680fa7c3b2526f7",
+            "0x07f1b7dad8aed7a3063146e47e1e15b51a597e6c0968e0e0632d073d4da92e19"
+          ],
+          "data": "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000042bdfb200000000000000000000000000000000000000000000000000000000042bdfb2",
+          "blockHash": "0xb6035fee0bbfe487d053f96baa9ae4ddfa3d84fd2a9c614b71d85a511c2f3914",
+          "blockNumber": "69984191",
+          "blockTimestamp": "1791683298",
+          "transactionHash": "0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0",
+          "transactionIndex": 2,
+          "logIndex": 3,
+          "removed": false
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "One latest indexed example and its full execution block, not a fresh paid run or a complete historical audit.",
+    "GraphQL and RPC reads only. No signatures, payments, permission changes or on-chain writes."
+  ],
+  "agentId": "1",
+  "agent": {
+    "chainId": 10143,
+    "registry": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+    "agentId": "1",
+    "owner": "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+    "agentURI": "ipfs://bafkreibo5gtw45fi27ykfsbubt7uo6vze3s4x44ytqf735ojnnhhylpuea",
+    "tasksCompleted": "2",
+    "shardsCreated": "2"
+  },
+  "shard": "0x4201f3d9f79f399dbc35dda9ee271951a6f284cf",
+  "taskId": "0x46da11b4cede5d6dec2248563747d37cd9a4ae83ee1defb0e612ef190bdf8639",
+  "executionTx": "0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66",
+  "executionBlock": "69984178",
+  "inputHash": "0xe7634ba3a8d13e86f2a83497e7d8a65da07e027c39446ff93be027ffb92a5b46",
+  "outputHash": "0x078cb485392b96cd52932d51d8feefad33ff74c1f2a854ba4bd5882dbaec9b7b",
+  "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "batchId": "0x07f1b7dad8aed7a3063146e47e1e15b51a597e6c0968e0e0632d073d4da92e19",
+  "root": "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5",
+  "leafCount": "1",
+  "commitmentTx": "0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0",
+  "indexedThrough": "70160755",
+  "explorerExecution": "https://testnet.monadscan.com/tx/0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66",
+  "explorerCommitment": "https://testnet.monadscan.com/tx/0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0",
+  "finalized": {
+    "number": "70160764",
+    "hash": "0xe23448e56baf38a8b2799fe165cdee540a1712276eb40078329dd797f91f3f30",
+    "timestamp": "1791736616"
+  },
+  "canonicalBlock": {
+    "number": "69984178",
+    "hash": "0x76f1c6faa42c9f3a5be8a0c7d9f34768cc4d0320cb7ac57108a3a074cd7f2e75",
+    "transactionLogs": [
+      {
+        "eventName": "TaskExecuted",
+        "args": {
+          "shard": "0x4201f3d9f79f399DBc35Dda9EE271951A6f284CF",
+          "agentId": "1",
+          "taskId": "0x46da11b4cede5d6dec2248563747d37cd9a4ae83ee1defb0e612ef190bdf8639",
+          "inputHash": "0xe7634ba3a8d13e86f2a83497e7d8a65da07e027c39446ff93be027ffb92a5b46",
+          "outputHash": "0x078cb485392b96cd52932d51d8feefad33ff74c1f2a854ba4bd5882dbaec9b7b",
+          "proofHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "address": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "topics": [
+          "0x80cf2927c4cd68d127ea8a48f9a4c2805602112ca473d905717bc95f6fea2c26",
+          "0x0000000000000000000000004201f3d9f79f399dbc35dda9ee271951a6f284cf",
+          "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "0x46da11b4cede5d6dec2248563747d37cd9a4ae83ee1defb0e612ef190bdf8639"
+        ],
+        "data": "0xe7634ba3a8d13e86f2a83497e7d8a65da07e027c39446ff93be027ffb92a5b46078cb485392b96cd52932d51d8feefad33ff74c1f2a854ba4bd5882dbaec9b7b0000000000000000000000000000000000000000000000000000000000000000",
+        "blockHash": "0x76f1c6faa42c9f3a5be8a0c7d9f34768cc4d0320cb7ac57108a3a074cd7f2e75",
+        "blockNumber": "69984178",
+        "blockTimestamp": "1791683294",
+        "transactionHash": "0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66",
+        "transactionIndex": 2,
+        "logIndex": 20,
+        "removed": false
+      }
+    ],
+    "leaves": [
+      "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5"
+    ],
+    "root": "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5",
+    "leafCount": 1,
+    "batchId": "0x07f1b7dad8aed7a3063146e47e1e15b51a597e6c0968e0e0632d073d4da92e19"
+  },
+  "routerStorage": {
+    "blockNumber": "70160764",
+    "batchId": "0x07f1b7dad8aed7a3063146e47e1e15b51a597e6c0968e0e0632d073d4da92e19",
+    "root": "0x45e92776602d005f9b43414767250e3bfe8c6d8467eec619897b554d198716a5",
+    "leafCount": "1",
+    "fromBlock": "69984178",
+    "toBlock": "69984178"
+  },
+  "status": "PASS",
+  "completedAt": "2026-10-11T16:37:01.852Z"
+}

@@ -1,0 +1,632 @@
+{
+  "startedAt": "2026-10-11T23:11:30.245Z",
+  "base": "https://monad-astheris.vercel.app",
+  "revision": "f1e97db252aaf85d03b0b74e5bbe7d87b8eb79a4",
+  "workingTree": "Deployed production UI under test",
+  "viewportHeight": 1000,
+  "checks": [
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 1440,
+      "route": "/",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 166,
+        "height": 166,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 1425,
+        "width": 1440,
+        "padding": 182,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 1440,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 1440,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 1440,
+      "route": "/",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 1440,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 166,
+        "height": 166,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 1425,
+        "width": 1440,
+        "padding": 182,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 1440,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 166,
+        "height": 166,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 1425,
+        "width": 1440,
+        "padding": 182,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Task records anchor stays visible below sticky header",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "headerBottom": 166,
+        "targetTop": 201.8125,
+        "targetBottom": 283.5,
+        "hash": "#task-history"
+      }
+    },
+    {
+      "name": "Shard map is bounded and labeled for keyboard scrolling",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "height": 550,
+        "clientHeight": 549,
+        "scrollHeight": 1104,
+        "tabIndex": 0,
+        "role": "region",
+        "label": "Every lane has an address",
+        "overflow": "auto",
+        "outline": "none",
+        "shards": 22,
+        "pageY": 1653,
+        "top": 182.421875
+      }
+    },
+    {
+      "name": "PageDown scrolls shard map without scrolling page",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "pageY": 1653,
+        "innerY": 452,
+        "focused": "execution-canvas"
+      }
+    },
+    {
+      "name": "Tab reaches interactive shard from scrolling region",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "inShard": true,
+        "outline": "solid"
+      }
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 1440,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 390,
+      "route": "/",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 205,
+        "height": 205,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 375,
+        "width": 390,
+        "padding": 221,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 390,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 390,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 390,
+      "route": "/",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 390,
+      "route": "/",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 390,
+      "route": "/agents",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 205,
+        "height": 205,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 375,
+        "width": 390,
+        "padding": 221,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 390,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 390,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 390,
+      "route": "/agents",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 390,
+      "route": "/agents",
+      "passed": true
+    },
+    {
+      "name": "Header stays at viewport top after page scroll",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "top": 0,
+        "bottom": 205,
+        "height": 205,
+        "position": "sticky",
+        "zIndex": "50",
+        "scrollY": 700,
+        "scrollWidth": 375,
+        "width": 390,
+        "padding": 221,
+        "noProvider": true
+      }
+    },
+    {
+      "name": "No horizontal page overflow",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Anchor padding includes measured header height",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "Task records anchor stays visible below sticky header",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "headerBottom": 205,
+        "targetTop": 240.65625,
+        "targetBottom": 362.046875,
+        "hash": "#task-history"
+      }
+    },
+    {
+      "name": "Shard map is bounded and labeled for keyboard scrolling",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "height": 550,
+        "clientHeight": 549,
+        "scrollHeight": 3336,
+        "tabIndex": 0,
+        "role": "region",
+        "label": "Every lane has an address",
+        "overflow": "auto",
+        "outline": "none",
+        "shards": 22,
+        "pageY": 2641,
+        "top": 220.890625
+      }
+    },
+    {
+      "name": "PageDown scrolls shard map without scrolling page",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "pageY": 2641,
+        "innerY": 452,
+        "focused": "execution-canvas"
+      }
+    },
+    {
+      "name": "Tab reaches interactive shard from scrolling region",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "inShard": true,
+        "outline": "solid"
+      }
+    },
+    {
+      "name": "Notification dialog remains above sticky header",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true,
+      "details": {
+        "open": true,
+        "modal": true,
+        "focusInside": true,
+        "headerHit": true,
+        "heading": "Access notifications"
+      }
+    },
+    {
+      "name": "Escape restores notification trigger focus",
+      "width": 390,
+      "route": "/visualizer",
+      "passed": true
+    },
+    {
+      "name": "No unhandled browser exceptions",
+      "passed": true
+    }
+  ],
+  "blockedWrites": [
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    }
+  ],
+  "exceptions": [],
+  "screenshots": [
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/sticky-overview-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/sticky-agents-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/sticky-visualizer-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/bounded-shard-map-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/notification-over-header-1440.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/sticky-overview-390.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/sticky-agents-390.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/sticky-visualizer-390.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/bounded-shard-map-390.png",
+    ".tools/bounty-layout-checks/2026-10-11T23-11-30-239Z/notification-over-header-390.png"
+  ],
+  "observations": [
+    {
+      "width": 1440,
+      "route": "/",
+      "walletInitiallyReady": true,
+      "walletReadinessWaitMs": 3
+    },
+    {
+      "width": 1440,
+      "route": "/",
+      "notificationTarget": {
+        "disabled": false,
+        "ready": true,
+        "hitMatches": true,
+        "rect": {
+          "x": 991.640625,
+          "y": 22.5,
+          "width": 42,
+          "height": 42
+        }
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/agents",
+      "walletInitiallyReady": false,
+      "walletReadinessWaitMs": 260
+    },
+    {
+      "width": 1440,
+      "route": "/agents",
+      "notificationTarget": {
+        "disabled": false,
+        "ready": true,
+        "hitMatches": true,
+        "rect": {
+          "x": 991.640625,
+          "y": 22.5,
+          "width": 42,
+          "height": 42
+        }
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/visualizer",
+      "walletInitiallyReady": false,
+      "walletReadinessWaitMs": 682
+    },
+    {
+      "width": 1440,
+      "route": "/visualizer",
+      "notificationTarget": {
+        "disabled": false,
+        "ready": true,
+        "hitMatches": true,
+        "rect": {
+          "x": 991.640625,
+          "y": 22.5,
+          "width": 42,
+          "height": 42
+        }
+      }
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "walletInitiallyReady": true,
+      "walletReadinessWaitMs": 4
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "notificationTarget": {
+        "disabled": false,
+        "ready": true,
+        "hitMatches": true,
+        "rect": {
+          "x": 148.421875,
+          "y": 18.5,
+          "width": 36,
+          "height": 38
+        }
+      }
+    },
+    {
+      "width": 390,
+      "route": "/agents",
+      "walletInitiallyReady": true,
+      "walletReadinessWaitMs": 8
+    },
+    {
+      "width": 390,
+      "route": "/agents",
+      "notificationTarget": {
+        "disabled": false,
+        "ready": true,
+        "hitMatches": true,
+        "rect": {
+          "x": 148.421875,
+          "y": 18.5,
+          "width": 36,
+          "height": 38
+        }
+      }
+    },
+    {
+      "width": 390,
+      "route": "/visualizer",
+      "walletInitiallyReady": false,
+      "walletReadinessWaitMs": 284
+    },
+    {
+      "width": 390,
+      "route": "/visualizer",
+      "notificationTarget": {
+        "disabled": false,
+        "ready": true,
+        "hitMatches": true,
+        "rect": {
+          "x": 148.421875,
+          "y": 18.5,
+          "width": 36,
+          "height": 38
+        }
+      }
+    }
+  ],
+  "completedAt": "2026-10-11T23:12:04.793Z",
+  "passed": true,
+  "previousAttempt": {
+    "startedAt": "2026-10-11T16:35:39.973Z",
+    "completedAt": "2026-10-11T16:36:34.724Z",
+    "revision": "f1e97db252aaf85d03b0b74e5bbe7d87b8eb79a4",
+    "passed": false,
+    "checks": 39,
+    "failures": [
+      {
+        "name": "Notification dialog remains above sticky header",
+        "width": 1440,
+        "route": "/",
+        "passed": false,
+        "details": {
+          "open": false,
+          "headerHit": false
+        }
+      },
+      {
+        "name": "Escape restores notification trigger focus",
+        "width": 1440,
+        "route": "/",
+        "passed": false
+      }
+    ],
+    "preservedLocalReport": ".tools/bounty-layout-production-first-attempt.json",
+    "explanation": "The first cold Overview capture still showed Loading wallet and connecting data. The original harness waited for the header height effect but did not wait for the SDK-backed header to become ready. WalletSession replaces its initial context tree after mount, and its controls can change during SDK initialization. An initialization/DOM timing race is the likely explanation; the exact original event timing was not captured. The recheck waits for the enabled SDK-backed sidebar control and records notification button readiness, dimensions, and pointer hit-testing before each click. No application code was changed to obtain the passing recheck."
+  },
+  "verificationScope": "Production read-only browser checks of sticky navigation, anchor offsets, bounded shard scrolling, keyboard navigation, native notification modal layering, Escape and focus restoration at 1440px and 390px. No wallet connection, authentication, signature, transaction, or access decision was performed."
+}

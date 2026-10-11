@@ -1,6 +1,6 @@
 # Aetheris submission copy and recording kit
 
-Prepared October 11, 2026. **Not submitted; no video has been recorded or published by this verification task.** Wallet-based judging is blocked until the [readiness gates](final-readiness.md) are closed. The public product can be inspected without a wallet.
+Prepared October 11, 2026; recording update October 12. **Not submitted.** Silent [Envio and Dynamic sponsor demos](bounty-videos/README.md) are now recorded as upload-ready MP4 files; Loom/Vimeo publication remains outstanding. The separate main technical and pitch recordings below remain outstanding. Wallet-based judging is blocked until the [readiness gates](final-readiness.md) are closed. The public product can be inspected without a wallet.
 
 ## Portal fields
 
@@ -27,7 +27,7 @@ The deployed Monad Testnet demonstration has two registered agents. The self-ser
 | Technical video | **NOT VERIFIED: supply a real HTTPS recording, at most 3 minutes** |
 | Pitch video | **NOT VERIFIED: supply a separate real HTTPS recording, at most 2 minutes** |
 | Team | Enter the actual members, roles and motivation; no team identity was invented here |
-| Bounties | Check current signed-in requirements and attach evidence for each selected bounty. Envio indexing, Dynamic SDK integration and x402 execution are implemented; this alone does not prove sponsor eligibility |
+| Bounties | [Paste-ready answers and selection audit](../../docs/bounty-submission-answers.md): keep Envio and Dynamic; remove/defer CRE, Privy and both Mera selections. No additional qualifying integration bounty found. Check signed-in eligibility; selections have not been edited |
 | Deadline | Public portal still displays October 14, 03:59 UTC (04:59 WAT), consistent with the intended 2026 event. **Authenticated deadline and entry eligibility NOT VERIFIED** |
 | Entry status | **NOT VERIFIED / not submitted by this task** |
 

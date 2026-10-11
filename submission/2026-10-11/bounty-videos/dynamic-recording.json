@@ -1,0 +1,124 @@
+{
+  "sponsor": "dynamic",
+  "startedAt": "2026-10-11T16:37:18.832Z",
+  "site": "https://monad-astheris.vercel.app",
+  "capture": "Real production browser, with cuts and caption bar; source/evidence cards explicitly labeled.",
+  "newTransactions": 0,
+  "walletAuthenticationPerformed": false,
+  "scenes": [
+    {
+      "name": "wallet-entry",
+      "caption": "DYNAMIC | The shared wallet session is available throughout Aetheris.\nThis recording demonstrates the live sign-in UI and the implemented signing path.",
+      "startedAt": "2026-10-11T16:37:39.741Z",
+      "requestedSeconds": 7,
+      "location": "https://monad-astheris.vercel.app/",
+      "recordedSeconds": 7.005,
+      "frames": 33,
+      "seconds": 7
+    },
+    {
+      "name": "dynamic-auth-options",
+      "caption": "Dynamic provides the email, wallet and existing-passkey sign-in choices.\nNo wallet is authenticated and no signature is requested in this recording.",
+      "startedAt": "2026-10-11T16:37:53.611Z",
+      "requestedSeconds": 12,
+      "location": "https://monad-astheris.vercel.app/",
+      "recordedSeconds": 12.009,
+      "frames": 54,
+      "seconds": 12
+    },
+    {
+      "name": "separate-executor-permission",
+      "caption": "Agent task authority has its own interface and requires the owner approval.\nAuthentication alone does not grant executor authority or spend wallet funds.",
+      "startedAt": "2026-10-11T16:38:14.202Z",
+      "requestedSeconds": 10,
+      "location": "https://monad-astheris.vercel.app/agents",
+      "recordedSeconds": 10.009,
+      "frames": 50,
+      "seconds": 10
+    },
+    {
+      "name": "dynamic-provider-wiring",
+      "caption": "DynamicContextProvider owns the shared primary wallet and authentication state.\nThe SIWE message explicitly separates login from token payments and delegation.",
+      "startedAt": "2026-10-11T16:38:26.705Z",
+      "requestedSeconds": 10,
+      "location": "Labeled evidence/source card",
+      "recordedSeconds": 10.001,
+      "frames": 50,
+      "seconds": 10
+    },
+    {
+      "name": "dynamic-signing-path",
+      "caption": "Dynamic primaryWallet.getWalletClient() supplies the task-signing client.\nThe app requests separate typed signatures for the task and exact USDC payment.",
+      "startedAt": "2026-10-11T16:38:38.828Z",
+      "requestedSeconds": 12,
+      "location": "Labeled evidence/source card",
+      "recordedSeconds": 12.009,
+      "frames": 60,
+      "seconds": 12
+    },
+    {
+      "name": "historical-settlement-evidence",
+      "caption": "Historical on-chain receipts can be inspected without connecting a wallet.\nThese existing receipts are not a new authenticated run in this recording.",
+      "startedAt": "2026-10-11T16:38:56.307Z",
+      "requestedSeconds": 9,
+      "location": "https://monad-astheris.vercel.app/visualizer",
+      "recordedSeconds": 9.009,
+      "frames": 45,
+      "seconds": 9
+    },
+    {
+      "name": "dynamic-evidence-limits",
+      "caption": "The integration is implemented; a successful live login/signature is not filmed here.\nResolve the documented domain/service blockers before recording a fresh paid run.",
+      "startedAt": "2026-10-11T16:39:07.288Z",
+      "requestedSeconds": 9,
+      "location": "Labeled evidence/source card",
+      "recordedSeconds": 9.004,
+      "frames": 45,
+      "seconds": 9
+    }
+  ],
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    },
+    {
+      "method": "POST",
+      "url": "https://logs.dynamicauth.com/api/v1/5ee665e4-6f64-43c1-9537-99d989371a80"
+    }
+  ],
+  "exceptions": [],
+  "media": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1440,
+        "height": 1000,
+        "r_frame_rate": "24/1"
+      }
+    ],
+    "format": {
+      "duration": "69.000000",
+      "size": "757642"
+    }
+  },
+  "sha256": "32d8ec6e405cab983bb24786fbb47b2a880c4870b383a1c6a4e981d7b01cf247",
+  "file": "dynamic-demo.mp4",
+  "hostedUrl": null,
+  "passed": true,
+  "completedAt": "2026-10-11T16:39:18.315Z"
+}

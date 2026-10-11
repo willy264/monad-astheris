@@ -1,0 +1,22 @@
+{
+  "reviewedAt": "2026-10-11T23:15:16.374Z",
+  "uiRevision": "f1e97db252aaf85d03b0b74e5bbe7d87b8eb79a4",
+  "fullDecode": "ffmpeg -v error -i <video> -f null - passed for both files",
+  "visualReview": "Inspected actual browser frames and encoded captioned frames for sign-in, permissions, shard map and GraphQL evidence",
+  "videos": [
+    {
+      "name": "dynamic",
+      "file": "dynamic-demo.mp4",
+      "seconds": 69,
+      "sha256": "32d8ec6e405cab983bb24786fbb47b2a880c4870b383a1c6a4e981d7b01cf247",
+      "verified": true
+    },
+    {
+      "name": "envio",
+      "file": "envio-demo.mp4",
+      "seconds": 96.208333,
+      "sha256": "01b7f6854fcfaa9331362efdb326fd2268a116392fd1f7f27b6e87815ac7ac49",
+      "verified": true
+    }
+  ]
+}
