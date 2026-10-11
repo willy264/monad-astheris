@@ -1,10 +1,18 @@
 # Verification record
 
-Updated **2026-10-10**. A new user wallet registered Agent #2 and completed five paid browser checksum tasks through the self-service flow. Canonical task, registration, delegation and payment receipts were independently checked. All five corresponding Merkle batches have now been published, finalized and matched to verified hosted Envio commitments. The registered observer previously completed an authorized paid MCP task, reputation completion, finalized Merkle publication and project-controlled output-integrity validation on October 7. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links the exact receipts. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
+Updated **2026-10-11**. Agent #2 has 15 indexed task completions. Automatic hosted publication added ten finalized Merkle commitments, bringing the deployment total to 16 verified roots across both agents. The original self-service run's registration, delegation, task and payment receipts remain documented separately. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links exact receipts and states the limits of browser authorization evidence. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.
 
 **Wallet finding:** earlier user screenshots show a malicious-site classification for the production domain. The [review record](submission/2026-10-07/wallet-security-review.md) documents the unresolved warning and separately confirmed Dynamic display-name mismatch. Automated source checks and later successful user transactions do not clear this classification. Provider review and the physical passkey demonstration remain outstanding.
 
 **October 10 operational checks:** Render was resumed after equal latest/pending owner nonces and a disabled batch worker were verified. Its public health and configuration endpoints return 200. After the operator's Vercel redeploy, the demo configuration also returns **200 / enabled:true**, with the expected contracts and payment policy; this supersedes the earlier 503. Agent #1's owner is also a daemon relayer and cannot be the browser task signer. The prior separate Agent #1 task delegation was inactive at this check, and the recorded MetaMask scan still returned `BLOCK`. [Recovery evidence](submission/2026-10-10/demo-availability.json), [enabled configuration](submission/2026-10-10/demo-config-enabled.json) and [setup guide](frontend/docs/live-demo-setup.md). Those initial read-only checks submitted no transaction or payment; the later user-submitted Agent #2 execution is recorded below.
+
+## Automatic publication and indexed totals, October 11
+
+[Settlement evidence](submission/2026-10-11/agent2-automatic-batch-settlement.json) verifies all ten previously pending Agent #2 task blocks. The hosted worker published them automatically after a two-stage read-only/exclusive-writer deployment of `59b1153`. Every canonical source log, reconstructed root/batch ID, commitment calldata/event, finalized receipt/storage record and hosted Envio verification matched. Owner nonces advanced from 46 to 56 without task or payment resubmission.
+
+The worker is healthy with `batchWorker: running`, `taskSubmissionEnabled: true` and available indexer hints. Its recent scan reached the observed finalized block while independent deployment-history backfill continues. Render remains free/ephemeral; durable journals and full historical catch-up are not claimed. Unattended Render deployments are disabled to prevent overlapping signers. [Deployment record](submission/2026-10-11/automatic-worker-deployment.json), [host observations](submission/2026-10-11/automatic-worker-rollout-observations.json).
+
+Validation: **36 Rust tests**, compilation, formatting and Clippy; **173 frontend tests**, typecheck and production build; all four [component CI jobs](https://github.com/willy264/monad-astheris/actions/runs/38099328621). The [17 desktop/mobile browser checks](submission/2026-10-11/indexed-totals-ui-checks.json) use an actual live response and cover totals beyond displayed rows, pending-publication labels, compact/full nonce access, clipboard success/failure and page width. The pre-publication snapshot was 16 completed lanes/6 matched roots with only 2 matched roots in the latest 12 rows; settlement subsequently brought matched roots to 16.
 
 ## Live self-service checks, October 10
 
@@ -32,7 +40,7 @@ At the recorded block, the new wallet held **5.927053884 MON** and **20.995 test
 | Hosted Envio | All five `MerkleBatch` rows report `committed`; all five `BatchCommitment` rows report `verified: true` and match the corresponding on-chain transaction. The exact GraphQL query and response are saved in the artifact. |
 | Signer handoff | Render suspension, a new SIGTERM/draining log and the shutdown interval were observed before local signing. The existing local journal was retained. Latest/pending owner nonces were both **21** before and **26** after publication. Render resumed healthy at **17:05:28 UTC**. |
 
-This is a five-block publication, not a throughput measurement or a full historical worker scan. The CLI did not advance the worker cursor. Render remains on free ephemeral storage with `batchWorker: disabled`; durable automatic publication and journal retention are still open operational work.
+This is a five-block publication, not a throughput measurement or a full historical worker scan. The CLI did not advance the worker cursor. At that time Render remained on free ephemeral storage with `batchWorker: disabled`. The October 11 rollout supersedes the disabled-worker state; durable journal retention and full historical catch-up remain open operational work.
 
 ## Current source checks
 

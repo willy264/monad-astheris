@@ -1,0 +1,114 @@
+{
+  "startedAt": "2026-10-11T00:42:37.890Z",
+  "operations": [
+    {
+      "at": "2026-10-11T00:42:39.376Z",
+      "operation": "autoDeployTrigger",
+      "value": "off"
+    },
+    {
+      "at": "2026-10-11T00:42:39.721Z",
+      "operation": "environment",
+      "key": "TASK_SUBMISSION_ENABLED",
+      "value": "false"
+    },
+    {
+      "at": "2026-10-11T00:42:40.050Z",
+      "operation": "environment",
+      "key": "BATCH_ENABLED",
+      "value": "false"
+    },
+    {
+      "at": "2026-10-11T00:42:41.223Z",
+      "operation": "readonly-deploy",
+      "id": "dep-db5dn0flot8c73ejkc3g",
+      "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c"
+    },
+    {
+      "at": "2026-10-11T00:49:45.623Z",
+      "operation": "environment",
+      "key": "ENVIO_GRAPHQL_URL",
+      "value": "https://indexer.dev.hyperindex.xyz/635fbf6/v1/graphql"
+    },
+    {
+      "at": "2026-10-11T00:49:45.963Z",
+      "operation": "environment",
+      "key": "TASK_SUBMISSION_ENABLED",
+      "value": "true"
+    },
+    {
+      "at": "2026-10-11T00:49:46.607Z",
+      "operation": "environment",
+      "key": "BATCH_ENABLED",
+      "value": "true"
+    },
+    {
+      "at": "2026-10-11T00:49:47.321Z",
+      "operation": "activate-tested-build",
+      "id": "dep-db5dqap42hec738jogl0"
+    }
+  ],
+  "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+  "readonlyRequestedAt": "2026-10-11T00:42:40.051Z",
+  "readonlyDeploy": "dep-db5dn0flot8c73ejkc3g",
+  "lastObservation": {
+    "at": "2026-10-11T00:52:32.421Z",
+    "autoDeploy": "no",
+    "health": {
+      "http": 200,
+      "body": {
+        "batchProgress": {
+          "finalizedBlock": 69973102,
+          "historyThrough": 67976960,
+          "indexerHints": "available",
+          "recentThrough": 69973102
+        },
+        "batchWorker": "running",
+        "blockNumber": 69973109,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok",
+        "taskSubmissionEnabled": true
+      }
+    },
+    "deployments": [
+      {
+        "id": "dep-db5dqap42hec738jogl0",
+        "status": "live",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "finishedAt": "2026-10-11T00:50:01.58024Z"
+      },
+      {
+        "id": "dep-db5dn0flot8c73ejkc3g",
+        "status": "deactivated",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "finishedAt": "2026-10-11T00:46:54.377949Z"
+      },
+      {
+        "id": "dep-db21n1ugekts739gmegg",
+        "status": "deactivated",
+        "commit": "80570af5181de3727383f709d944cfd476f34e50",
+        "finishedAt": "2026-10-05T21:54:44.431111Z"
+      }
+    ]
+  },
+  "readonlyConfirmedAt": "2026-10-11T00:49:45.296Z",
+  "readonlyFinishedAt": "2026-10-11T00:46:54.377949Z",
+  "readonlyHealth": {
+    "batchProgress": null,
+    "batchWorker": "disabled",
+    "blockNumber": 69972555,
+    "chainId": 10143,
+    "relayers": [
+      "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+    ],
+    "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+    "status": "ok",
+    "taskSubmissionEnabled": false
+  },
+  "activationRequestedAt": "2026-10-11T00:49:46.607Z",
+  "activationDeploy": "dep-db5dqap42hec738jogl0"
+}
