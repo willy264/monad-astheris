@@ -1,0 +1,5 @@
+.nonce { width: 17ch; max-width: 170px; }
+.nonce summary { cursor: pointer; white-space: nowrap; color: #c5c7d8; }
+.expanded { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 10px; white-space: normal; }
+.expanded code { display: block; max-width: 100%; overflow-wrap: anywhere; user-select: all; }
+.expanded span { font: 11px/1.5 var(--font-sans), sans-serif; color: var(--muted); }

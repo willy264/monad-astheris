@@ -250,6 +250,11 @@ impl Engine {
             .get_transaction_count(relayer.address)
             .pending()
             .await?;
+        let confirmed_nonce = relayer
+            .provider
+            .get_transaction_count(relayer.address)
+            .await?;
+        ensure!(nonce == confirmed_nonce, "relayer has an unjournaled pending transaction; reconcile the signer before any new broadcast");
         let broadcast_key = format!("{journal_key}:broadcast-intent");
         let intent = serde_json::json!({"nonce":nonce,"sender":relayer.address,"router":self.router,"calldataHash":keccak256(&data)});
         ensure!(self.store.reserve(broadcast_key,&intent).await?, "prior broadcast intent has no durable transaction hash; reconcile signer nonce before any retry");
@@ -464,6 +469,57 @@ mod tests {
             .await
             .unwrap_err();
         assert!(error.to_string().contains("ambiguous prior broadcast"));
+    }
+
+    #[tokio::test]
+    async fn missing_journal_with_pending_signer_nonce_cannot_broadcast() {
+        use axum::{routing::post, Json, Router};
+        use serde_json::{json, Value};
+        let _ = rustls::crypto::ring::default_provider().install_default();
+        let dir = tempfile::tempdir().unwrap();
+        let store = Store::open(dir.path().join("state.redb")).unwrap();
+        let calls = Arc::new(Mutex::new(Vec::<Value>::new()));
+        let captured = calls.clone();
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}", listener.local_addr().unwrap());
+        let app=Router::new().route("/",post(move |Json(request):Json<Value>| {let calls=captured.clone();async move {
+            calls.lock().await.push(request.clone());assert_eq!(request["method"],"eth_getTransactionCount");
+            Json(json!({"jsonrpc":"2.0","id":request["id"],"result":if request["params"][1]=="pending" {"0x8"} else {"0x7"}}))
+        }}));
+        let server = tokio::spawn(async move {
+            axum::serve(listener, app).await.unwrap();
+        });
+        let provider = ProviderBuilder::new()
+            .connect_http(url.parse().unwrap())
+            .erased();
+        let engine = Engine {
+            provider: provider.clone(),
+            router: Address::repeat_byte(2),
+            relayers: vec![Relayer {
+                address: Address::repeat_byte(1),
+                provider,
+                lock: Mutex::new(()),
+            }],
+            permits: Arc::new(Semaphore::new(1)),
+            confirmations: 1,
+            store: store.clone(),
+            http: reqwest::Client::new(),
+            rpc_url: url,
+        };
+        let error = engine
+            .send(&engine.relayers[0], vec![1, 2, 3], "new-task".into())
+            .await
+            .unwrap_err();
+        assert!(error
+            .to_string()
+            .contains("unjournaled pending transaction"));
+        assert_eq!(calls.lock().await.len(), 2);
+        assert!(store
+            .get::<Value>("new-task:broadcast-intent".into())
+            .await
+            .unwrap()
+            .is_none());
+        server.abort();
     }
 
     #[test]

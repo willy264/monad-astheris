@@ -61,12 +61,18 @@ test('history caps are independent from recent window caps and the extra row is 
 });
 test('Merkle verified status requires matching canonical batch identity, root, range and count', () => {
   const batchId = keccak256(encodePacked(['uint256', 'address', 'uint256', 'bytes32'], [10143n, scope.router as `0x${string}`, 42n, hash]));
-  const batch = { chainId: 10143, router: scope.router, batchId, blockNumber: '42', blockHash: hash, root: hash, leafCount: '2', status: 'committed', committedRoot: hash, committedLeafCount: '2', commitmentTx: hash };
+  const batch = { chainId: 10143, router: scope.router, batchId, blockNumber: '42', blockHash: hash, root: hash, leafCount: '2', status: 'committed', committedRoot: hash, committedLeafCount: '2', commitmentTx: hash, commitmentBlock: '42' };
   const commitment = { chainId: 10143, router: scope.router, batchId, root: hash, leafCount: '2', fromBlock: '42', toBlock: '42', verified: true };
   assert.equal(parseBatches([batch], [commitment], scope, 42n)[0].verified, true);
   assert.equal(parseBatches([batch], [{ ...commitment, leafCount: '1' }], scope, 42n)[0].verified, false);
   assert.equal(parseBatches([batch], [], scope, 42n)[0].verified, false);
   assert.throws(() => parseBatches([{ ...batch, batchId: hash }], [commitment], scope, 42n), /different block/);
+  const unpublished = parseBatches([{ ...batch, commitmentBlock: '43' }], [commitment], scope, 42n)[0];
+  assert.equal(unpublished.verified, false, 'A publication after the pinned checkpoint cannot verify an older execution');
+  assert.equal(unpublished.status, 'complete');
+  assert.equal(unpublished.commitmentTx, undefined);
+  assert.equal(parseBatches([{ ...batch, commitmentBlock: null }], [commitment], scope, 42n)[0].verified, false);
+  assert.throws(() => parseBatches([{ ...batch, commitmentBlock: '41' }], [commitment], scope, 42n), /precedes/);
 });
 test('GraphQL request bounds transport and never forwards provider errors or credentials to callers', async () => {
   const fetcher: typeof fetch = async (_url, options) => {

@@ -1,0 +1,503 @@
+{
+  "observations": [
+    {
+      "observedAt": "2026-10-11T00:44:02.892Z",
+      "readOnly": true,
+      "service": {
+        "name": "monad-astheris-daemon",
+        "suspended": "not_suspended",
+        "autoDeploy": "no",
+        "shutdownDelaySeconds": 30
+      },
+      "deployment": {
+        "id": "dep-db5dn0flot8c73ejkc3g",
+        "status": "build_in_progress",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:42:41.58591Z"
+      },
+      "health": {
+        "batchWorker": "disabled",
+        "blockNumber": 69971416,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok"
+      },
+      "secondsSinceFinished": null,
+      "logs": []
+    },
+    {
+      "observedAt": "2026-10-11T00:45:11.037Z",
+      "readOnly": true,
+      "service": {
+        "name": "monad-astheris-daemon",
+        "suspended": "not_suspended",
+        "autoDeploy": "no",
+        "shutdownDelaySeconds": 30
+      },
+      "deployment": {
+        "id": "dep-db5dn0flot8c73ejkc3g",
+        "status": "build_in_progress",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:42:41.58591Z"
+      },
+      "health": {
+        "batchWorker": "disabled",
+        "blockNumber": 69971644,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok"
+      },
+      "secondsSinceFinished": null,
+      "logs": []
+    },
+    {
+      "observedAt": "2026-10-11T00:46:18.069Z",
+      "readOnly": true,
+      "service": {
+        "name": "monad-astheris-daemon",
+        "suspended": "not_suspended",
+        "autoDeploy": "no",
+        "shutdownDelaySeconds": 30
+      },
+      "deployment": {
+        "id": "dep-db5dn0flot8c73ejkc3g",
+        "status": "update_in_progress",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:42:41.58591Z"
+      },
+      "health": {
+        "batchWorker": "disabled",
+        "blockNumber": 69971865,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok"
+      },
+      "secondsSinceFinished": null,
+      "logs": []
+    },
+    {
+      "observedAt": "2026-10-11T00:47:30.093Z",
+      "readOnly": true,
+      "service": {
+        "name": "monad-astheris-daemon",
+        "suspended": "not_suspended",
+        "autoDeploy": "no",
+        "shutdownDelaySeconds": 30
+      },
+      "deployment": {
+        "id": "dep-db5dn0flot8c73ejkc3g",
+        "status": "live",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:42:41.58591Z",
+        "finishedAt": "2026-10-11T00:46:54.377949Z"
+      },
+      "health": {
+        "batchProgress": null,
+        "batchWorker": "disabled",
+        "blockNumber": 69972106,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok",
+        "taskSubmissionEnabled": false
+      },
+      "secondsSinceFinished": 35,
+      "logs": [
+        {
+          "timestamp": "2026-10-11T00:46:47.47721101Z",
+          "message": "2026-10-11T00:46:47.477088Z  INFO aetheris_daemon: Aetheris daemon ready address=0.0.0.0:10000 chain_id=10143",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-zgqqp"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:46:53.753212805Z",
+          "message": "2026-10-11T00:46:53.751225Z  INFO aetheris_daemon: Shutdown requested; HTTP listener draining active requests",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-sjmmn"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-10-11T00:48:39.071Z",
+      "readOnly": true,
+      "service": {
+        "name": "monad-astheris-daemon",
+        "suspended": "not_suspended",
+        "autoDeploy": "no",
+        "shutdownDelaySeconds": 30
+      },
+      "deployment": {
+        "id": "dep-db5dn0flot8c73ejkc3g",
+        "status": "live",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:42:41.58591Z",
+        "finishedAt": "2026-10-11T00:46:54.377949Z"
+      },
+      "health": {
+        "batchProgress": null,
+        "batchWorker": "disabled",
+        "blockNumber": 69972334,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok",
+        "taskSubmissionEnabled": false
+      },
+      "secondsSinceFinished": 104,
+      "logs": [
+        {
+          "timestamp": "2026-10-11T00:46:47.47721101Z",
+          "message": "2026-10-11T00:46:47.477088Z  INFO aetheris_daemon: Aetheris daemon ready address=0.0.0.0:10000 chain_id=10143",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-zgqqp"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:46:53.753212805Z",
+          "message": "2026-10-11T00:46:53.751225Z  INFO aetheris_daemon: Shutdown requested; HTTP listener draining active requests",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-sjmmn"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-10-11T00:49:35.482Z",
+      "readOnly": true,
+      "service": {
+        "name": "monad-astheris-daemon",
+        "suspended": "not_suspended",
+        "autoDeploy": "no",
+        "shutdownDelaySeconds": 30
+      },
+      "deployment": {
+        "id": "dep-db5dn0flot8c73ejkc3g",
+        "status": "live",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:42:41.58591Z",
+        "finishedAt": "2026-10-11T00:46:54.377949Z"
+      },
+      "health": {
+        "batchProgress": null,
+        "batchWorker": "disabled",
+        "blockNumber": 69972521,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok",
+        "taskSubmissionEnabled": false
+      },
+      "secondsSinceFinished": 161,
+      "logs": [
+        {
+          "timestamp": "2026-10-11T00:46:47.47721101Z",
+          "message": "2026-10-11T00:46:47.477088Z  INFO aetheris_daemon: Aetheris daemon ready address=0.0.0.0:10000 chain_id=10143",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-zgqqp"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:46:53.753212805Z",
+          "message": "2026-10-11T00:46:53.751225Z  INFO aetheris_daemon: Shutdown requested; HTTP listener draining active requests",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-sjmmn"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-10-11T00:52:32.441Z",
+      "readOnly": true,
+      "service": {
+        "name": "monad-astheris-daemon",
+        "suspended": "not_suspended",
+        "autoDeploy": "no",
+        "shutdownDelaySeconds": 30
+      },
+      "deployment": {
+        "id": "dep-db5dqap42hec738jogl0",
+        "status": "live",
+        "commit": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+        "createdAt": "2026-10-11T00:49:47.688818Z",
+        "finishedAt": "2026-10-11T00:50:01.58024Z"
+      },
+      "health": {
+        "batchProgress": {
+          "finalizedBlock": 69973102,
+          "historyThrough": 67976960,
+          "indexerHints": "available",
+          "recentThrough": 69973102
+        },
+        "batchWorker": "running",
+        "blockNumber": 69973107,
+        "chainId": 10143,
+        "relayers": [
+          "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+        ],
+        "router": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+        "status": "ok",
+        "taskSubmissionEnabled": true
+      },
+      "secondsSinceFinished": 150,
+      "logs": [
+        {
+          "timestamp": "2026-10-11T00:49:58.972035746Z",
+          "message": "2026-10-11T00:49:58.971876Z  INFO aetheris_daemon: Aetheris daemon ready address=0.0.0.0:10000 chain_id=10143",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:01.02348369Z",
+          "message": "2026-10-11T00:50:01.021541Z  INFO aetheris_daemon: Shutdown requested; HTTP listener draining active requests",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-zgqqp"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:04.421237996Z",
+          "message": "2026-10-11T00:50:04.421123Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885224 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69885224",
+          "transactionHash": "0x3a9d46ebeb29f12e78a8f05efb64f9ffc61e93d1173e77f43dcc887a8cded320",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:08.747413372Z",
+          "message": "2026-10-11T00:50:08.747299Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884353 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69884353",
+          "transactionHash": "0xdc9c54be5b8007674a0b0054f55674dd13044ddde292b8a1caa2700ea5acf73f",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:13.021776173Z",
+          "message": "2026-10-11T00:50:13.021656Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884380 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69884380",
+          "transactionHash": "0x00ed8d6e62ce0a7276bc389c31e6180d80c8e19290d9e0054ffc8d50c3011d7f",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:13.138166353Z",
+          "message": "2026-10-11T00:50:13.138059Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858120 status=\"already_committed\" transaction=None",
+          "sourceBlock": "69858120",
+          "publicationStatus": "already_committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:17.391327887Z",
+          "message": "2026-10-11T00:50:17.391166Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884408 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69884408",
+          "transactionHash": "0x9816c3519efa4836699c7196a99f3099a07d78db77e41259fb9c7545f3d8f7fd",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:21.682881221Z",
+          "message": "2026-10-11T00:50:21.682588Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885197 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69885197",
+          "transactionHash": "0xfbe62d443ba70508cc8b06bd623eaa5912c2ee41b8ea8ea7465358d3fa49abdb",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:25.973047413Z",
+          "message": "2026-10-11T00:50:25.972906Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885142 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69885142",
+          "transactionHash": "0xb0f08bda7af9d86222c835723d5e8145b05d459274a11c5409258190dfe41cc1",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:30.752129944Z",
+          "message": "2026-10-11T00:50:30.752015Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884325 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69884325",
+          "transactionHash": "0xfb012771135051ef8e55e1ade6bc5660b64ecd3f58ccdc1fcf740f4d3f080455",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:33.481709577Z",
+          "message": "2026-10-11T00:50:33.481574Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858203 status=\"already_committed\" transaction=None",
+          "sourceBlock": "69858203",
+          "publicationStatus": "already_committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:37.753335864Z",
+          "message": "2026-10-11T00:50:37.753214Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885170 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69885170",
+          "transactionHash": "0xf38ad129eca1813f0e5a0b454992fa156f98b87e76343b2e1f08656170f2dbda",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:37.928537504Z",
+          "message": "2026-10-11T00:50:37.928378Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858175 status=\"already_committed\" transaction=None",
+          "sourceBlock": "69858175",
+          "publicationStatus": "already_committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:38.12529618Z",
+          "message": "2026-10-11T00:50:38.125188Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69066769 status=\"already_committed\" transaction=None",
+          "sourceBlock": "69066769",
+          "publicationStatus": "already_committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:38.247291432Z",
+          "message": "2026-10-11T00:50:38.246971Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858148 status=\"already_committed\" transaction=None",
+          "sourceBlock": "69858148",
+          "publicationStatus": "already_committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:38.377435085Z",
+          "message": "2026-10-11T00:50:38.377331Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69858093 status=\"already_committed\" transaction=None",
+          "sourceBlock": "69858093",
+          "publicationStatus": "already_committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:42.657214945Z",
+          "message": "2026-10-11T00:50:42.657002Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69884435 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69884435",
+          "transactionHash": "0xe1558821297ebf9ea89fc74c4cbaa1fb306d36f1fd195872acff246bb1f382d1",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        },
+        {
+          "timestamp": "2026-10-11T00:50:47.509963905Z",
+          "message": "2026-10-11T00:50:47.509811Z  INFO aetheris_daemon::merkle::worker: Indexed task block verified and batch reconciled block=69885252 status=\"committed\" transaction=Some([hex redacted])",
+          "sourceBlock": "69885252",
+          "transactionHash": "0xd800043f864d26374b3f6ae568cbeab287c4f0a604bb0ea63aceb347c79077fe",
+          "publicationStatus": "committed",
+          "instanceLabels": [
+            {
+              "name": "instance",
+              "value": "srv-db0pe2vavr4c738pa9h0-vbs4r"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

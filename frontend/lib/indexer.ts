@@ -31,23 +31,34 @@ export async function getIndexedSnapshot(networkHead: bigint, lookback: bigint, 
   const windowStart = indexed >= lookback - 1n ? indexed - lookback + 1n : 0n;
   const from = deployment > windowStart ? deployment : windowStart;
   const range = { _gte: from.toString(), _lte: indexed.toString() };
-  const data = await request(`query Overview($agents: Agent_bool_exp!, $shards: EphemeralShard_bool_exp!, $executions: TaskExecution_bool_exp!, $batches: MerkleBatch_bool_exp!, $commitments: BatchCommitment_bool_exp!) {
+  const indexedRange = { _gte: deployment.toString(), _lte: indexed.toString() };
+  const indexedExecutions = { ...routerWhere(current), blockNumber: indexedRange, agent: { registry: { _eq: current.registry } } };
+  const data = await request(`query Overview($agents: Agent_bool_exp!, $shards: EphemeralShard_bool_exp!, $executions: TaskExecution_bool_exp!, $indexedExecutions: TaskExecution_bool_exp!, $verifiedBatches: TaskExecution_bool_exp!, $batches: MerkleBatch_bool_exp!, $commitments: BatchCommitment_bool_exp!) {
     registered: Agent_aggregate(where: $agents) { aggregate { count } }
+    completedTaskLanes: TaskExecution_aggregate(where: $indexedExecutions) { aggregate { count(columns: shard_id, distinct: true) } }
+    verifiedBatches: TaskExecution_aggregate(where: $verifiedBatches) { aggregate { count(columns: batch_id, distinct: true) } }
     active: TaskExecution_aggregate(where: $executions) { aggregate { count(columns: agentId, distinct: true) } }
     executions: TaskExecution_aggregate(where: $executions) { aggregate { count } }
     shards: EphemeralShard(where: $shards, limit: 201, order_by: [{createdBlock: desc}, {id: asc}]) {
       id chainId router address agentId taskId sequenceNonce executor inputHash outputHash proofHash status createdBlock completedBlock creationTx agent { registry } execution { transactionHash blockNumber }
     }
-    batches: MerkleBatch(where: $batches, limit: 12, order_by: {blockNumber: desc}) { chainId router batchId blockNumber blockHash root leafCount status committedRoot committedLeafCount commitmentTx }
+    batches: MerkleBatch(where: $batches, limit: 12, order_by: {blockNumber: desc}) { chainId router batchId blockNumber blockHash root leafCount status committedRoot committedLeafCount commitmentTx commitmentBlock }
     commitments: BatchCommitment(where: $commitments, limit: 24, order_by: {fromBlock: desc}) { chainId router batchId root leafCount fromBlock toBlock verified transactionHash }
   }`, {
     agents: agentWhere(current), shards: shardHistoryWhere(current, deployment, indexed),
+    indexedExecutions,
     executions: { ...routerWhere(current), blockNumber: range, agent: { registry: { _eq: current.registry } } },
-    batches: { ...routerWhere(current), blockNumber: { _lte: indexed.toString() } }, commitments: { ...routerWhere(current), toBlock: { _lte: indexed.toString() } },
+    batches: { ...routerWhere(current), blockNumber: indexedRange },
+    // The indexer assigns "committed" only after matching the root, leaf count
+    // and canonical batch identity. Bound publication as well as execution to
+    // the pinned checkpoint; a later commitment must not leak into this total.
+    verifiedBatches: { ...indexedExecutions, batch: { ...routerWhere(current), blockNumber: indexedRange, commitmentBlock: indexedRange, status: { _eq: 'committed' } } },
+    commitments: { ...routerWhere(current), fromBlock: { _gte: deployment.toString() }, toBlock: { _lte: indexed.toString() } },
   });
   const shardData = parseShardHistory(data.shards, current, deployment, indexed, from);
   return { fromBlock: from.toString(), registeredAgents: String(count(data.registered)), activeAgents: count(data.active), executions: count(data.executions),
     ...shardData, batches: parseBatches(data.batches, data.commitments, current, indexed),
+    indexedTotals: { completedTaskLanes: count(data.completedTaskLanes), verifiedBatchRoots: count(data.verifiedBatches), fromBlock: deployment.toString(), toBlock: indexed.toString() },
     source: { kind: 'envio' as const, indexedThrough: indexed.toString(), lagBlocks: (networkHead - indexed).toString() } };
 }
 export async function getIndexedAgents(page: number) {

@@ -1,0 +1,159 @@
+{
+  "checks": [
+    {
+      "name": "Overview shows indexed completed total instead of recent zero",
+      "width": 1440,
+      "passed": true,
+      "text": "Completed task lanes\n16\n16\nIndexed total\nAll indexed completions \u00b7 through block 69971115",
+      "value": "16",
+      "scroll": 1425
+    },
+    {
+      "name": "All-indexed totals remain independent of recent window and latest12 rows",
+      "width": 1440,
+      "passed": true,
+      "stats": [
+        "16",
+        "0",
+        "6",
+        "Every 12s"
+      ],
+      "latestTableMatched": 2
+    },
+    {
+      "name": "Historical topology and ledger retain Agent2 completed tasks without page overflow",
+      "width": 1440,
+      "passed": true,
+      "nodes": 16,
+      "agent2": 15,
+      "ledger": 16,
+      "scroll": 1425,
+      "viewport": 1440
+    },
+    {
+      "name": "Unpublished batches say Awaiting publication rather than verification failure",
+      "width": 1440,
+      "passed": true,
+      "pending": 10,
+      "hasFailedCopy": false
+    },
+    {
+      "name": "Long nonce stays compact with full accessible expandable value",
+      "width": 229.6875,
+      "passed": true,
+      "compact": "45501704\u2026933580",
+      "full": "4550170463569152272556905480349370672217757726490416898369967293102622933580",
+      "accessible": "Sequence nonce 4550170463569152272556905480349370672217757726490416898369967293102622933580. Expand for the full value and copy control.",
+      "title": "4550170463569152272556905480349370672217757726490416898369967293102622933580",
+      "scroll": 1425,
+      "viewport": 1440
+    },
+    {
+      "name": "Copy nonce preserves every digit using isolated clipboard stub",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "name": "Blocked clipboard retains selectable full nonce",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "name": "Shard detail uses compact nonce with full value",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "name": "Overview shows indexed completed total instead of recent zero",
+      "width": 390,
+      "passed": true,
+      "text": "Completed task lanes\n16\n16\nIndexed total\nAll indexed completions \u00b7 through block 69971115",
+      "value": "16",
+      "scroll": 375
+    },
+    {
+      "name": "All-indexed totals remain independent of recent window and latest12 rows",
+      "width": 390,
+      "passed": true,
+      "stats": [
+        "16",
+        "0",
+        "6",
+        "Every 12s"
+      ],
+      "latestTableMatched": 2
+    },
+    {
+      "name": "Historical topology and ledger retain Agent2 completed tasks without page overflow",
+      "width": 390,
+      "passed": true,
+      "nodes": 16,
+      "agent2": 15,
+      "ledger": 16,
+      "scroll": 375,
+      "viewport": 390
+    },
+    {
+      "name": "Unpublished batches say Awaiting publication rather than verification failure",
+      "width": 390,
+      "passed": true,
+      "pending": 10,
+      "hasFailedCopy": false
+    },
+    {
+      "name": "Long nonce stays compact with full accessible expandable value",
+      "width": 162.390625,
+      "passed": true,
+      "compact": "45501704\u2026933580",
+      "full": "4550170463569152272556905480349370672217757726490416898369967293102622933580",
+      "accessible": "Sequence nonce 4550170463569152272556905480349370672217757726490416898369967293102622933580. Expand for the full value and copy control.",
+      "title": "4550170463569152272556905480349370672217757726490416898369967293102622933580",
+      "scroll": 375,
+      "viewport": 390
+    },
+    {
+      "name": "Copy nonce preserves every digit using isolated clipboard stub",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "name": "Blocked clipboard retains selectable full nonce",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "name": "Shard detail uses compact nonce with full value",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "name": "No browser exceptions or paid requests; SDK telemetry remained blocked",
+      "passed": true
+    }
+  ],
+  "reading": {
+    "chainId": 10143,
+    "indexedTotals": {
+      "completedTaskLanes": 16,
+      "verifiedBatchRoots": 6,
+      "fromBlock": "67972561",
+      "toBlock": "69971115"
+    },
+    "recentExecutions": 0,
+    "historyRows": 16,
+    "agent2": 15,
+    "tableMatchedRoots": 2,
+    "pendingRows": 10
+  },
+  "passed": true,
+  "observedAt": "2026-10-11T00:42:31.402Z",
+  "revision": "59b115336da2c9e5dedb79d7c17eb72d5f761a1c",
+  "environment": "Local production build at desktop 1440px and mobile 390px; actual public API response captured once for stable rendering checks",
+  "frontendTests": 173,
+  "daemonTests": 36,
+  "limits": [
+    "No wallet signatures, task submissions or payments were made by this browser harness.",
+    "Wallet SDK telemetry was blocked; these checks do not establish a passkey ceremony.",
+    "The live snapshot predates automatic batch publication."
+  ]
+}
