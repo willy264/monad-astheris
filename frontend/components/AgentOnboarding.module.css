@@ -41,7 +41,8 @@
 .balances strong small { display: inline; font: inherit; }
 .executors { list-style: none; padding: 0; margin: 0 0 16px; }
 .executors li { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin-top: 8px; color: #bcbcc5; font-size: 11px; }
-.executors a { font-family: var(--font-mono), monospace; color: #edcf6d; }
+.executors li > div { min-width: 0; flex: 1; }
+.executors a { overflow-wrap: anywhere; font-family: var(--font-mono), monospace; color: #edcf6d; }
 .funding { display: grid; gap: 12px; padding: 16px; border: 1px solid #ffffff10; border-radius: 12px; margin-bottom: 16px; }
 .funding strong { color: #dedee5; font-size: 12px; line-height: 1.6; }
 .funding p { margin: 8px 0 0; font-size: 11px; overflow-wrap: anywhere; }

@@ -7,12 +7,12 @@ import { isEthereumWallet } from '@dynamic-labs/ethereum';
 import { isAddress, type Address, type Hash } from 'viem';
 import { contracts, explorerAddress, explorerTx, identityAbi, monadTestnet, routerAbi, truncate, walletPublicClient } from '@/lib/contracts';
 import { Notice } from './Shared';
-import { requireDelegationTarget, verifyDelegationReceipt } from '@/lib/delegation';
+import { executorAuthorityLabel, requireDelegationTarget, verifyDelegationReceipt } from '@/lib/delegation';
 import { userErrorMessage } from '@/lib/user-error';
 import { useAccessSession } from './AccessContext';
 import { passkeyErrorMessage, registerAccountPasskey, requirePasskeyVerification } from '@/lib/passkey';
 
-export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?: string }) {
+export default function WalletAccess({ initialAgentId = '1', initialExecutor = '', selectionRevision = 0 }: { initialAgentId?: string; initialExecutor?: string; selectionRevision?: number }) {
   const { withWalletPrompt } = useAccessSession();
   const { primaryWallet, user, setShowDynamicUserProfile } = useDynamicContext();
   const dynamicClient = useDynamicClient();
@@ -22,7 +22,7 @@ export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?
   const registerPasskey = useRegisterPasskey();
   const { isStepUpRequired, promptStepUpAuth, resetState } = useStepUpAuthentication();
   const [agentId, setAgentId] = useState(initialAgentId);
-  const [delegate, setDelegate] = useState('');
+  const [delegate, setDelegate] = useState(initialExecutor);
   const isConnectedExecutor = Boolean(primaryWallet && isAddress(delegate) && delegate.toLowerCase() === primaryWallet.address.toLowerCase());
   const [hours, setHours] = useState('1');
   const [busy, setBusy] = useState(false);
@@ -38,13 +38,34 @@ export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?
   });
   const ownsAgent = Boolean(ownership.data && ownership.data.toLowerCase() === walletAddress);
   const canManage = ownsAgent && !ownership.isError && !ownership.isFetching;
+  const authority = useQuery({
+    queryKey: ['executor-authority', contracts.router, agentId, delegate],
+    enabled: Boolean(contracts.router && validAgentId && isAddress(delegate)),
+    retry: false,
+    refetchInterval: busy ? false : 15000,
+    queryFn: async () => {
+      const [grant, authorized, block] = await Promise.all([
+        walletPublicClient.readContract({ address: contracts.router!, abi: routerAbi, functionName: 'delegates', args: [BigInt(agentId), delegate as Address] }),
+        walletPublicClient.readContract({ address: contracts.router!, abi: routerAbi, functionName: 'isAuthorized', args: [BigInt(agentId), delegate as Address] }),
+        walletPublicClient.getBlock({ blockTag: 'latest' }),
+      ]);
+      return { authorized, expiresAt: grant[1], label: executorAuthorityLabel(authorized, grant[1], block.timestamp) };
+    },
+  });
   const session = `${walletAddress}:${agentId}`;
   const currentSession = useRef(session);
   currentSession.current = session;
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
-  const appliedAgentId = useRef(initialAgentId);
-  useEffect(() => { if (!busy && appliedAgentId.current !== initialAgentId) { setAgentId(initialAgentId); appliedAgentId.current = initialAgentId; } }, [initialAgentId, busy]);
+  const appliedSelection = useRef({ initialAgentId, initialExecutor, selectionRevision });
+  useEffect(() => {
+    const previous = appliedSelection.current;
+    if (busy || (previous.initialAgentId === initialAgentId && previous.initialExecutor === initialExecutor && previous.selectionRevision === selectionRevision)) return;
+    // Reopening the same action must discard a different manually entered target.
+    // Keep an in-flight transaction attached to its original selection until it settles.
+    setAgentId(initialAgentId); setDelegate(initialExecutor); setHours('1');
+    appliedSelection.current = { initialAgentId, initialExecutor, selectionRevision };
+  }, [initialAgentId, initialExecutor, selectionRevision, busy]);
   const [error, setError] = useState('');
   const [hash, setHash] = useState<Hash>();
   const [confirmed, setConfirmed] = useState(false);
@@ -116,7 +137,9 @@ export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?
         return wallet;
       });
       assertCurrent();
-      const expiresAt = hours === '0' ? 0n : BigInt(Math.floor(Date.now() / 1000) + Number(hours) * 3600);
+      const chainBlock = await walletPublicClient.getBlock({ blockTag: 'latest' });
+      assertCurrent();
+      const expiresAt = hours === '0' ? 0n : chainBlock.timestamp + BigInt(Number(hours) * 3600);
       const { request } = await walletPublicClient.simulateContract({ address: contracts.router, abi: routerAbi, functionName: 'setDelegate', args: [BigInt(agentId), delegate, expiresAt], account: signer });
       const transaction = await withWalletPrompt(async () => {
         const [accounts, walletChain] = await Promise.all([client.getAddresses(), client.getChainId()]);
@@ -125,9 +148,9 @@ export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?
         return client.writeContract({ ...request, account: signer, chain: monadTestnet });
       });
       if (mounted.current && currentSession.current === origin) setHash(transaction);
-      const receipt = await walletPublicClient.waitForTransactionReceipt({ hash: transaction, confirmations: 1, timeout: 120000 });
-      verifyDelegationReceipt(receipt, transaction, contracts.router, owner);
-      if (mounted.current && currentSession.current === origin) setConfirmed(true);
+      const receipt = await walletPublicClient.waitForTransactionReceipt({ hash: transaction, confirmations: 2, timeout: 120000 });
+      verifyDelegationReceipt(receipt, transaction, contracts.router, owner, { agentId: BigInt(agentId), executor: delegate, expiresAt });
+      if (mounted.current && currentSession.current === origin) { setConfirmed(true); void authority.refetch(); }
     } catch (cause) { if (mounted.current && currentSession.current === origin) setError(userErrorMessage(cause, 'The delegation request could not be confirmed. Check your wallet activity before trying again.')); }
     finally { setBusy(false); }
   }
@@ -138,6 +161,8 @@ export default function WalletAccess({ initialAgentId = '1' }: { initialAgentId?
     </div>}
     <form className="delegate-form" onSubmit={authorize}><div className="form-field"><label htmlFor="agent-id">Agent ID</label><input id="agent-id" value={agentId} onChange={(event) => setAgentId(event.target.value)} placeholder="e.g. 1" inputMode="numeric" required disabled={busy} /></div><div className="form-field executor-field"><label htmlFor="executor">Executor wallet</label><input id="executor" value={delegate} onChange={(event) => setDelegate(event.target.value)} placeholder="0x…" autoComplete="off" required disabled={busy} /></div><div className="form-field"><label htmlFor="duration">Authorization</label><select id="duration" value={hours} onChange={(event) => setHours(event.target.value)} disabled={busy}><option value="1">1 hour</option><option value="6">6 hours</option><option value="24">24 hours</option><option value="168">7 days</option><option value="0">Revoke access</option></select></div><button className="button button-primary" type="submit" disabled={busy || !primaryWallet || !canManage || isConnectedExecutor}>{busy ? 'Confirming…' : hours === '0' ? 'Revoke executor' : 'Authorize executor'}</button></form>
     {canManage && isConnectedExecutor && <Notice>You entered your connected wallet. Agent owners already have task authority, which cannot be revoked here. Enter a different executor address. For Aetheris tasks, <a className="text-link" href="/#interactive-demo">use guided setup to authorize the task executor</a>.</Notice>}
+    {validAgentId && isAddress(delegate) && <div aria-live="polite">{authority.isFetching ? <Notice>Checking executor authority...</Notice> : authority.isError ? <Notice error>Executor authority could not be checked. <button type="button" className="text-link" onClick={() => void authority.refetch()}>Check again</button></Notice> : authority.data && <Notice>{authority.data.label}.{authority.data.expiresAt > 0n && <> Recorded expiry: {new Date(Number(authority.data.expiresAt) * 1000).toUTCString()}.</>}{canManage && !isConnectedExecutor && hours !== '0' && <><br /><button type="button" className="text-link" disabled={busy} onClick={() => setHours('0')}>Choose executor revocation</button></>}</Notice>}</div>}
+    {hours === '0' && <Notice>Revocation sets this executor's expiry to zero. Confirm the displayed agent and executor, then approve the separate wallet transaction. Existing task receipts remain available.</Notice>}
     <p className="form-note">The executor may create and execute tasks for this agent until expiry. This permission does not transfer the agent identity or grant access to wallet funds.</p>
     {error && <Notice error>{error}</Notice>}{hash && <Notice>{confirmed ? 'Delegation confirmed.' : 'Transaction submitted; awaiting confirmation.'} <a href={explorerTx(hash)} target="_blank" rel="noreferrer" className="text-link">View transaction ↗</a></Notice>}
   </div>;

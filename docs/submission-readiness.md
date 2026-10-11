@@ -1,5 +1,7 @@
 # Submission readiness: live-site audit
 
+**Later October 11 remediation:** use the [final readiness report](../submission/2026-10-11/final-readiness.md) for current statuses, 22 tasks/22 roots, repaired code, fresh test counts and exact next actions. The report below remains the earlier live-site snapshot. Wallet-based judging is still blocked.
+
 Evidence files identified as local files below are retained only in the verification workspace and are not published in this repository. Existing linked transaction evidence remains available in the repository.
 
 **Checked October 11, 2026. The core testnet workflow works, but the project is not ready to invite judges to connect a wallet.** MetaMask's current domain scan still returns `BLOCK`. Resolve that classification and the remaining proof/presentation items below before an interactive judging session.

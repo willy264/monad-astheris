@@ -543,6 +543,8 @@ mod tests {
             private_keys: vec![format!("{:064x}", 1)],
             listen: "127.0.0.1:0".parse().unwrap(),
             database: String::new(),
+            database_require_existing: false,
+            database_mount_path: None,
             cors_origin: String::new(),
             confirmations: 1,
             deployment_block: 1,

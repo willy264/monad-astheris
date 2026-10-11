@@ -29,6 +29,8 @@ pub struct AppState {
     pub store: store::Store,
     pub batch_health: Arc<RwLock<&'static str>>,
     pub task_submission_enabled: bool,
+    pub journal_mount_verified: bool,
+    pub recovery_summary: store::RecoverySummary,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -100,7 +102,11 @@ async fn main() -> anyhow::Result<()> {
         )
         .init();
     let config = config::Config::from_env()?;
-    let store = store::Store::open(&config.database)?;
+    let store = store::Store::open_checked(
+        &config.database,
+        config.database_require_existing,
+        config.database_mount_path.as_deref(),
+    )?;
     if command == Command::Serve {
         let interrupted = store.mark_interrupted_jobs().await?;
         if interrupted > 0 {
@@ -110,6 +116,20 @@ async fn main() -> anyhow::Result<()> {
             );
         }
     }
+    let recovery_summary = store.recovery_summary().await?;
+    tracing::info!(
+        jobs = recovery_summary.jobs,
+        completed_jobs = recovery_summary.completed_jobs,
+        reconciliation_jobs = recovery_summary.reconciliation_jobs,
+        payment_reservations = recovery_summary.payment_reservations,
+        settlement_intents = recovery_summary.settlement_intents,
+        batches = recovery_summary.batches,
+        broadcast_intents = recovery_summary.broadcast_intents,
+        unresolved_signers = recovery_summary.unresolved_signers,
+        access_requests = recovery_summary.access_requests,
+        mount_verified = config.database_mount_path.is_some(),
+        "journal recovery complete; no interrupted task or payment automatically resubmitted"
+    );
     let engine = router::Engine::connect(&config, store.clone()).await
         .map_err(|_| anyhow::anyhow!("RPC/router/relayer initialization failed; verify configured network, deployment and signer keys"))?;
     if let Command::CommitBlock(block) = command {
@@ -133,6 +153,8 @@ async fn main() -> anyhow::Result<()> {
         payments,
         store: store.clone(),
         task_submission_enabled: config.task_submission_enabled,
+        journal_mount_verified: config.database_mount_path.is_some(),
+        recovery_summary,
         batch_health: Arc::new(RwLock::new(if config.batch_enabled {
             "running"
         } else {
@@ -219,6 +241,20 @@ fn shutdown_signal() -> anyhow::Result<impl std::future::Future<Output = ()>> {
 }
 
 async fn health(State(state): State<AppState>) -> ApiResult {
+    tokio::time::timeout(Duration::from_secs(5), state.store.health_check())
+        .await
+        .map_err(|_| {
+            ApiError(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "Journal write probe timed out; paid execution requires durable storage".into(),
+            )
+        })?
+        .map_err(|_| {
+            ApiError(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "Journal unavailable; preserve existing data and restore storage".into(),
+            )
+        })?;
     let block = tokio::time::timeout(
         Duration::from_secs(5),
         state.engine.provider.get_block_number(),
@@ -238,7 +274,7 @@ async fn health(State(state): State<AppState>) -> ApiResult {
     } else {
         StatusCode::OK
     };
-    Ok((code,Json(json!({"status":if stopped { "degraded" } else { "ok" },"batchWorker":batch_health,"batchProgress":batch_progress,"taskSubmissionEnabled":state.task_submission_enabled,"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"blockNumber":block}))).into_response())
+    Ok((code,Json(json!({"status":if stopped { "degraded" } else { "ok" },"journal":{"writable":true,"mountVerified":state.journal_mount_verified,"startupRecovery":state.recovery_summary},"batchWorker":batch_health,"batchProgress":batch_progress,"taskSubmissionEnabled":state.task_submission_enabled,"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"blockNumber":block}))).into_response())
 }
 
 async fn public_config(State(state): State<AppState>) -> Json<Value> {
@@ -358,6 +394,22 @@ async fn submit(
                     tracing::error!(%request_id, category="journal_write_failed", "cannot journal confirmed execution; settlement paused");
                     record.error =
                         Some("confirmed execution requires journal reconciliation".into());
+                    return record;
+                }
+                // The persisted boundary distinguishes no settlement attempt from a
+                // possibly accepted remote request whose response was lost. Never retry
+                // an existing intent automatically, even after a process restart.
+                if !matches!(
+                    state
+                        .store
+                        .reserve(
+                            format!("settlement-intent:{request_id}"),
+                            &json!({"paymentId":payment.id})
+                        )
+                        .await,
+                    Ok(true)
+                ) {
+                    record.error = Some("Payment settlement requires journal reconciliation; no retry was submitted".into());
                     return record;
                 }
                 match state.payments.settle(&payment).await {

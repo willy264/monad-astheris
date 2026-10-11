@@ -19,14 +19,14 @@ function fixture(context: TestContext) {
   const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage'); const values = new Map<string, string>();
   Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value) } });
   context.after(() => { Object.assign(contracts, previous); if (descriptor) Object.defineProperty(globalThis, 'localStorage', descriptor); else Reflect.deleteProperty(globalThis, 'localStorage'); });
-  const state = { account: owner, chainId: 10143, current: true, signatures: 0, afterSign: () => {} };
+  const state = { account: owner, chainId: 10143, current: true, signatures: 0, signerAuthorized: true, executorAuthorized: true, afterSign: () => {} };
   context.mock.method(rpc, 'getChainId', async () => 10143);
   context.mock.method(rpc, 'getBlock', async () => ({ timestamp: BigInt(Math.floor(Date.now() / 1000)) }));
   context.mock.method(rpc, 'readContract', async (input: { functionName: string; args?: readonly unknown[] }) => {
     if (input.functionName === 'identityRegistry') return identity;
     if (input.functionName === 'ownerOf') { assert.equal(input.args?.[0], 42n); return owner; }
     if (input.functionName === 'balanceOf') return 50n;
-    if (input.functionName === 'isAuthorized') { assert.equal(input.args?.[0], 42n); return true; }
+    if (input.functionName === 'isAuthorized') { assert.equal(input.args?.[0], 42n); return input.args?.[1] === executor ? state.executorAuthorized : state.signerAuthorized; }
     throw new Error('Unexpected chain read.');
   });
   context.mock.method(globalThis, 'fetch', async () => { throw new Error('Preparing signatures must never make a paid HTTP request.'); });
@@ -96,4 +96,17 @@ test('an obsolete setup cannot open a network-switch prompt before signing', asy
   state.current = false; state.chainId = 1;
   await assert.rejects(() => signDemo(config, wallet, owner, () => {}, undefined, { journalContext: scope, isCurrent: () => state.current }), /changed/);
   assert.equal(state.signatures, 0); assert.equal(values.size, 0);
+});
+
+test('revoked or expired authority stops before any signing prompt while saved receipts remain readable', async context => {
+  for (const actor of ['signerAuthorized', 'executorAuthorized'] as const) await context.test(actor, async child => {
+    const { state, wallet, values } = fixture(child);
+    const previous = journal(); saveDemo(previous, undefined, 'demo', scope);
+    const stored = [...values.values()];
+    state[actor] = false;
+    await assert.rejects(() => signDemo(config, wallet, owner, () => assert.fail('No task or payment prompt may start'), undefined, { journalContext: scope }), /authorized delegate|delegate execution/);
+    assert.equal(state.signatures, 0);
+    assert.deepEqual([...values.values()], stored, 'revocation cannot rewrite previous receipts');
+    assert.equal(readDemo('demo', scope)?.records.length, 5, 'saved requests remain available for receipt recovery');
+  });
 });

@@ -120,7 +120,7 @@ function TaskRun({ config, walletAddress, ready, setupBusy, onBusy, onSettledCou
   return <div className={styles.liveRun} data-testid="personal-agent-run">
     <div className={styles.runSteps}>
       <div className={styles.step}><span className={styles.stepNumber}>05</span><h3>Run your agent’s tasks</h3><p>Agent #{config.agentId} · {truncate(walletAddress)}<br />Five browser checksum workloads, each in its own storage shard.</p>
-        <button type="button" className={styles.primaryButton} disabled={!loaded || busy || setupBusy || !ready || Boolean(unresolved) || journalUnreadable} onClick={() => void run()}>{busy ? 'Following your tasks…' : 'Spawn 5 Autonomous Tasks'}</button>
+        <button type="button" className={styles.primaryButton} disabled={!loaded || busy || setupBusy || !ready || Boolean(unresolved) || journalUnreadable} onClick={() => void run()}>{busy ? 'Following your tasks…' : 'Run 5 checksum tasks'}</button>
         {!ready && <p className={styles.note}>Complete the setup checks above to start a new run. Saved requests can still be checked here.</p>}
         <p className={styles.note}>Five payments of {config.challenge.accepts[0].amount} token base units each. Token {truncate(config.policy.asset)}. Recipient {truncate(config.policy.receiver)}. Your wallet approves each task and payment.</p>
         {journal && <button type="button" className={styles.textButton} disabled={busy || setupBusy} onClick={() => void run(true)}>Recover saved status</button>}

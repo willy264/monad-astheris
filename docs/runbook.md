@@ -406,7 +406,7 @@ The daemon and indexer do not automatically publish reputation feedback or valid
 
 ## 6. Verification without deploying or paying
 
-The [verification record](../VERIFICATION.md) separates historical component checks from the final integration run: 38 contract tests, 17 Rust tests, 17 script tests, 18 judge frontend tests, two indexer tests and 61 ABI declarations were recorded, followed by MCP, RPC pagination and IPFS gateway tests. Linux Envio generation and generated-type checks passed. Four contracts and observer agent #1 were subsequently deployed/registered and their MCP output independently checked; see [live proof](../SUBMISSION_PROOF.md). Paid execution/settlement, actual passkey enrollment and hosted GraphQL output remain unverified. Re-run the commands for the integrated commit and record the actual results.
+Use the [current final readiness report](../submission/2026-10-11/final-readiness.md) and [verification record](../VERIFICATION.md) for fresh command results and exact scope. Existing paid execution, payment, validation and hosted Envio/Merkle evidence are independently checked in [live proof](../SUBMISSION_PROOF.md). Physical passkey ceremonies, explicit live revocation and durable Render storage remain gated; older test counts are historical.
 
 From each indicated directory, these checks require no funded keys:
 

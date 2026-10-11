@@ -1,5 +1,13 @@
 # Aetheris live evidence
 
+## Latest independent verification - October 11, 2026
+
+**22 completed indexed task lanes and 22 matching committed Merkle batches** were rechecked against finalized Monad Testnet records: 2 for Observer #1 and 20 for Checksum Agent #2. [All independently verified transaction hashes and explorer links](submission/2026-10-11/verified-transactions.md) and [canonical receipts, CREATE2/root checks, wallet state and actual GraphQL query/response](submission/2026-10-11/final-readiness-protocol.json) are published. These are read-only verification results, not new paid runs.
+
+All four contract runtime hashes and creation inputs match; [exact source inputs and constructors](docs/contract-source-verification.md) reproduce the artifacts. **Explorer acceptance remains NOT VERIFIED.** Observer token ID 1 retains its published IPFS URI. Its original payment/completion and project-controlled validation were rechecked; independent feedback remains absent, so Unrated/0 is correct.
+
+Use the [final readiness report](submission/2026-10-11/final-readiness.md), [judge/recording kit](submission/2026-10-11/submission-package.md) and [manual test guide](frontend/docs/manual-test-guide.md). MetaMask still blocks the domain; physical passkey and live revocation evidence are outstanding. Historical sections below remain dated proof, not current totals.
+
 Evidence files identified as local files below are retained only in the verification workspace and are not published in this repository. Existing linked transaction evidence remains available in the repository.
 
 Updated **2026-10-11**. Agent #2 has **15 indexed task completions** on **Monad Testnet, chain 10143**. The hosted worker has now automatically published the ten latest outstanding batches; together with earlier evidence, all **16 task batches** across Agents #1 and #2 have verified commitments. The original five-task self-service run includes independently checked registration, delegation, task and payment receipts. The additional batch evidence verifies canonical tasks and commitments without reconstructing original browser signatures or payment linkage. Physical passkey enrollment and explicit delegation revocation remain unverified.
@@ -68,7 +76,7 @@ Each batch contains **one leaf**. Envio returns `status: committed` and a matchi
 
 | Step | Observed result | Public evidence |
 | --- | --- | --- |
-| Deploy contracts | Four contracts have successful canonical receipts, verified code and registry/role links. Earliest deployment block: `67972561`. | [Live manifest](contracts/deployments/10143.json), [contract explorer links](README.md#deployment-manifest-and-explorer). |
+| Deploy contracts | Four contracts have successful canonical receipts, checked runtime bytecode and registry/role links. Earliest deployment block: `67972561`. | [Live manifest](contracts/deployments/10143.json), [contract explorer links](README.md#deployment-manifest-and-explorer). |
 | Register an agent | Aetheris Monad Observer is agent **1**, with an IPFS card and a public `get_monad_block` MCP tool. | [Registration manifest](contracts/deployments/10143.agent.json), [registration transaction](https://testnet.monadscan.com/tx/0xc9bbd6e8a390f4fb1788f3d305f241293ec919b49d35238c7aeda5c829f3a716), [card bytes](contracts/deployments/10143.agent-card.json). |
 | Grant task authority | The owner granted the dedicated task signer expiring authority. Authorization was verified before execution; this was wallet delegation, not a completed passkey ceremony. | [Grant proof](submission/2026-10-07/delegation-grant.json), [transaction](https://testnet.monadscan.com/tx/0xed2170affe40cff87744fb919280352b3c15db69fc19598513772af7ff083961). |
 | Invoke MCP and execute | The client called the actual observer, committed its input/output bytes, and verified the CREATE2 shard and task event. Execution block: **69066769**. | [Task proof](submission/2026-10-07/task-proof.json), [shard creation](https://testnet.monadscan.com/tx/0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d), [execution](https://testnet.monadscan.com/tx/0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a). |

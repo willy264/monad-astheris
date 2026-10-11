@@ -1,0 +1,58 @@
+--- a/src/lib/components/Portal/ModalComponent/ModalComponent.js
++++ b/src/lib/components/Portal/ModalComponent/ModalComponent.js
+@@ -18,7 +18,7 @@
+         inputKey: 'Escape',
+         onKeyPressed: handleClose,
+     });
+-    return (jsxs(ReactFocusLock, { className: 'modal-component__container', whiteList: whiteList, children: [withBackdrop && (jsx("div", { "data-testid": 'portal-backdrop', role: 'button', onClick: onBackdropClick, tabIndex: 0, "aria-label": 'Close modal', className: 'modal-component__backdrop' })), jsx("div", { children: children })] }));
++    return (jsxs(ReactFocusLock, { className: 'modal-component__container', returnFocus: true, lockProps: { role: 'dialog', 'aria-modal': true, 'aria-label': 'Wallet access' }, children: [withBackdrop && (jsx("div", { "data-testid": 'portal-backdrop', onClick: onBackdropClick, 'aria-hidden': true, className: 'modal-component__backdrop' })), jsx("div", { children: children })] }));
+ };
+ 
+ export { ModalComponent };
+--- a/src/lib/layout/DynamicAuthLayout/Header/header.js
++++ b/src/lib/layout/DynamicAuthLayout/Header/header.js
+@@ -133,12 +133,12 @@
+         setExistentAccountData(undefined);
+         setError(undefined);
+     }, [view.events, goBack, setExistentAccountData, setError]);
+-    const closeButton = showCloseButton && handleClose && (jsx(IconButton, { onClick: handleClose, type: 'button', id: 'close-button', "data-testid": 'close-button', className: 'layout-header__icon', children: jsx(SvgClose, {}) }));
+-    const infoButton = showHelpContent && (jsx(Tooltip, { content: 'Need some help?', className: 'layout-header__tooltip', children: jsx(IconButton, { type: 'button', onClick: () => setIsFooterExpanded(!isFooterExpanded), "data-testid": 'info-button', className: 'layout-header__icon', children: isWalletListTypeView ? jsx(SvgQuestionMark, {}) : jsx(SvgFooterInfoIcon, {}) }) }, 'info-button'));
++    const closeButton = showCloseButton && handleClose && (jsx(IconButton, { onClick: handleClose, type: 'button', id: 'close-button', 'aria-label': 'Close wallet access', "data-testid": 'close-button', className: 'layout-header__icon', children: jsx(SvgClose, {}) }));
++    const infoButton = showHelpContent && (jsx(Tooltip, { content: 'Need some help?', className: 'layout-header__tooltip', children: jsx(IconButton, { type: 'button', onClick: () => setIsFooterExpanded(!isFooterExpanded), "data-testid": 'info-button', 'aria-label': 'Wallet help', className: 'layout-header__icon', children: isWalletListTypeView ? jsx(SvgQuestionMark, {}) : jsx(SvgFooterInfoIcon, {}) }) }, 'info-button'));
+     const leadingButtons = [];
+     const showBackButton = canGoBack && view.type !== 'unlock-wallet' && view.type !== 'auth-loading';
+     if (showBackButton) {
+-        leadingButtons.push(jsx(IconButton, { type: 'button', onClick: handleBackClick, "data-testid": 'back-button', className: 'layout-header__icon', children: jsx(SvgArrowLeft, {}) }, 'back-button'));
++        leadingButtons.push(jsx(IconButton, { type: 'button', onClick: handleBackClick, "data-testid": 'back-button', 'aria-label': 'Go back', className: 'layout-header__icon', children: jsx(SvgArrowLeft, {}) }, 'back-button'));
+     }
+     // if has close button and info button, info button should be on the right
+     if (closeButton && infoButton) {
+--- a/src/lib/components/Portal/ModalComponent/ModalComponent.cjs
++++ b/src/lib/components/Portal/ModalComponent/ModalComponent.cjs
+@@ -26,7 +26,7 @@
+         inputKey: 'Escape',
+         onKeyPressed: handleClose,
+     });
+-    return (jsxRuntime.jsxs(ReactFocusLock__default["default"], { className: 'modal-component__container', whiteList: whiteList, children: [withBackdrop && (jsxRuntime.jsx("div", { "data-testid": 'portal-backdrop', role: 'button', onClick: onBackdropClick, tabIndex: 0, "aria-label": 'Close modal', className: 'modal-component__backdrop' })), jsxRuntime.jsx("div", { children: children })] }));
++    return (jsxRuntime.jsxs(ReactFocusLock__default["default"], { className: 'modal-component__container', returnFocus: true, lockProps: { role: 'dialog', 'aria-modal': true, 'aria-label': 'Wallet access' }, children: [withBackdrop && (jsxRuntime.jsx("div", { "data-testid": 'portal-backdrop', onClick: onBackdropClick, 'aria-hidden': true, className: 'modal-component__backdrop' })), jsxRuntime.jsx("div", { children: children })] }));
+ };
+ 
+ exports.ModalComponent = ModalComponent;
+--- a/src/lib/layout/DynamicAuthLayout/Header/header.cjs
++++ b/src/lib/layout/DynamicAuthLayout/Header/header.cjs
+@@ -137,12 +137,12 @@
+         setExistentAccountData(undefined);
+         setError(undefined);
+     }, [view.events, goBack, setExistentAccountData, setError]);
+-    const closeButton = showCloseButton && handleClose && (jsxRuntime.jsx(IconButton.IconButton, { onClick: handleClose, type: 'button', id: 'close-button', "data-testid": 'close-button', className: 'layout-header__icon', children: jsxRuntime.jsx(close.ReactComponent, {}) }));
+-    const infoButton = showHelpContent && (jsxRuntime.jsx(Tooltip.Tooltip, { content: 'Need some help?', className: 'layout-header__tooltip', children: jsxRuntime.jsx(IconButton.IconButton, { type: 'button', onClick: () => setIsFooterExpanded(!isFooterExpanded), "data-testid": 'info-button', className: 'layout-header__icon', children: isWalletListTypeView ? jsxRuntime.jsx(questionMark.ReactComponent, {}) : jsxRuntime.jsx(footerInfoIcon.ReactComponent, {}) }) }, 'info-button'));
++    const closeButton = showCloseButton && handleClose && (jsxRuntime.jsx(IconButton.IconButton, { onClick: handleClose, type: 'button', id: 'close-button', 'aria-label': 'Close wallet access', "data-testid": 'close-button', className: 'layout-header__icon', children: jsxRuntime.jsx(close.ReactComponent, {}) }));
++    const infoButton = showHelpContent && (jsxRuntime.jsx(Tooltip.Tooltip, { content: 'Need some help?', className: 'layout-header__tooltip', children: jsxRuntime.jsx(IconButton.IconButton, { type: 'button', onClick: () => setIsFooterExpanded(!isFooterExpanded), "data-testid": 'info-button', 'aria-label': 'Wallet help', className: 'layout-header__icon', children: isWalletListTypeView ? jsxRuntime.jsx(questionMark.ReactComponent, {}) : jsxRuntime.jsx(footerInfoIcon.ReactComponent, {}) }) }, 'info-button'));
+     const leadingButtons = [];
+     const showBackButton = canGoBack && view.type !== 'unlock-wallet' && view.type !== 'auth-loading';
+     if (showBackButton) {
+-        leadingButtons.push(jsxRuntime.jsx(IconButton.IconButton, { type: 'button', onClick: handleBackClick, "data-testid": 'back-button', className: 'layout-header__icon', children: jsxRuntime.jsx(arrowLeft.ReactComponent, {}) }, 'back-button'));
++        leadingButtons.push(jsxRuntime.jsx(IconButton.IconButton, { type: 'button', onClick: handleBackClick, "data-testid": 'back-button', 'aria-label': 'Go back', className: 'layout-header__icon', children: jsxRuntime.jsx(arrowLeft.ReactComponent, {}) }, 'back-button'));
+     }
+     // if has close button and info button, info button should be on the right
+     if (closeButton && infoButton) {

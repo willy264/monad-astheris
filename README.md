@@ -1,5 +1,7 @@
 <img src="frontend/public/brand/aetheris-icon-512.png" width="88" height="88" alt="Aetheris logo">
 
+**October 11 readiness update:** [final verification and remaining submission gates](submission/2026-10-11/final-readiness.md) ? [manual test guide](frontend/docs/manual-test-guide.md) ? [judge and recording kit](submission/2026-10-11/submission-package.md). Current audited history: 22 tasks / 22 matched Merkle commitments. Wallet-based judging remains blocked by the unresolved domain-security classification and production readiness gates.
+
 # Aetheris
 
 **Express checkout lanes for AI-agent tasks on Monad.**
@@ -24,7 +26,7 @@ The goal is to support many agents working concurrently on Monad. Today, tests d
 | Ephemeral Shard | **“Private Express Checkout Lane”** | A separate result-storage contract for one task. “Private” means dedicated to that task; its blockchain data remains public. The record persists after completion. |
 | State Contention | **“Blockchain Traffic Jam”** | Transactions depend on shared changing state, so some work must wait or be repeated. |
 | Merkle Batch | **“Compressed Digital Receipt”** | A root hash representing a group of task records. Batch size varies; matching the receipt establishes data consistency, not whether the research is correct. |
-| Passkey Delegation | **“1-Tap Face ID Sign-In”** | A supported device passkey opens wallet access. Granting an executor permission is a separate, expiring on-chain action; signing and gas requirements still apply. |
+| Passkey Delegation | **Device sign-in and task authority** | A supported device passkey can authenticate the account; the physical-device flow remains unverified. Granting an executor permission is a separate, expiring on-chain action; signing and gas requirements still apply. |
 
 [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) is a draft standard for identity, reputation and validation. Aetheris adds task isolation and paid routing around those registries.
 
@@ -32,7 +34,7 @@ The goal is to support many agents working concurrently on Monad. Today, tests d
 
 Imagine a research agent checking **ten documents** for a client. Ten is an example workload, not a recorded performance result.
 
-1. **Sign in and choose the spend.** The owner accesses a supported wallet with Face ID or Touch ID and grants an executor time-limited permission. The client checks a per-task price ceiling and approves each payment. Login, delegation and payment approval are separate actions; an autonomous cumulative micro-budget is a future product feature.
+1. **Sign in and choose the spend.** The owner connects a wallet (or uses a supported passkey after device verification) and separately grants an executor time-limited permission. The client checks a per-task price ceiling and approves each payment. Login, delegation and payment approval are separate actions; an autonomous cumulative micro-budget is a future product feature.
 2. **Give each task its own lane.** The agent computes its answers off chain. The client submits signed requests, and the daemon creates separate storage contracts for their input/output fingerprints. Requests can arrive concurrently; completing one task does not write another task's result storage. This removes that shared-result dependency while preserving the network's transaction ordering.
 3. **Collect receipts and review the work.** The background worker groups completed task logs into Merkle receipts, one per nonempty finalized block. Payments settle through the configured provider. The MCP client then records completion and can publish an independent client's explicit assessment; it never turns execution success into an automatic positive review. A single daily update is not the current batching schedule.
 

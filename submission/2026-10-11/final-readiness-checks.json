@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-10-11T15:08:15.353Z",
+  "baselineRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+  "scope": "Remediation working tree. Final tested commit and deployment separately recorded. Source-only expiry separator changed after final build; no behavior change.",
+  "commands": [
+    {
+      "startedAt": "2026-10-11T14:17:40.926Z",
+      "completedAt": "2026-10-11T14:17:54.481Z",
+      "command": "pnpm exec tsx --test --test-concurrency=1 test/delegation.test.ts test/passkey.test.ts test/onboarding.test.ts test/self-service-server.test.ts test/self-service-client.test.ts",
+      "exitCode": 0
+    },
+    {
+      "name": "foundry-fmt",
+      "startedAt": "2026-10-11T14:15:19.189Z",
+      "completedAt": "2026-10-11T14:15:21.140Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "contracts",
+      "command": "..\\.tools\\foundry\\forge.exe fmt --check",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/foundry-fmt.log"
+    },
+    {
+      "name": "foundry-tests",
+      "startedAt": "2026-10-11T14:15:21.274Z",
+      "completedAt": "2026-10-11T14:15:25.192Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "contracts",
+      "command": "..\\.tools\\foundry\\forge.exe test",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/foundry-tests.log"
+    },
+    {
+      "name": "frontend-audit",
+      "startedAt": "2026-10-11T13:31:57.544Z",
+      "completedAt": "2026-10-11T13:32:02.500Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "frontend",
+      "command": "pnpm audit --json",
+      "exitCode": 1,
+      "log": ".tools/final-readiness-checks/frontend-audit.log"
+    },
+    {
+      "name": "frontend-build",
+      "startedAt": "2026-10-11T14:42:54.405Z",
+      "completedAt": "2026-10-11T14:46:51.248Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "frontend",
+      "command": "pnpm build",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/frontend-build.log"
+    },
+    {
+      "name": "frontend-frozen",
+      "startedAt": "2026-10-11T13:48:43.668Z",
+      "completedAt": "2026-10-11T13:48:47.001Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "frontend",
+      "command": "pnpm install --frozen-lockfile",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/frontend-frozen.log"
+    },
+    {
+      "name": "frontend-tests",
+      "startedAt": "2026-10-11T13:48:43.655Z",
+      "completedAt": "2026-10-11T13:49:46.188Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "frontend",
+      "command": "pnpm test",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/frontend-tests.log"
+    },
+    {
+      "name": "frontend-types",
+      "startedAt": "2026-10-11T13:48:43.659Z",
+      "completedAt": "2026-10-11T13:49:43.379Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "frontend",
+      "command": "pnpm typecheck",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/frontend-types.log"
+    },
+    {
+      "name": "indexer-audit",
+      "startedAt": "2026-10-11T13:23:39.733Z",
+      "completedAt": "2026-10-11T13:23:42.174Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "indexer",
+      "command": "pnpm audit --json",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/indexer-audit.log"
+    },
+    {
+      "name": "indexer-codegen",
+      "startedAt": "2026-10-11T14:15:19.176Z",
+      "completedAt": "2026-10-11T14:15:44.193Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "indexer",
+      "command": "pnpm codegen",
+      "exitCode": 1,
+      "log": ".tools/final-readiness-checks/indexer-codegen.log"
+    },
+    {
+      "name": "indexer-tests",
+      "startedAt": "2026-10-11T13:32:07.175Z",
+      "completedAt": "2026-10-11T13:32:17.899Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "indexer",
+      "command": "pnpm test",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/indexer-tests.log"
+    },
+    {
+      "name": "indexer-types",
+      "startedAt": "2026-10-11T13:31:57.545Z",
+      "completedAt": "2026-10-11T13:32:07.021Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "indexer",
+      "command": "pnpm typecheck",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/indexer-types.log"
+    },
+    {
+      "name": "interfaces",
+      "startedAt": "2026-10-11T14:15:25.287Z",
+      "completedAt": "2026-10-11T14:15:25.516Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": ".",
+      "command": "node scripts/check-interfaces.mjs",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/interfaces.log"
+    },
+    {
+      "name": "scripts-audit",
+      "startedAt": "2026-10-11T13:23:39.733Z",
+      "completedAt": "2026-10-11T13:23:41.934Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "scripts",
+      "command": "pnpm audit --json",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/scripts-audit.log"
+    },
+    {
+      "name": "scripts-tests",
+      "startedAt": "2026-10-11T14:15:33.547Z",
+      "completedAt": "2026-10-11T14:16:07.456Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "scripts",
+      "command": "pnpm test",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/scripts-tests.log"
+    },
+    {
+      "name": "scripts-types",
+      "startedAt": "2026-10-11T14:15:19.159Z",
+      "completedAt": "2026-10-11T14:15:33.355Z",
+      "sourceRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+      "workingTree": "uncommitted remediation under test",
+      "cwd": "scripts",
+      "command": "pnpm typecheck",
+      "exitCode": 0,
+      "log": ".tools/final-readiness-checks/scripts-types.log"
+    }
+  ]
+}

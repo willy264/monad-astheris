@@ -1,0 +1,95 @@
+{
+  "startedAt": "2026-10-11T13:46:11.706Z",
+  "chainId": 10143,
+  "compiler": {
+    "version": "0.8.24+commit.e11b9ed9",
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "viaIR": true,
+    "evmVersion": "cancun"
+  },
+  "freshCompilation": true,
+  "contracts": [
+    {
+      "name": "AgentRegistry",
+      "address": "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+      "target": "src/AgentRegistry.sol:AgentRegistry",
+      "compiler": "0.8.24+commit.e11b9ed9",
+      "inputFile": "AgentRegistry.standard-input.json",
+      "inputSha256": "375a3aabbbe68d2b735d394913e7395459c4b53cff22f07b463fce93bdb519e2",
+      "sourceCount": 29,
+      "constructorValues": [],
+      "constructorArguments": "",
+      "sourceHashesMatchDeployment": true,
+      "freshCreationAndRuntimeTemplateMatch": true,
+      "deploymentTransaction": "0x9a30b9b3d8ce9efc2854c6015faf322adcbfb6befdb3a40a9633248c20c55924",
+      "manifestRuntimeCodeHash": "0xa152be218d30f0245b583adfeaf4dd3ee3319389f2942d5525432436c4904bcf",
+      "explorer": "https://testnet.monadscan.com/address/0x754d7f2fd55a9841dbff248f9cb91d497116f231#code",
+      "acceptedSourceVerification": "NOT VERIFIED: preparation does not submit or establish explorer acceptance"
+    },
+    {
+      "name": "ReputationRegistry",
+      "address": "0x8f1fe9beef6df891189355129bf48f073d9ab322",
+      "target": "src/ReputationRegistry.sol:ReputationRegistry",
+      "compiler": "0.8.24+commit.e11b9ed9",
+      "inputFile": "ReputationRegistry.standard-input.json",
+      "inputSha256": "3abe2a4df9c16f30381a2c16fbbbec22035e56f25a863aaba93f25f036515e4e",
+      "sourceCount": 36,
+      "constructorValues": [
+        "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+        "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+      ],
+      "constructorArguments": "000000000000000000000000754d7f2fd55a9841dbff248f9cb91d497116f2310000000000000000000000005d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+      "sourceHashesMatchDeployment": true,
+      "freshCreationAndRuntimeTemplateMatch": true,
+      "deploymentTransaction": "0xd33a1d00bbcff1a71520478a03843aa718e80f90fccf9855527e5ed4441992d3",
+      "manifestRuntimeCodeHash": "0x35ca60dd04d8f84f1d7a89e080e9759e5499dc4df0df0fb818a299819ff22a4c",
+      "explorer": "https://testnet.monadscan.com/address/0x8f1fe9beef6df891189355129bf48f073d9ab322#code",
+      "acceptedSourceVerification": "NOT VERIFIED: preparation does not submit or establish explorer acceptance"
+    },
+    {
+      "name": "ValidationRegistry",
+      "address": "0xcd0cf354acd2c79145caeac7d4f0639f8957308d",
+      "target": "src/ValidationRegistry.sol:ValidationRegistry",
+      "compiler": "0.8.24+commit.e11b9ed9",
+      "inputFile": "ValidationRegistry.standard-input.json",
+      "inputSha256": "76e0478f6a7af9a499ffb6fea1cc8c95bfa52406cf4eddc3fb7fac57ffa448d9",
+      "sourceCount": 33,
+      "constructorValues": [
+        "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+        "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+      ],
+      "constructorArguments": "000000000000000000000000754d7f2fd55a9841dbff248f9cb91d497116f2310000000000000000000000005d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+      "sourceHashesMatchDeployment": true,
+      "freshCreationAndRuntimeTemplateMatch": true,
+      "deploymentTransaction": "0x4e57487e9c8e249f83dc9ea294fa29c4d13de0b98177654d125900706c8b02d0",
+      "manifestRuntimeCodeHash": "0xeda28037ff121cbbd6f919a1ba8a86fc9d69061d466cb1bbbc52458dd8b2ddd4",
+      "explorer": "https://testnet.monadscan.com/address/0xcd0cf354acd2c79145caeac7d4f0639f8957308d#code",
+      "acceptedSourceVerification": "NOT VERIFIED: preparation does not submit or establish explorer acceptance"
+    },
+    {
+      "name": "AetherisRouter",
+      "address": "0xac4a33521b32122c9f014eac8800144dd9aa5ebe",
+      "target": "src/AetherisRouter.sol:AetherisRouter",
+      "compiler": "0.8.24+commit.e11b9ed9",
+      "inputFile": "AetherisRouter.standard-input.json",
+      "inputSha256": "7e6bd34d72f22bd997dea14d216c200b21307d77f0ccc2913f382dbbed807592",
+      "sourceCount": 35,
+      "constructorValues": [
+        "0x754d7f2fd55a9841dbff248f9cb91d497116f231",
+        "0xcd0cf354acd2c79145caeac7d4f0639f8957308d",
+        "0x5d8853e81f580a12e3affaa9a7c76e0a65e02f57"
+      ],
+      "constructorArguments": "000000000000000000000000754d7f2fd55a9841dbff248f9cb91d497116f231000000000000000000000000cd0cf354acd2c79145caeac7d4f0639f8957308d0000000000000000000000005d8853e81f580a12e3affaa9a7c76e0a65e02f57",
+      "sourceHashesMatchDeployment": true,
+      "freshCreationAndRuntimeTemplateMatch": true,
+      "deploymentTransaction": "0xabc10b999bf0114783274620a1f3bdb03cdc8d828d56c078ac9403780863a69a",
+      "manifestRuntimeCodeHash": "0xa6335f63f6e34c5f9b5500fd11258b9096162d672d1332dd54de9445403f709d",
+      "explorer": "https://testnet.monadscan.com/address/0xac4a33521b32122c9f014eac8800144dd9aa5ebe#code",
+      "acceptedSourceVerification": "NOT VERIFIED: preparation does not submit or establish explorer acceptance"
+    }
+  ],
+  "completedAt": "2026-10-11T13:48:10.279Z"
+}

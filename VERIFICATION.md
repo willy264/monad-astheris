@@ -1,5 +1,13 @@
 # Verification record
 
+## Final remediation verification - October 11, 2026
+
+The [final report](submission/2026-10-11/final-readiness.md) and [exact command records](submission/2026-10-11/final-readiness-checks.json) supersede earlier counts for this remediation. Fresh checks: **192 frontend tests**, **55 Rust unit + 1 actual-process restart test**, **38 Foundry tests**, **17 script tests**, **2 indexer tests**, **72 shared ABI declarations**, **11 live MCP checks**, TypeScript and production build. The subsequent per-open executor-selection correction passed 78 scoped auth tests and a final rebuild.
+
+Four exact Solidity builds reproduced; 74 canonical successful receipt checks reconcile **22 indexed tasks and 22 committed roots**. Frontend audit still reports five version advisories, documented with local mitigation/applicability limits. Windows Envio codegen failed in its native CLI; indexer types/tests passed against existing generated bindings. No standalone frontend lint command is configured. Browser and deployed results are in the [release record](submission/2026-10-11/final-readiness-release.json); device ceremonies are not inferred from browser checks.
+
+**Production remains gated:** MetaMask BLOCK, provider branding review, persistent Render journal/migration, approved renewal/revocation, physical passkey testing and accepted explorer source verification. No new signatures or chain transactions were generated. Earlier results below retain their historical dates and scope.
+
 Evidence files identified as local files below are retained only in the verification workspace and are not published in this repository. Existing linked transaction evidence remains available in the repository.
 
 Updated **2026-10-11**. Agent #2 has 15 indexed task completions. Automatic hosted publication added ten finalized Merkle commitments, bringing the deployment total to 16 verified roots across both agents. The original self-service run's registration, delegation, task and payment receipts remain documented separately. [SUBMISSION_PROOF.md](SUBMISSION_PROOF.md) links exact receipts and states the limits of browser authorization evidence. Tests, hosted builds, device ceremonies and on-chain results are separate verification categories.

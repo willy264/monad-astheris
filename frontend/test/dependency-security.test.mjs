@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readdirSync } from 'node:fs';
+import { readdirSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,7 +12,8 @@ const store = fileURLToPath(new URL('../node_modules/.pnpm/', import.meta.url));
 const require = createRequire(import.meta.url);
 function patchedPackage(name, version, entry = '') {
   // pnpm shortens long virtual-store directory names on Windows.
-  const folder = readdirSync(store).find(value => value.startsWith(`${name}@${version}_patch_`));
+  const folder = readdirSync(store).filter(value => value.startsWith(`${name}@${version}_patch_`))
+    .find(value => existsSync(path.join(store, value, 'node_modules', name, 'package.json')));
   assert.ok(folder, `The committed ${name} security patch must be installed.`);
   return path.join(store, folder, 'node_modules', name, entry);
 }
@@ -29,6 +30,26 @@ test('brace parsers and AST walkers bound hostile nesting while preserving ordin
     let node = { type: 'text', value: 'x' };
     for (let index = 0; index < 5000; index++) node = { type: 'root', nodes: [node] };
     assert.throws(() => braces[method](node), /safe depth limit/);
+  }
+});
+
+test('streamed object keys preserve JSON data without changing object prototypes, including revivers', async () => {
+  const directory = patchedPackage('stream-json', '1.9.1');
+  const { parser } = require(directory);
+  const Assembler = require(path.join(directory, 'Assembler'));
+  const input = '{"__proto__":{"isAdmin":true},"constructor":{"prototype":{"polluted":true}},"nested":{"__proto__":{"trusted":true}},"items":[1,null,"ok"]}';
+  for (const options of [undefined, { reviver: (_key, value) => value }]) {
+    const assembler = new Assembler(options);
+    await pipeline(Readable.from([input]), parser(), new Writable({ objectMode: true, write(token, _encoding, callback) {
+      assembler.consume(token); callback();
+    } }));
+    assert.deepEqual(assembler.current, JSON.parse(input));
+    assert.equal(Object.getPrototypeOf(assembler.current), Object.prototype);
+    assert.equal(Object.getPrototypeOf(assembler.current.nested), Object.prototype);
+    assert.equal(assembler.current.isAdmin, undefined);
+    assert.equal(assembler.current.nested.trusted, undefined);
+    assert.equal(Object.hasOwn(assembler.current, '__proto__'), true);
+    assert.equal({}.polluted, undefined);
   }
 });
 

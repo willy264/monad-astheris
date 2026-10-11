@@ -5,7 +5,7 @@ export interface AccessSession {
   ready: boolean;
   address?: string;
   openSignIn(): void;
-  openAccess(agentId?: string): void;
+  openAccess(agentId?: string, executor?: string): void;
   withWalletPrompt<T>(action: () => Promise<T>): Promise<T>;
 }
 export const AccessContext = createContext<AccessSession | undefined>(undefined);

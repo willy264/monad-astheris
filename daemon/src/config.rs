@@ -10,6 +10,8 @@ pub struct Config {
     pub private_keys: Vec<String>,
     pub listen: SocketAddr,
     pub database: String,
+    pub database_require_existing: bool,
+    pub database_mount_path: Option<String>,
     pub cors_origin: String,
     pub confirmations: u64,
     pub deployment_block: u64,
@@ -37,6 +39,21 @@ impl Config {
             (1..=256).contains(&max_inflight),
             "MAX_INFLIGHT must be 1..256"
         );
+        let on_render = env::var("RENDER").as_deref() == Ok("true");
+        let database_mount_path = env::var("DATABASE_MOUNT_PATH")
+            .ok()
+            .filter(|path| !path.trim().is_empty());
+        ensure!(
+            !on_render || database_mount_path.is_some(),
+            "Render requires DATABASE_MOUNT_PATH pointing to an attached persistent disk; ephemeral journals cannot safely retain paid task history"
+        );
+        let database_require_existing = parse_switch(
+            "DATABASE_REQUIRE_EXISTING",
+            env::var("DATABASE_REQUIRE_EXISTING").ok(),
+            on_render,
+        )?;
+        ensure!(!on_render || database_require_existing,
+            "Render requires DATABASE_REQUIRE_EXISTING=true; restore the retained journal before starting the service");
         Ok(Self {
             rpc_url,
             router,
@@ -46,6 +63,8 @@ impl Config {
                 env::var("PORT").ok().as_deref(),
             )?,
             database: env::var("DATABASE_PATH").unwrap_or_else(|_| "aetheris.redb".into()),
+            database_require_existing,
+            database_mount_path,
             cors_origin: env::var("CORS_ORIGIN").unwrap_or_else(|_| "http://localhost:3000".into()),
             deployment_block: required("DEPLOYMENT_BLOCK")?
                 .parse()

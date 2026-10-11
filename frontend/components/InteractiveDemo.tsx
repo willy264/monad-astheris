@@ -6,7 +6,7 @@ import styles from './InteractiveDemo.module.css';
 import { dynamicEnvironmentId } from '@/lib/dynamic-config';
 
 const DemoWallet = dynamic(() => import('./DemoWallet'), { ssr: false, loading: () => <p className={styles.note}>Preparing secure wallet access…</p> });
-const taskNames = ['Research agent', 'Market analyst', 'Data curator', 'Risk observer', 'Report writer'];
+const taskNames = ['Task lane 1', 'Task lane 2', 'Task lane 3', 'Task lane 4', 'Task lane 5'];
 export { taskNames };
 
 function Preview() {
@@ -20,7 +20,7 @@ function Preview() {
   return <><p className={styles.previewNotice}><span aria-hidden="true">✦</span> Preview · simulated progress, no wallet, payment or blockchain transaction.</p>
     <div className={styles.steps}>
       <div className={styles.step}><span className={styles.stepNumber}>01</span><h3>Your identity, unlocked</h3><p>Use a familiar device sign-in to access your agent wallet.</p><button type="button" className={styles.secondaryButton} disabled={signedIn} onClick={() => setSignedIn(true)}>{signedIn ? '✓ Preview identity ready' : 'Preview passkey sign-in'}</button></div>
-      <div className={styles.step}><span className={styles.stepNumber}>02</span><h3>Five tasks. Five lanes.</h3><p>Each task gets its own workspace, so their results stay independent.</p><button type="button" className={styles.primaryButton} disabled={!signedIn || running} onClick={() => { started.current = Date.now(); setProgress(0); setRunning(true); }}>{running ? 'Tasks moving in parallel…' : progress === 100 ? 'Replay five-task preview' : 'Preview 5 Autonomous Tasks'} <span aria-hidden="true">↗</span></button></div>
+      <div className={styles.step}><span className={styles.stepNumber}>02</span><h3>Five tasks. Five lanes.</h3><p>Each task gets its own workspace, so their results stay independent.</p><button type="button" className={styles.primaryButton} disabled={!signedIn || running} onClick={() => { started.current = Date.now(); setProgress(0); setRunning(true); }}>{running ? 'Tasks moving in parallel…' : progress === 100 ? 'Replay five-task preview' : 'Preview 5 task lanes'} <span aria-hidden="true">↗</span></button></div>
       <div className={`${styles.step} ${styles.streamStep}`}><span className={styles.stepNumber}>03</span><h3>Watch them move together</h3><p>In live mode, every completed lane links to a verified testnet receipt.</p><div className={styles.stream}>{taskNames.map((name, index) => {
         const value = progress === 100 ? 100 : Math.min(98, Math.max(0, progress - index * 2));
         return <div key={name} className={styles.task}><div className={styles.taskHeading}><span><i className={styles.dot} />{name}</span><span>{value === 100 ? 'Simulated ✓' : value > 0 ? `${Math.round(value)}%` : 'Ready'}</span></div><div className={styles.track} role="progressbar" aria-label={`${name} simulated progress`} aria-valuenow={Math.round(value)} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${value}%` }} /></div></div>;

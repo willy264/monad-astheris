@@ -6,6 +6,8 @@ Dynamic's two direct packages remain at the previously tested 5.9.2 release; the
 
 ## Explicit dependency patches
 
+The October 11 final review also upgrades `sharp` to **0.35.5** for the [librsvg advisory](https://github.com/advisories/GHSA-wq5f-xc86-pv6w), and `postcss-selector-parser` to **7.1.6** for [quadratic parsing](https://github.com/advisories/GHSA-rj75-hqrm-r3gf). These compatible overrides are locked. The review found no evidence tying these advisories to MetaMask's domain classification; its cause remains unknown.
+
 Some transitive dependencies have no compatible published security fix. The committed `pnpm.patchedDependencies` entries apply the following narrow mitigations during installation. These are local patches, not upstream releases. The lockfile records their hashes; preserve the `patches/` directory and use `pnpm install --frozen-lockfile`.
 
 | Package and advisory | Local change | Compatibility boundary |
@@ -14,8 +16,12 @@ Some transitive dependencies have no compatible published security fix. The comm
 | `braces@3.0.3` — [recursive stack exhaustion](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) | Parser and recursive AST walkers reject nesting beyond 256 levels. | Ordinary glob syntax is preserved. Extremely nested string patterns and caller-supplied ASTs raise a controlled `RangeError`. |
 | `stream-json@1.9.1` — [filter nesting denial of service](https://github.com/advisories/GHSA-528h-pc64-c93x) | Filter path matching rejects nesting beyond 256 levels through the stream error callback before repeatedly rebuilding deep paths. | Ordinary filters and stream APIs remain intact; excessively nested paths being matched fail. Subtrees already selected for direct pass/skip keep their streaming behavior without repeatedly rebuilding paths. This avoids forcing the incompatible ESM version 3 API into Jayson 4. |
 
-Run `pnpm test` to verify the application tests and the security regressions in `test/dependency-security.test.mjs`. The tests cover ordinary inputs, deep patterns and direct ASTs, exact large integer conversions without native bindings, and streamed filter errors.
+The `stream-json` patch additionally addresses [prototype assignment in Assembler](https://github.com/advisories/GHSA-mjw6-4jj6-33hc): a parsed `__proto__` member becomes an own data property in both normal and reviver assembly. Regression coverage compares streamed output with `JSON.parse`, including nested keys, and checks that no inherited properties appear. The separate [JSONC scan advisory](https://github.com/advisories/GHSA-hqr4-qq8f-hg3x) names affected versions broadly, but the installed 1.9.1 package does not ship the later JSONC parser/verifier implementation. This is a reviewed applicability boundary, not a suppressed advisory.
+
+Run `pnpm test` to verify the application tests and the four security regressions in `test/dependency-security.test.mjs`. The tests cover ordinary inputs, deep patterns and direct ASTs, exact large integer conversions without native bindings, streamed filter errors and prototype-safe assembly.
 
 `pnpm audit` evaluates upstream package versions and can continue reporting the three patched packages. No advisory is suppressed or ignored. A passing regression suite is evidence for these specific mitigations, not a claim that the dependency graph has no possible vulnerabilities. Review upstream releases regularly and remove each local patch when a compatible upstream fix is installed and tested.
 
-The Dynamic connector graph may still emit peer-version warnings from its bundled providers. Do not force unrelated cryptographic provider majors merely to silence those warnings; confirm real passkey and wallet operations against the configured Dynamic environment after deployment.
+The fresh frontend audit decreased from seven to **five advisories (two high, three moderate)**. Those remaining upstream-version findings cover the locally patched packages and JSONC applicability described above. `pnpm audit` still exits nonzero; do not report a clean audit. Scripts and indexer audits reported zero findings. See the dated final readiness evidence for command timestamps.
+
+The Dynamic connector graph may still emit peer-version warnings from its bundled providers. Do not force unrelated cryptographic provider majors merely to silence those warnings; confirm real passkey and wallet operations against the configured Dynamic environment after deployment. The separate SDK accessibility patch reuses its existing focus lock and adds modal semantics; its scope and physical-device limitations are in [authentication verification](authentication-verification.md).

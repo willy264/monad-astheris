@@ -63,12 +63,14 @@ impl Drop for ApprovalWorker {
 struct AccessState {
     engine: Arc<Engine>,
     store: Store,
+    submission_enabled: bool,
 }
 impl FromRef<AppState> for AccessState {
     fn from_ref(state: &AppState) -> Self {
         Self {
             engine: state.engine.clone(),
             store: state.store.clone(),
+            submission_enabled: state.task_submission_enabled,
         }
     }
 }
@@ -371,6 +373,7 @@ async fn config(State(state): State<AccessState>) -> ApiResult {
 }
 
 async fn handle(State(state): State<AccessState>, Json(envelope): Json<Envelope>) -> ApiResult {
+    require_submission_enabled(&state, &envelope.action)?;
     let actor = envelope
         .auth
         .verify(state.engine.router, now().map_err(internal)?)
@@ -407,6 +410,16 @@ async fn handle(State(state): State<AccessState>, Json(envelope): Json<Envelope>
         response["approval"] = approval;
     }
     Ok(Json(response).into_response())
+}
+
+fn require_submission_enabled(state: &AccessState, action: &str) -> Result<(), ApiError> {
+    // Owner-grant broadcasts share the paid task/batch signer. Maintenance
+    // cannot leave this path active while another deployment takes ownership.
+    if !state.submission_enabled && matches!(action, "prepare" | "grant") {
+        return Err(error(StatusCode::SERVICE_UNAVAILABLE,
+            "Executor approvals are paused for maintenance. Existing requests and receipts remain available."));
+    }
+    Ok(())
 }
 
 async fn create(
@@ -1158,6 +1171,27 @@ mod tests {
     };
     use tokio::sync::Semaphore;
 
+    #[test]
+    fn maintenance_stops_grant_preparation_and_broadcast_but_preserves_inbox_reconciliation() {
+        let directory = tempfile::tempdir().unwrap();
+        let mut state = state_with_store(
+            Store::open(directory.path().join("state.redb")).unwrap(),
+            "http://127.0.0.1:1",
+        );
+        state.submission_enabled = false;
+        for action in ["prepare", "grant"] {
+            assert_eq!(
+                require_submission_enabled(&state, action).unwrap_err().0,
+                StatusCode::SERVICE_UNAVAILABLE
+            );
+        }
+        for action in ["list", "seen", "request", "deny", "cancel", "approve"] {
+            assert!(require_submission_enabled(&state, action).is_ok());
+        }
+        state.submission_enabled = true;
+        assert!(require_submission_enabled(&state, "grant").is_ok());
+    }
+
     fn state_with_store(store: Store, endpoint: &str) -> AccessState {
         let _ = rustls::crypto::ring::default_provider().install_default();
         let engine = Arc::new(Engine {
@@ -1172,7 +1206,11 @@ mod tests {
             http: reqwest::Client::new(),
             rpc_url: endpoint.into(),
         });
-        AccessState { engine, store }
+        AccessState {
+            engine,
+            store,
+            submission_enabled: true,
+        }
     }
 
     fn fixture() -> (AccessState, Snapshot, tempfile::TempDir) {

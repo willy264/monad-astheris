@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-10-11T15:08:15.357Z",
+  "baselineRevision": "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+  "sourceScope": "All application changes in the same commit as this initial record; subsequent evidence follow-up pins the exact commit.",
+  "gitPush": "PENDING",
+  "frontendDeployment": "NOT VERIFIED for remediation; GitHub deployment6995947246 at baseline was observed",
+  "daemonDeployment": "NOT PERFORMED; free service has no persistent disk; autoDeploy=no",
+  "externalRequests": "NONE",
+  "newSignaturesOrTransactions": "NONE",
+  "walletJudging": "BLOCKED"
+}

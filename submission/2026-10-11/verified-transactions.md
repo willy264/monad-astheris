@@ -1,0 +1,80 @@
+# Independently verified transaction ledger
+
+Checked 2026-10-11T13:28:50.422Z through 2026-10-11T13:30:59.400Z. Monad Testnet 10143. All 74 receipt checks passed against canonical successful finalized receipts; 74 distinct transaction hashes. No new transactions were submitted for this audit. See [full verification fields and GraphQL response](final-readiness-protocol.json).
+
+| Evidence | Transaction | Block |
+| --- | --- | --- |
+| AgentRegistry deployment | [0x9a30b9b3d8ce9efc2854c6015faf322adcbfb6befdb3a40a9633248c20c55924](https://testnet.monadscan.com/tx/0x9a30b9b3d8ce9efc2854c6015faf322adcbfb6befdb3a40a9633248c20c55924) | 67972561 |
+| ReputationRegistry deployment | [0xd33a1d00bbcff1a71520478a03843aa718e80f90fccf9855527e5ed4441992d3](https://testnet.monadscan.com/tx/0xd33a1d00bbcff1a71520478a03843aa718e80f90fccf9855527e5ed4441992d3) | 67972569 |
+| ValidationRegistry deployment | [0x4e57487e9c8e249f83dc9ea294fa29c4d13de0b98177654d125900706c8b02d0](https://testnet.monadscan.com/tx/0x4e57487e9c8e249f83dc9ea294fa29c4d13de0b98177654d125900706c8b02d0) | 67972578 |
+| AetherisRouter deployment | [0xabc10b999bf0114783274620a1f3bdb03cdc8d828d56c078ac9403780863a69a](https://testnet.monadscan.com/tx/0xabc10b999bf0114783274620a1f3bdb03cdc8d828d56c078ac9403780863a69a) | 67972587 |
+| Agent 1 shard creation | [0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d](https://testnet.monadscan.com/tx/0x0d33f7ed299fa96f0bd17817c2f524fe9c9e3f86124b7783861194544475854d) | 69066755 |
+| Agent 1 task execution | [0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a](https://testnet.monadscan.com/tx/0xc2e82710f180b4e2e37ca13d53a80f1767fbbb6ec9f4402d8b5c83ee3e6c310a) | 69066769 |
+| Merkle batch commitment | [0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc](https://testnet.monadscan.com/tx/0x2fec55ca5081d8dbf23fe46e53f51e7570399b632a57088d6e3d4a7db75659bc) | 69069880 |
+| Agent 2 shard creation | [0x46f89d4a4cef677c8724e817b4cded67447bdea9570ea96a340e9dc226cf3354](https://testnet.monadscan.com/tx/0x46f89d4a4cef677c8724e817b4cded67447bdea9570ea96a340e9dc226cf3354) | 69858079 |
+| Agent 2 task execution | [0xdf4c591369968ad52145170913e0d3c8f5a2c9a243b1496afd28865082710188](https://testnet.monadscan.com/tx/0xdf4c591369968ad52145170913e0d3c8f5a2c9a243b1496afd28865082710188) | 69858093 |
+| Merkle batch commitment | [0x164a9f70a51b2e73d9d5bd32973c7d13fcbb150f9f8ecd2e18152b18f224e39c](https://testnet.monadscan.com/tx/0x164a9f70a51b2e73d9d5bd32973c7d13fcbb150f9f8ecd2e18152b18f224e39c) | 69880010 |
+| Agent 2 shard creation | [0x41d2e014c95afc3e05884e44f76c3a08dac0b00ffa55915c25e6ee3b9f422fed](https://testnet.monadscan.com/tx/0x41d2e014c95afc3e05884e44f76c3a08dac0b00ffa55915c25e6ee3b9f422fed) | 69858107 |
+| Agent 2 task execution | [0x328151947bcfe78cc1e028f959c1c671e506777e51104d5b46cb29ac5662876d](https://testnet.monadscan.com/tx/0x328151947bcfe78cc1e028f959c1c671e506777e51104d5b46cb29ac5662876d) | 69858120 |
+| Merkle batch commitment | [0xb4a3ded82a118276fc9353aa4014c74aa4abc81e48268b45f57b3a536374d493](https://testnet.monadscan.com/tx/0xb4a3ded82a118276fc9353aa4014c74aa4abc81e48268b45f57b3a536374d493) | 69880058 |
+| Agent 2 shard creation | [0x02db9fc2b25099ab4941788f533fed3d8dd0eca7bb6ba42a3c6a0221f5654381](https://testnet.monadscan.com/tx/0x02db9fc2b25099ab4941788f533fed3d8dd0eca7bb6ba42a3c6a0221f5654381) | 69858134 |
+| Agent 2 task execution | [0xc5428faadc9172b56e5476d74a13149d967ae1edf04eb7cd139896535e1c4ae0](https://testnet.monadscan.com/tx/0xc5428faadc9172b56e5476d74a13149d967ae1edf04eb7cd139896535e1c4ae0) | 69858148 |
+| Merkle batch commitment | [0x4e937f73ef44019e0c40346dd4bdd2c8c106f4b1d898ccde7a0bbb10f1a226ee](https://testnet.monadscan.com/tx/0x4e937f73ef44019e0c40346dd4bdd2c8c106f4b1d898ccde7a0bbb10f1a226ee) | 69880096 |
+| Agent 2 shard creation | [0xcecd8478ea3c3c21a4508a9240c95a3879d81696bccdce8b6ef905eeee73d409](https://testnet.monadscan.com/tx/0xcecd8478ea3c3c21a4508a9240c95a3879d81696bccdce8b6ef905eeee73d409) | 69858162 |
+| Agent 2 task execution | [0xa9d25f58fa1a72e1bf746abba75a0bdbf7f7910920a9f2dce670b1da511afb93](https://testnet.monadscan.com/tx/0xa9d25f58fa1a72e1bf746abba75a0bdbf7f7910920a9f2dce670b1da511afb93) | 69858175 |
+| Merkle batch commitment | [0xa8694f9559ac391f3a5357520601d007740966ccc4281c46f811595a7106a123](https://testnet.monadscan.com/tx/0xa8694f9559ac391f3a5357520601d007740966ccc4281c46f811595a7106a123) | 69880139 |
+| Agent 2 shard creation | [0xb67915e0f74d34b4b47ea7158cd59138e681804a075d4ab014fb34940f046577](https://testnet.monadscan.com/tx/0xb67915e0f74d34b4b47ea7158cd59138e681804a075d4ab014fb34940f046577) | 69858189 |
+| Agent 2 task execution | [0x8eba4496c5b024827beac851b1b7a81564ca56a6c50106343d88099b6d272922](https://testnet.monadscan.com/tx/0x8eba4496c5b024827beac851b1b7a81564ca56a6c50106343d88099b6d272922) | 69858203 |
+| Merkle batch commitment | [0x548cc469f7b0a256a788477cc6fbe04ea949d1cdd562bad85c074e1b9315a239](https://testnet.monadscan.com/tx/0x548cc469f7b0a256a788477cc6fbe04ea949d1cdd562bad85c074e1b9315a239) | 69880185 |
+| Agent 2 shard creation | [0xc2ffdf6d034f441a41b4e67d0b220249334e2ee21663f03d5d96e5c97c43b637](https://testnet.monadscan.com/tx/0xc2ffdf6d034f441a41b4e67d0b220249334e2ee21663f03d5d96e5c97c43b637) | 69884312 |
+| Agent 2 task execution | [0x8a22962e3e27cc4fabcc016d5b2e2416909543736c65d558eef8bb14cdce7efa](https://testnet.monadscan.com/tx/0x8a22962e3e27cc4fabcc016d5b2e2416909543736c65d558eef8bb14cdce7efa) | 69884325 |
+| Merkle batch commitment | [0xfb012771135051ef8e55e1ade6bc5660b64ecd3f58ccdc1fcf740f4d3f080455](https://testnet.monadscan.com/tx/0xfb012771135051ef8e55e1ade6bc5660b64ecd3f58ccdc1fcf740f4d3f080455) | 69972691 |
+| Agent 2 shard creation | [0x5550c065ecfc7b8c87cea461f6ccfd103971754ab53bef1b7cc7fbd6b0516290](https://testnet.monadscan.com/tx/0x5550c065ecfc7b8c87cea461f6ccfd103971754ab53bef1b7cc7fbd6b0516290) | 69884339 |
+| Agent 2 task execution | [0x0a59bc3805ba395f0024d603230c5275a5aa45966c7f90b235508916ca14d1e8](https://testnet.monadscan.com/tx/0x0a59bc3805ba395f0024d603230c5275a5aa45966c7f90b235508916ca14d1e8) | 69884353 |
+| Merkle batch commitment | [0xdc9c54be5b8007674a0b0054f55674dd13044ddde292b8a1caa2700ea5acf73f](https://testnet.monadscan.com/tx/0xdc9c54be5b8007674a0b0054f55674dd13044ddde292b8a1caa2700ea5acf73f) | 69972619 |
+| Agent 2 shard creation | [0xe0d2a29fee474308a93b039e12ab1b5038df83cdb442e63f58d7cd01cbd70e10](https://testnet.monadscan.com/tx/0xe0d2a29fee474308a93b039e12ab1b5038df83cdb442e63f58d7cd01cbd70e10) | 69884366 |
+| Agent 2 task execution | [0x219c25caf3abb2df520e56075598322e0906de586f3fa7476539f2a523383972](https://testnet.monadscan.com/tx/0x219c25caf3abb2df520e56075598322e0906de586f3fa7476539f2a523383972) | 69884380 |
+| Merkle batch commitment | [0x00ed8d6e62ce0a7276bc389c31e6180d80c8e19290d9e0054ffc8d50c3011d7f](https://testnet.monadscan.com/tx/0x00ed8d6e62ce0a7276bc389c31e6180d80c8e19290d9e0054ffc8d50c3011d7f) | 69972633 |
+| Agent 2 shard creation | [0x7779ad3d4fd3fccff17169fd6eba695fcecf3874691e3af369e6e62119c25728](https://testnet.monadscan.com/tx/0x7779ad3d4fd3fccff17169fd6eba695fcecf3874691e3af369e6e62119c25728) | 69884394 |
+| Agent 2 task execution | [0x4f88ee5de8feeb48bce5b5c7e9a8d395f646c7d8ece41456b113f77240af4980](https://testnet.monadscan.com/tx/0x4f88ee5de8feeb48bce5b5c7e9a8d395f646c7d8ece41456b113f77240af4980) | 69884408 |
+| Merkle batch commitment | [0x9816c3519efa4836699c7196a99f3099a07d78db77e41259fb9c7545f3d8f7fd](https://testnet.monadscan.com/tx/0x9816c3519efa4836699c7196a99f3099a07d78db77e41259fb9c7545f3d8f7fd) | 69972648 |
+| Agent 2 shard creation | [0x9c641be7c6a4fc9d082b41313c2c070067dc1c23432b21cd1a4347302d6f89ba](https://testnet.monadscan.com/tx/0x9c641be7c6a4fc9d082b41313c2c070067dc1c23432b21cd1a4347302d6f89ba) | 69884421 |
+| Agent 2 task execution | [0xe4e122ba48d0946a69e33b0a742d2b73b171632c9cf319854d6904c5fcb42bb9](https://testnet.monadscan.com/tx/0xe4e122ba48d0946a69e33b0a742d2b73b171632c9cf319854d6904c5fcb42bb9) | 69884435 |
+| Merkle batch commitment | [0xe1558821297ebf9ea89fc74c4cbaa1fb306d36f1fd195872acff246bb1f382d1](https://testnet.monadscan.com/tx/0xe1558821297ebf9ea89fc74c4cbaa1fb306d36f1fd195872acff246bb1f382d1) | 69972731 |
+| Agent 2 shard creation | [0x59f936b1586d63b4b8d07adcb980c121488ba58fb5879ace408d511652bb7676](https://testnet.monadscan.com/tx/0x59f936b1586d63b4b8d07adcb980c121488ba58fb5879ace408d511652bb7676) | 69885128 |
+| Agent 2 task execution | [0x7fc48f4f91a0212879aedd7076dd726121784f49c379fbfada957a005de893a6](https://testnet.monadscan.com/tx/0x7fc48f4f91a0212879aedd7076dd726121784f49c379fbfada957a005de893a6) | 69885142 |
+| Merkle batch commitment | [0xb0f08bda7af9d86222c835723d5e8145b05d459274a11c5409258190dfe41cc1](https://testnet.monadscan.com/tx/0xb0f08bda7af9d86222c835723d5e8145b05d459274a11c5409258190dfe41cc1) | 69972676 |
+| Agent 2 shard creation | [0x22ac69452ed48c50ef7d5acac94180fef25b17a7b303cdfa3b65d76b84b27514](https://testnet.monadscan.com/tx/0x22ac69452ed48c50ef7d5acac94180fef25b17a7b303cdfa3b65d76b84b27514) | 69885156 |
+| Agent 2 task execution | [0x95bacf774b361cd864663ec3361956a26ca752452ef7c4fe246b091aecdb52c6](https://testnet.monadscan.com/tx/0x95bacf774b361cd864663ec3361956a26ca752452ef7c4fe246b091aecdb52c6) | 69885170 |
+| Merkle batch commitment | [0xf38ad129eca1813f0e5a0b454992fa156f98b87e76343b2e1f08656170f2dbda](https://testnet.monadscan.com/tx/0xf38ad129eca1813f0e5a0b454992fa156f98b87e76343b2e1f08656170f2dbda) | 69972715 |
+| Agent 2 shard creation | [0xbde7cdac6c5dc188cb19c89e4042bf0cb53b735bdb0312b5f72208cd6e854a1c](https://testnet.monadscan.com/tx/0xbde7cdac6c5dc188cb19c89e4042bf0cb53b735bdb0312b5f72208cd6e854a1c) | 69885183 |
+| Agent 2 task execution | [0x711a216cab738df079eb1252fc2d0fea38b96a8a58f0c5a4729f26f0056b7399](https://testnet.monadscan.com/tx/0x711a216cab738df079eb1252fc2d0fea38b96a8a58f0c5a4729f26f0056b7399) | 69885197 |
+| Merkle batch commitment | [0xfbe62d443ba70508cc8b06bd623eaa5912c2ee41b8ea8ea7465358d3fa49abdb](https://testnet.monadscan.com/tx/0xfbe62d443ba70508cc8b06bd623eaa5912c2ee41b8ea8ea7465358d3fa49abdb) | 69972662 |
+| Agent 2 shard creation | [0x40dc075bedac1ae7535f9ba1e5ba7f734d9b48605a03f39b11203115777d0071](https://testnet.monadscan.com/tx/0x40dc075bedac1ae7535f9ba1e5ba7f734d9b48605a03f39b11203115777d0071) | 69885211 |
+| Agent 2 task execution | [0x00f3d4ba38e10241e5b3f896c7c077ea1e623b4b84907b6b7384779d4d8c5f9c](https://testnet.monadscan.com/tx/0x00f3d4ba38e10241e5b3f896c7c077ea1e623b4b84907b6b7384779d4d8c5f9c) | 69885224 |
+| Merkle batch commitment | [0x3a9d46ebeb29f12e78a8f05efb64f9ffc61e93d1173e77f43dcc887a8cded320](https://testnet.monadscan.com/tx/0x3a9d46ebeb29f12e78a8f05efb64f9ffc61e93d1173e77f43dcc887a8cded320) | 69972604 |
+| Agent 2 shard creation | [0x55b67804f93dd95e168486381894696d6bda2526e6922e7706d56f7cdb34dae7](https://testnet.monadscan.com/tx/0x55b67804f93dd95e168486381894696d6bda2526e6922e7706d56f7cdb34dae7) | 69885238 |
+| Agent 2 task execution | [0xe96abe77acf244de13149bddcfcd8798bfc5d66649ed2dfd5f587da03c1f11e7](https://testnet.monadscan.com/tx/0xe96abe77acf244de13149bddcfcd8798bfc5d66649ed2dfd5f587da03c1f11e7) | 69885252 |
+| Merkle batch commitment | [0xd800043f864d26374b3f6ae568cbeab287c4f0a604bb0ea63aceb347c79077fe](https://testnet.monadscan.com/tx/0xd800043f864d26374b3f6ae568cbeab287c4f0a604bb0ea63aceb347c79077fe) | 69972746 |
+| Agent 2 shard creation | [0xfdfd826e2dc930ab11d52220d132c9a9a7d1421dd7acde1ca912bdff956c5d8a](https://testnet.monadscan.com/tx/0xfdfd826e2dc930ab11d52220d132c9a9a7d1421dd7acde1ca912bdff956c5d8a) | 69982602 |
+| Agent 2 task execution | [0xb6e22d88a1bc1c43fe1e7c287b79400582815b06bf363415a4c6f94dba6aeb9d](https://testnet.monadscan.com/tx/0xb6e22d88a1bc1c43fe1e7c287b79400582815b06bf363415a4c6f94dba6aeb9d) | 69982616 |
+| Merkle batch commitment | [0xdb865f88e91ed0f15a074c6e68caa598b2956befb4aba84f7f766c660c3b8ca1](https://testnet.monadscan.com/tx/0xdb865f88e91ed0f15a074c6e68caa598b2956befb4aba84f7f766c660c3b8ca1) | 69982741 |
+| Agent 2 shard creation | [0x76dbbd6c2d0fb6764ca20b636e519762b10fb8c798451da05d2e81ce9b1a324d](https://testnet.monadscan.com/tx/0x76dbbd6c2d0fb6764ca20b636e519762b10fb8c798451da05d2e81ce9b1a324d) | 69982630 |
+| Agent 2 task execution | [0x42f02e5dda0030d61d7039431522a1e3a36e6820a898758b211d2c3c9110bb53](https://testnet.monadscan.com/tx/0x42f02e5dda0030d61d7039431522a1e3a36e6820a898758b211d2c3c9110bb53) | 69982643 |
+| Merkle batch commitment | [0x33b22f28c6e0e494472b4beff7bd46be4680dbdde2cbe9f504d8a2161958a12d](https://testnet.monadscan.com/tx/0x33b22f28c6e0e494472b4beff7bd46be4680dbdde2cbe9f504d8a2161958a12d) | 69982767 |
+| Agent 2 shard creation | [0x246914bfceb4bfa7c84c8912a982076153318798c7cfbfd02ed6611f29205c65](https://testnet.monadscan.com/tx/0x246914bfceb4bfa7c84c8912a982076153318798c7cfbfd02ed6611f29205c65) | 69982657 |
+| Agent 2 task execution | [0x9c154f8194478e52589c880975469d87eb996bb3d1f76ab67099b8efd18985e8](https://testnet.monadscan.com/tx/0x9c154f8194478e52589c880975469d87eb996bb3d1f76ab67099b8efd18985e8) | 69982671 |
+| Merkle batch commitment | [0x332d0238f35e2a658001727916f3f4c2c1ab8519b717072129b60987146f6f3a](https://testnet.monadscan.com/tx/0x332d0238f35e2a658001727916f3f4c2c1ab8519b717072129b60987146f6f3a) | 69982781 |
+| Agent 2 shard creation | [0x8d69e8f6f4eb4fcdc982932e6141f9bd2668067b40ccd96828f147475b18e90a](https://testnet.monadscan.com/tx/0x8d69e8f6f4eb4fcdc982932e6141f9bd2668067b40ccd96828f147475b18e90a) | 69982685 |
+| Agent 2 task execution | [0xc2a8fa2247e10f499198f4865437b4425ec8f076ee6a17a388644529d15da9ae](https://testnet.monadscan.com/tx/0xc2a8fa2247e10f499198f4865437b4425ec8f076ee6a17a388644529d15da9ae) | 69982700 |
+| Merkle batch commitment | [0x81124d4fcd20556ee3768bd2745d13593694eb86340a1d11b7a83d752bf87c40](https://testnet.monadscan.com/tx/0x81124d4fcd20556ee3768bd2745d13593694eb86340a1d11b7a83d752bf87c40) | 69982795 |
+| Agent 2 shard creation | [0x80fe3b5e7f01149a5e9d41c21d94f64eb4b1ea6974ae38e950eac8291bf9b496](https://testnet.monadscan.com/tx/0x80fe3b5e7f01149a5e9d41c21d94f64eb4b1ea6974ae38e950eac8291bf9b496) | 69982714 |
+| Agent 2 task execution | [0xbd52489e317663717d317cdbb0b5779ec42e915b0062aacf8a3d516383c54bf3](https://testnet.monadscan.com/tx/0xbd52489e317663717d317cdbb0b5779ec42e915b0062aacf8a3d516383c54bf3) | 69982728 |
+| Merkle batch commitment | [0x302e32b291c3d480d4ff8522adfb9d7c966359e8ef233438836f668224c20253](https://testnet.monadscan.com/tx/0x302e32b291c3d480d4ff8522adfb9d7c966359e8ef233438836f668224c20253) | 69982821 |
+| Agent 1 shard creation | [0xbe86e08442aa19b26a5dde05db129ed187fbdef523acdf89c2221fb95b4f03bb](https://testnet.monadscan.com/tx/0xbe86e08442aa19b26a5dde05db129ed187fbdef523acdf89c2221fb95b4f03bb) | 69984163 |
+| Agent 1 task execution | [0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66](https://testnet.monadscan.com/tx/0xabb4ed811ad213167c03326f7bb3c178434ed425245db38e26243855871ecd66) | 69984178 |
+| Merkle batch commitment | [0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0](https://testnet.monadscan.com/tx/0x91e8c106ec9165afadee7ae95e5e0b2621bd7956a069d372b7b4ef0bf41739f0) | 69984191 |
+| Observer x402 payment | [0xb3623f7b05b489fe647372c586a612463a60b6e9c9be87122ba57e1b5ad37db0](https://testnet.monadscan.com/tx/0xb3623f7b05b489fe647372c586a612463a60b6e9c9be87122ba57e1b5ad37db0) | 69066783 |
+| Observer completion record | [0x5c3d91a10d4e7c0057bec30c94a8ccf43a367fdb85903e4caba4172a293246ab](https://testnet.monadscan.com/tx/0x5c3d91a10d4e7c0057bec30c94a8ccf43a367fdb85903e4caba4172a293246ab) | 69066814 |
+| Validation request | [0xc1e84725ebf676ca8c684e991d402d2f13b96d21ed87dc3d0db05399bb11d4c8](https://testnet.monadscan.com/tx/0xc1e84725ebf676ca8c684e991d402d2f13b96d21ed87dc3d0db05399bb11d4c8) | 69069962 |
+| Validation response | [0xec93029a9e8ec008d2281cdb8f626309b82180a2ef7141d698dcf2c379bbcca6](https://testnet.monadscan.com/tx/0xec93029a9e8ec008d2281cdb8f626309b82180a2ef7141d698dcf2c379bbcca6) | 69069985 |

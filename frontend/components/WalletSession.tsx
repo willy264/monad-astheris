@@ -23,13 +23,15 @@ function AccessController({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [openedOnce, setOpenedOnce] = useState(false);
   const [agentId, setAgentId] = useState('1');
+  const [executor, setExecutor] = useState('');
+  const [accessRevision, setAccessRevision] = useState(0);
   const [walletPrompts, setWalletPrompts] = useState({ pending: 0 });
   const dialog = useRef<HTMLDialogElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const opener = useRef<HTMLElement>();
-  const openAccess = useCallback((id = '1') => {
+  const openAccess = useCallback((id = '1', executorAddress = '') => {
     opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
-    setAgentId(id); setOpenedOnce(true); setOpen(true);
+    setAgentId(id); setExecutor(executorAddress); setAccessRevision(value => value + 1); setOpenedOnce(true); setOpen(true);
   }, []);
   const close = useCallback(() => {
     setOpen(false);
@@ -62,7 +64,7 @@ function AccessController({ children }: { children: ReactNode }) {
       if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) close();
     }}>
       <div className={styles.dialogHeader}><div><span className={styles.eyebrow}>YOUR AGENT. YOUR PERMISSION.</span><h2 id="access-title" ref={heading} tabIndex={-1}>Passkeys & task authority</h2><p>Connect your wallet, then choose who can execute tasks and for how long.</p></div><button type="button" className={styles.close} aria-label="Close agent access" onClick={close}>×</button></div>
-      {openedOnce && <WalletAccess initialAgentId={agentId} />}
+      {openedOnce && <WalletAccess initialAgentId={agentId} initialExecutor={executor} selectionRevision={accessRevision} />}
       {openedOnce && process.env.NEXT_PUBLIC_MERA_ENABLED === 'true' && <MeraAccess />}
     </dialog>
   </AccessContext.Provider>;
@@ -74,5 +76,5 @@ export function WalletSession({ children }: { children: ReactNode }) {
   // Preserve server-rendered page content without initializing browser storage in Node.
   // Node 25 exposes localStorage, which this SDK mistakes for a browser environment.
   if (!mounted) return <AccessContext.Provider value={initializingSession}>{children}</AccessContext.Provider>;
-  return <DynamicContextProvider theme="dark" settings={{ environmentId: dynamicEnvironmentId, cssOverrides: ':root, :host, [data-dynamic-theme], .dynamic-shadow-dom-content { --dynamic-font-family-primary: "Josefin Sans", sans-serif !important; }', walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><AccessController>{children}</AccessController></DynamicContextProvider>;
+  return <DynamicContextProvider theme="dark" settings={{ environmentId: dynamicEnvironmentId, appName: 'Aetheris', siweStatement: 'Sign in to Aetheris. This signature proves control of this wallet for authentication. It does not authorize a token payment or grant agent executor permissions.', cssOverrides: ':root, :host, [data-dynamic-theme], .dynamic-shadow-dom-content { --dynamic-font-family-primary: "Josefin Sans", sans-serif !important; }', walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><AccessController>{children}</AccessController></DynamicContextProvider>;
 }

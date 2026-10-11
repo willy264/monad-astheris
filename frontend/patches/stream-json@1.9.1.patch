@@ -9,3 +9,32 @@ diff --git a/filters/FilterBase.js b/filters/FilterBase.js
      // update the last stack key
      switch (chunk.name) {
        case 'startObject':
+diff --git a/Assembler.js b/Assembler.js
+--- a/Assembler.js
++++ b/Assembler.js
+@@ -128,7 +128,11 @@
+       if (this.current instanceof Array) {
+         this.current.push(value);
+       } else {
+-        this.current[this.key] = value;
++        if (this.key === '__proto__') {
++          Object.defineProperty(this.current, this.key, { value, enumerable: true, configurable: true, writable: true });
++        } else {
++          this.current[this.key] = value;
++        }
+         this.key = null;
+       }
+     }
+@@ -146,7 +150,11 @@
+       } else {
+         value = this.reviver(this.key, value);
+         if (value !== undefined) {
+-          this.current[this.key] = value;
++          if (this.key === '__proto__') {
++            Object.defineProperty(this.current, this.key, { value, enumerable: true, configurable: true, writable: true });
++          } else {
++            this.current[this.key] = value;
++          }
+         }
+         this.key = null;
+       }

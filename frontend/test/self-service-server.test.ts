@@ -177,6 +177,17 @@ test('self-service server validates selected agents before forwarding any paid r
       assert.equal(state.forwarded.length, 1); assert.equal(state.chainChecks(), 2);
     });
 
+    await context.test('revoking the daemon blocks new payments and restoring its permission permits a later request', async child => {
+      const state = fixture(child);
+      await submitDemo(await signedRequest());
+      state.state.executorAuthorized = false;
+      await assert.rejects(() => signedRequest().then(submitDemo), /authorize every configured executor/);
+      assert.equal(state.forwarded.length, 1, 'revoked executor cannot reach paid daemon endpoint');
+      state.state.executorAuthorized = true;
+      await submitDemo(await signedRequest());
+      assert.equal(state.forwarded.length, 2, 'a later authorized request may be forwarded');
+    });
+
     for (const [label, changes, message] of [
       ['wrong RPC chain', { chainId: 1 }, /not Monad Testnet/],
       ['foreign identity registry', { linkedIdentity: receiver }, /different identity registry/],

@@ -1,0 +1,90 @@
+{
+    "startedAt":  "2026-10-11T13:44:47.1289797Z",
+    "completedAt":  "2026-10-11T13:46:32.0587923Z",
+    "baselineRevision":  "5b4b19d1a544ce7b063c7f099f783c745b2d0277",
+    "revisionScope":  "working-tree durability changes on this baseline; final commit recorded by main report",
+    "productionMutation":  false,
+    "realSignaturesOrTransactions":  false,
+    "scope":  "Local Rust checks; real daemon binary processes using isolated retained filesystem and local RPC/facilitator fixtures. No live restart.",
+    "commands":  [
+                     {
+                         "command":  "cargo fmt --all -- --check",
+                         "workingDirectory":  "daemon",
+                         "startedAt":  "2026-10-11T13:44:47.1994484Z",
+                         "completedAt":  "2026-10-11T13:44:50.2587496Z",
+                         "exitCode":  0,
+                         "status":  "PASS",
+                         "log":  ".tools/final-readiness-daemon/fmt.log",
+                         "summaries":  [
+
+                                       ]
+                     },
+                     {
+                         "command":  "cargo check --locked --offline --all-targets --jobs 1",
+                         "workingDirectory":  "daemon",
+                         "startedAt":  "2026-10-11T13:44:50.5310996Z",
+                         "completedAt":  "2026-10-11T13:45:23.6865870Z",
+                         "exitCode":  0,
+                         "status":  "PASS",
+                         "log":  ".tools/final-readiness-daemon/check.log",
+                         "summaries":  [
+
+                                       ]
+                     },
+                     {
+                         "command":  "cargo clippy --locked --offline --all-targets --jobs 1 -- -D warnings",
+                         "workingDirectory":  "daemon",
+                         "startedAt":  "2026-10-11T13:45:23.7111543Z",
+                         "completedAt":  "2026-10-11T13:45:39.2703690Z",
+                         "exitCode":  0,
+                         "status":  "PASS",
+                         "log":  ".tools/final-readiness-daemon/clippy.log",
+                         "summaries":  [
+
+                                       ]
+                     },
+                     {
+                         "command":  "cargo test --locked --offline --jobs 1 -- --nocapture",
+                         "workingDirectory":  "daemon",
+                         "startedAt":  "2026-10-11T13:45:39.2763698Z",
+                         "completedAt":  "2026-10-11T13:46:32.0397303Z",
+                         "exitCode":  0,
+                         "status":  "PASS",
+                         "log":  ".tools/final-readiness-daemon/test.log",
+                         "summaries":  [
+                                           "test result: ok. 55 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.49s",
+                                           "restart 0: recovered 4 jobs, 4 payment reservations, 1 batch; interrupted jobs quarantined; startup summary recorded",
+                                           "restart 1: recovered 4 jobs, 4 payment reservations, 1 batch; interrupted jobs quarantined; startup summary recorded",
+                                           "zero payment verify/settle or transaction broadcasts across both actual daemon processes; missing retained journal fails before RPC",
+                                           "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.84s"
+                                       ]
+                     }
+                 ],
+    "production":  {
+                       "observedAt":  "2026-10-11T13:09:13.126Z",
+                       "status":  200,
+                       "services":  [
+                                        {
+                                            "id":  "srv-db0pe2vavr4c738pa9h0",
+                                            "name":  "monad-astheris-daemon",
+                                            "type":  "web_service",
+                                            "suspended":  "not_suspended",
+                                            "repo":  "https://github.com/willy264/monad-astheris",
+                                            "branch":  "main",
+                                            "autoDeploy":  "no",
+                                            "plan":  "free",
+                                            "url":  "https://monad-astheris-daemon.onrender.com",
+                                            "disk":  null
+                                        }
+                                    ]
+                   },
+    "productionDurability":  {
+                                 "status":  "BLOCKED",
+                                 "reason":  "Render remains free with no attached disk. Local startup guards require retained mounted storage; migration and production restart need operator action."
+                             },
+    "references":  [
+                       "daemon/tests/journal_restart.rs",
+                       "docs/daemon-durability.md",
+                       "daemon/src/store.rs"
+                   ]
+}
