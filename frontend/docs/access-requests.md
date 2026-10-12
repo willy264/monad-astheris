@@ -2,13 +2,21 @@
 
 This feature lets another wallet ask Agent #1’s current owner for expiring task authority. Requests and decisions are stored by the daemon and appear in the header’s **Access notifications** inbox. Connecting a wallet or sending a request does not grant authority.
 
-## October 12 deployment check
+## October 12 backend deployment
+
+Backend release `06fa439ab84f2f38414654124c04a7f62dee677d` is deployed at [the Render service](https://monad-astheris-daemon.onrender.com/health). It became active at `2026-10-12T18:41:46Z`. At `18:43:26Z`, `/health`, `/v1/config`, `/v1/access-requests/config`, the frontend access proxy, and the Agent #2 demo configuration all returned HTTP 200. Task submission was enabled and the batch worker was running. The missing inbox API is now deployed. A brief empty 503 was observed immediately after activation before these successful checks; these observations do not establish uninterrupted availability.
+
+The operator explicitly selected the free Render plan with temporary testnet storage. The journal was newly created; old local task receipts were not migrated. Requests, decisions and inbox history can disappear when the instance restarts or is replaced. On-chain delegations and payments remain on-chain. See [the temporary deployment policy](../../docs/daemon-durability.md). Public readiness checks do not replace the two-wallet request/approval/denial acceptance test below.
+
+The follow-up production browser run passed **21/21** read-only checks at `18:44:22–18:44:41Z`, at 1440 and 390 pixels. The access panel and notification dialog offered wallet connection, both configuration endpoints matched the deployed chain/router/registry, and there were no stale outage messages, horizontal overflow, browser exceptions or access mutation attempts. No wallet connection, signature, request or decision was submitted. Backend validation passed 59 tests, formatting, Clippy and all 73 shared ABI checks; all four CI jobs passed for the release.
+
+## Earlier October 12 deployment check
 
 The screenshot's unavailable inbox is a deployment mismatch, not a wallet permission failure. At `2026-10-12T12:23:50Z`, Render still served commit `59b115336da2c9e5dedb79d7c17eb72d5f761a1c` with automatic deployment disabled. Its `/health` returned 200, but `/v1/access-requests/config` returned 404. Vercel's `/api/access-requests/config` consequently returned 503. A running task worker does not imply the newer access-request API is deployed.
 
 The frontend checks service availability before offering inbox authentication. **Check availability** retries only the public configuration GET; it does not connect a wallet, sign a message, send a request or approve access. It pauses existing private inbox polling and seen updates until an explicit inbox refresh. Once the current backend is safely deployed and configured, this check exposes the normal connect/unlock flow again. Existing inbox history and approval recovery hints remain intact during outages.
 
-To enable production requests, follow the [retained-journal deployment procedure](../../docs/daemon-durability.md), then verify both configuration endpoints return 200 with the matching chain/router/registry and complete the two-wallet acceptance test below. The current free Render instance has no durable disk. Preserve its existing task/payment journal before replacing it; pushing frontend changes to GitHub alone cannot add the missing backend route.
+For a future durable deployment, follow the [retained-journal deployment procedure](../../docs/daemon-durability.md), then verify both configuration endpoints return 200 with the matching chain/router/registry and complete the two-wallet acceptance test below. The free Render instance has no durable disk; its explicitly accepted temporary-storage deployment above does not satisfy durable retention.
 
 Local verification on October 12 passed the production build, TypeScript, 15 targeted access tests, and 10 read-only browser checks at 1440 and 390 pixels. Browser checks covered the unavailable panel and notification inbox before authentication, public GET retries, absence of wallet prompts and access mutations, and horizontal layout. They did not sign in, send requests or grant access. The backend route remains unavailable, so this is outage-handling evidence rather than an end-to-end access acceptance test.
 

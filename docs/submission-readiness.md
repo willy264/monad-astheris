@@ -1,5 +1,7 @@
 # Submission readiness: live-site audit
 
+**October 12 backend update:** release `06fa439` is live on the existing [Render backend](https://monad-astheris-daemon.onrender.com/health). The access-request API and frontend proxy returned HTTP 200, the demo configuration was enabled, and the task/batch workers were active at `18:43:26Z`. The operator chose free hosting with explicit temporary testnet storage: local receipts and inbox history can reset, and the new instance started with an empty journal. This removes the missing-API deployment blocker; it does not prove durable retention or complete the two-wallet approval test. See [deployment details](daemon-durability.md) and the [access test guide](../frontend/docs/access-requests.md). The older audit below remains dated evidence.
+
 **October 12 presentation update:** the sticky navbar and bounded shard map are deployed. See the [bounty selection audit and paste-ready answers](bounty-submission-answers.md) and [two completed silent sponsor videos](../submission/2026-10-11/bounty-videos/README.md). Upload to Loom/Vimeo remains outstanding. This presentation work does not clear the wallet/service readiness gates below.
 
 **Later October 11 remediation:** use the [final readiness report](../submission/2026-10-11/final-readiness.md) for current statuses, 22 tasks/22 roots, repaired code, fresh test counts and exact next actions. The report below remains the earlier live-site snapshot. Wallet-based judging is still blocked.
