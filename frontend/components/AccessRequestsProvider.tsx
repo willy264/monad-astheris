@@ -35,6 +35,7 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
   const inbox = useQuery({ queryKey: inboxKey, enabled: !!validAuth && availability === 'ready' && !inboxPaused,
     queryFn: ({ signal }) => sendAccessAction(validAuth!, 'list', cursor ? { cursor } : {}, signal), retry: false, refetchInterval: 15000,
     refetchIntervalInBackground: false, staleTime: 10000 });
+  const needsInboxRefresh = !!validAuth && (inboxPaused || inbox.isError);
   const fresh = useCallback((actor: Address) => {
     ensure(mounted.current && same(latest.current, actor), 'The wallet changed. Return to the original wallet to check this request.');
   }, []);
@@ -50,6 +51,11 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
     const timer = window.setTimeout(() => { setAuth(undefined); queryClient.removeQueries({ queryKey: ['access-inbox'] }); }, Math.max(0, auth.expiresAt * 1000 - Date.now()));
     return () => window.clearTimeout(timer);
   }, [auth, queryClient]);
+  useEffect(() => {
+    // Keep saved requests visible after an outage, but require an explicit private
+    // refresh before resuming polling or acting on the saved review state.
+    if (validAuth && (availability === 'unavailable' || inbox.isError)) setInboxPaused(true);
+  }, [validAuth, availability, inbox.isError, inbox.errorUpdatedAt]);
 
   async function run<T>(action: () => Promise<T>): Promise<T> {
     if (busyRef.current) throw new Error('Finish the current wallet request first.');
@@ -57,7 +63,9 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
     try { return await action(); }
     catch (cause) {
       if (cause instanceof AccessHttpError && cause.status === 401) setAuth(undefined);
-      const message = userErrorMessage(cause, 'The access request could not be completed. Check the inbox before trying again.');
+      const serviceFailed = cause instanceof AccessHttpError && cause.status >= 500;
+      if (serviceFailed) setInboxPaused(true);
+      const message = serviceFailed ? 'The access service could not complete this action. Refresh your inbox to check its status before trying again.' : userErrorMessage(cause, 'The access request could not be completed. Check the inbox before trying again.');
       if (mounted.current && latest.current === actor) setError(message);
       throw new Error(message);
     } finally { busyRef.current = false; if (mounted.current) setBusy(false); }
@@ -109,17 +117,21 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
   const visibleRequests = validAuth ? inbox.data?.requests || [] : [];
   return <AccessRequestsContext.Provider value={{ address, ready: session.ready, authenticated: !!validAuth,
     requests: visibleRequests, config, busy, pendingApproval, availability,
-    needsInboxRefresh: !!validAuth && inboxPaused,
+    needsInboxRefresh,
     checkAvailability: async () => {
       // A public retry must not resume private POST polling or mark notifications seen.
       setInboxPaused(true);
+      setError('');
       await queryClient.cancelQueries({ queryKey: ['access-inbox'] });
       await checkAccessService(queryClient);
       setError('');
     },
     hasNextPage: !!validAuth && !!inbox.data?.nextCursor, hasPreviousPage: !!validAuth && pages.length > 1,
     loading: configQuery.isFetching || (!!validAuth && inbox.isFetching),
-    error: availability === 'ready' ? error || (validAuth && inbox.error ? userErrorMessage(inbox.error, 'The inbox could not be refreshed.') : '') : '',
+    // A failed private query remains in React Query after the public service
+    // recovers. The refresh notice represents that saved state; do not present
+    // its historical error as the current service availability.
+    error: availability === 'ready' ? error : '',
     clearError: () => setError(''),
     connect: () => run(async () => {
       const selected = await serviceConfig();
@@ -139,16 +151,18 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
       await action(selected, authorization, 'list', previous ? { cursor: previous } : {}); setPages(old => old.slice(0, -1));
     }),
     requestAccess: (durationSeconds, reason) => run(async () => {
+      ensure(!needsInboxRefresh, 'Refresh your inbox before sending another access request.');
       const selected = await serviceConfig(), authorization = await authenticate(selected);
       const owner = await rpc.readContract({ address: selected.identity, abi: identityAbi, functionName: 'ownerOf', args: [1n] }); fresh(authorization.wallet);
       await action(selected, authorization, 'request', { id: toHex(crypto.getRandomValues(new Uint8Array(32))), agentId: '1', owner, durationSeconds, reason: reason.trim() });
     }),
     deny: (request, note) => run(async () => {
+      ensure(!needsInboxRefresh, 'Refresh your inbox before reviewing this request.');
       const selected = await serviceConfig(), authorization = await authenticate(selected);
       await action(selected, authorization, 'deny', { id: request.id, note: note.trim() });
     }),
     markSeen: async items => {
-      if (!config || availability !== 'ready' || inboxPaused || !validAuth || !items.length || busyRef.current) throw new Error('Inbox is not ready.');
+      if (!config || availability !== 'ready' || needsInboxRefresh || !validAuth || !items.length || busyRef.current) throw new Error('Inbox is not ready.');
       await action(config, validAuth, 'seen', { items });
     },
     recoverApproval: (request, transaction) => run(async () => {
@@ -161,6 +175,7 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
       clearApproval(selected, authorization.wallet, request.id); setPendingApproval(undefined);
     }),
     approve: request => run(async () => {
+      ensure(!needsInboxRefresh, 'Refresh your inbox before reviewing this request.');
       const selected = await serviceConfig(), authorization = await authenticate(selected), actor = authorization.wallet;
       ensure(same(request.owner, actor), 'Only the agent owner can approve this request.');
       await withApprovalLock(actor, async () => {

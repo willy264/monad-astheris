@@ -18,6 +18,68 @@ impl std::fmt::Display for ReadUnavailable {
 }
 impl std::error::Error for ReadUnavailable {}
 
+#[derive(Debug, Clone, Copy)]
+struct WorkerLocation {
+    stage: &'static str,
+    from: Option<u64>,
+    to: Option<u64>,
+}
+impl WorkerLocation {
+    fn stage(stage: &'static str) -> Self {
+        Self {
+            stage,
+            from: None,
+            to: None,
+        }
+    }
+    fn range(stage: &'static str, from: u64, to: u64) -> Self {
+        Self {
+            stage,
+            from: Some(from),
+            to: Some(to),
+        }
+    }
+}
+impl std::fmt::Display for WorkerLocation {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str(self.stage)
+    }
+}
+impl std::error::Error for WorkerLocation {}
+
+#[derive(Debug)]
+struct TaskBlock(u64);
+impl std::fmt::Display for TaskBlock {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "task block {}", self.0)
+    }
+}
+impl std::error::Error for TaskBlock {}
+
+// These fields are our own static classifications and public block numbers.
+// Never log the source error: RPC transports can include credentials or bodies.
+fn failure_category(error: &anyhow::Error) -> &'static str {
+    if error.downcast_ref::<PublicationError>().is_some() {
+        "publication_requires_reconciliation"
+    } else if error.downcast_ref::<ReadUnavailable>().is_some() {
+        "rpc_read_unavailable"
+    } else {
+        "validation_or_journal_failure"
+    }
+}
+
+pub(super) fn log_failure(error: &anyhow::Error) {
+    let location = error
+        .downcast_ref::<WorkerLocation>()
+        .copied()
+        .unwrap_or_else(|| WorkerLocation::stage("worker_validation"));
+    let block = error.downcast_ref::<TaskBlock>().map(|block| block.0);
+    tracing::error!(category = failure_category(error), stage = location.stage,
+        from_block = ?location.from, to_block = ?location.to, task_block = ?block,
+        reason = publication_error(error),
+        "Merkle worker operation failed; journal and failed-range checkpoint preserved");
+}
+
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Progress {
@@ -108,6 +170,7 @@ async fn scan_range(
     }])).await.context(ReadUnavailable)?;
     let blocks = discovery_blocks(engine.router, start, end, serde_json::from_value(raw)?)?;
     for (block, (hash, logs)) in blocks {
+        let result: Result<()> = async {
         check_header(&header(engine, block).await?, block, Some(hash))?;
         let discovered =
             block_batch(engine.router, block, hash, logs)?.context("empty discovered block")?;
@@ -122,6 +185,9 @@ async fn scan_range(
         );
         let publication = publish_batch(engine, canonical).await?;
         tracing::info!(block, root=%publication.batch.root, leaves=publication.batch.leaf_count, status=publication.status, transaction=?publication.transaction, "Merkle batch finalized");
+        Ok(())
+        }.await;
+        result.context(TaskBlock(block))?;
     }
     check_header(&header(engine, start).await?, start, Some(first_hash))?;
     check_header(&header(engine, end).await?, end, Some(last_hash))?;
@@ -291,6 +357,7 @@ async fn scan_hints(
             break;
         };
         if published.insert(hint.block) {
+            let result: Result<()> = async {
             let source = header(engine, hint.block).await?;
             let canonical = check_header(&source, hint.block, None)?;
             // Untrusted stale indexer rows do not change canonical cursor/state.
@@ -300,6 +367,9 @@ async fn scan_hints(
                     tracing::info!(block=hint.block, status=publication.status, transaction=?publication.transaction, "Indexed task block verified and batch reconciled");
                 }
             }
+            Ok(())
+            }.await;
+            result.context(TaskBlock(hint.block))?;
         }
         let completed = hints.queue.pop_front().expect("hint remains queued");
         hints.after = completed.id;
@@ -333,14 +403,24 @@ fn retryable(error: &anyhow::Error) -> bool {
 pub async fn run(engine: Arc<Engine>, deployment: u64, indexer_url: Option<String>) -> Result<()> {
     let history_key = format!("merkle-cursor:{CHAIN_ID}:{}", engine.router);
     let recent_key = format!("merkle-recent-cursor:{CHAIN_ID}:{}", engine.router);
-    let mut history = engine.store.get::<Cursor>(history_key.clone()).await?;
-    let mut recent = engine.store.get::<Cursor>(recent_key.clone()).await?;
+    let mut history = engine
+        .store
+        .get::<Cursor>(history_key.clone())
+        .await
+        .context(WorkerLocation::stage("history_checkpoint_read"))?;
+    let mut recent = engine
+        .store
+        .get::<Cursor>(recent_key.clone())
+        .await
+        .context(WorkerLocation::stage("recent_checkpoint_read"))?;
     let mut recent_start = None;
     let mut hints = Hints::default();
     let mut failures = 0;
     loop {
         let result: Result<()> = async {
-            let head = finalized(&engine).await?;
+            let head = finalized(&engine)
+                .await
+                .context(WorkerLocation::stage("finalized_head"))?;
             // Check both independent cursor anchors even when neither has work.
             for previous in [history.as_ref(), recent.as_ref()].into_iter().flatten() {
                 ensure!(
@@ -348,10 +428,21 @@ pub async fn run(engine: Arc<Engine>, deployment: u64, indexer_url: Option<Strin
                     "finalized chain moved behind the batch cursor"
                 );
                 check_header(
-                    &header(&engine, previous.number).await?,
+                    &header(&engine, previous.number)
+                        .await
+                        .context(WorkerLocation::range(
+                            "checkpoint_anchor",
+                            previous.number,
+                            previous.number,
+                        ))?,
                     previous.number,
                     Some(previous.hash),
-                )?;
+                )
+                .context(WorkerLocation::range(
+                    "checkpoint_anchor",
+                    previous.number,
+                    previous.number,
+                ))?;
             }
             let boot =
                 *recent_start.get_or_insert(head.saturating_sub(RECENT_BLOCKS - 1).max(deployment));
@@ -366,7 +457,12 @@ pub async fn run(engine: Arc<Engine>, deployment: u64, indexer_url: Option<Strin
                     next_recent,
                     range_end(next_recent, head),
                 )
-                .await?;
+                .await
+                .context(WorkerLocation::range(
+                    "recent_scan",
+                    next_recent,
+                    range_end(next_recent, head),
+                ))?;
             }
             let next_history = history
                 .as_ref()
@@ -379,10 +475,17 @@ pub async fn run(engine: Arc<Engine>, deployment: u64, indexer_url: Option<Strin
                     next_history,
                     range_end(next_history, head),
                 )
-                .await?;
+                .await
+                .context(WorkerLocation::range(
+                    "history_scan",
+                    next_history,
+                    range_end(next_history, head),
+                ))?;
             }
             if let Some(endpoint) = indexer_url.as_deref() {
-                scan_hints(&engine, endpoint, deployment, head, &mut hints).await?;
+                scan_hints(&engine, endpoint, deployment, head, &mut hints)
+                    .await
+                    .context(WorkerLocation::stage("indexer_hint_reconciliation"))?;
             }
             engine
                 .store
@@ -400,7 +503,8 @@ pub async fn run(engine: Arc<Engine>, deployment: u64, indexer_url: Option<Strin
                         .into(),
                     },
                 )
-                .await?;
+                .await
+                .context(WorkerLocation::stage("progress_checkpoint_write"))?;
             Ok(())
         }
         .await;
@@ -413,6 +517,8 @@ pub async fn run(engine: Arc<Engine>, deployment: u64, indexer_url: Option<Strin
                 failures += 1;
                 tracing::warn!(
                     attempt = failures,
+                    category = failure_category(&error),
+                    reason = publication_error(&error),
                     "Merkle discovery read failed; retrying without advancing failed range"
                 );
                 tokio::time::sleep(Duration::from_secs((1u64 << failures).min(30))).await;
@@ -475,9 +581,36 @@ mod tests {
     fn only_prepublication_transport_reads_may_retry() {
         let read = anyhow::anyhow!("private provider response").context(ReadUnavailable);
         assert!(retryable(&read));
+        assert_eq!(failure_category(&read), "rpc_read_unavailable");
         let publication = read.context(PublicationError("ambiguous publication"));
         assert!(!retryable(&publication));
+        assert_eq!(
+            failure_category(&publication),
+            "publication_requires_reconciliation"
+        );
         assert!(!retryable(&anyhow::anyhow!("canonical block changed")));
+    }
+
+    #[test]
+    fn worker_diagnostics_keep_safe_context_without_provider_contents() {
+        let error = anyhow::anyhow!("https://private.invalid/key?token=secret")
+            .context(ReadUnavailable)
+            .context(PublicationReadError(
+                "unable to read the router's existing batch commitment",
+            ))
+            .context(TaskBlock(42))
+            .context(WorkerLocation::stage("indexer_hint_reconciliation"));
+        assert!(retryable(&error));
+        assert_eq!(failure_category(&error), "rpc_read_unavailable");
+        assert_eq!(
+            publication_error(&error),
+            "unable to read the router's existing batch commitment"
+        );
+        assert_eq!(error.downcast_ref::<TaskBlock>().unwrap().0, 42);
+        assert_eq!(
+            error.downcast_ref::<WorkerLocation>().unwrap().stage,
+            "indexer_hint_reconciliation"
+        );
     }
 
     #[derive(Clone, Copy)]
@@ -486,6 +619,9 @@ mod tests {
         Range,
         Canonical,
         Partial,
+        ExistingRead,
+        FinalizedExistingRead,
+        ExistingMismatch,
     }
 
     async fn fixture(
@@ -511,6 +647,15 @@ mod tests {
                 if matches!(fault,Fault::Range) && request["method"]=="eth_getLogs" && request["params"][0].get("fromBlock").is_some() {
                     return Json(json!({"jsonrpc":"2.0","id":request["id"],"error":{"code":-32000,"message":"temporary range failure"}}));
                 }
+                let first_existing_read = matches!(fault, Fault::ExistingRead)
+                    && request["method"] == "eth_call"
+                    && calls.iter().filter(|call| call["method"] == "eth_call").count() == 1;
+                let first_finalized_read = matches!(fault, Fault::FinalizedExistingRead)
+                    && request["method"] == "eth_getBlockByNumber" && request["params"][0] == "finalized"
+                    && calls.iter().filter(|call| call["method"] == "eth_getBlockByNumber" && call["params"][0] == "finalized").count() == 1;
+                if first_existing_read || first_finalized_read {
+                    return Json(json!({"jsonrpc":"2.0","id":request["id"],"error":{"code":-32000,"message":"temporary read failure"}}));
+                }
                 let result=match request["method"].as_str().unwrap() {
                     "eth_chainId"=>json!("0x279f"),"eth_getCode"=>json!("0x01"),
                     "eth_getBlockByNumber"=>{
@@ -526,7 +671,7 @@ mod tests {
                             if from<=42&&to>=42 {json!([super::super::tests::task_log()])} else {json!([])}
                         } else if matches!(fault,Fault::Partial) {json!([])} else {json!([super::super::tests::task_log()])}
                     },
-                    "eth_call"=>json!(format!("0x{}",hex::encode((batch.root,U256::from(1),U256::from(42),U256::from(42)).abi_encode()))),
+                    "eth_call"=>json!(format!("0x{}",hex::encode((if matches!(fault, Fault::ExistingMismatch) { B256::repeat_byte(0x55) } else { batch.root },U256::from(1),U256::from(42),U256::from(42)).abi_encode()))),
                     other=>panic!("Unexpected RPC / broadcast in worker fixture: {other}")
                 };
                 Json(json!({"jsonrpc":"2.0","id":request["id"],"result":result}))
@@ -610,6 +755,56 @@ mod tests {
                 < 25,
             "empty blocks must not each require a header read"
         );
+        server.abort();
+    }
+
+    #[tokio::test]
+    async fn transient_existing_commitment_reads_retry_without_broadcast_or_checkpoint_loss() {
+        for fault in [Fault::ExistingRead, Fault::FinalizedExistingRead] {
+            let (engine, store, calls, server, _dir) = fixture(fault).await;
+            let mut cursor = None;
+            let error = scan_range(&engine, "read-retry", &mut cursor, 1, 100)
+                .await
+                .unwrap_err();
+            assert!(retryable(&error));
+            assert_eq!(error.downcast_ref::<TaskBlock>().unwrap().0, 42);
+            assert!(cursor.is_none());
+            assert!(store
+                .get::<Cursor>("read-retry".into())
+                .await
+                .unwrap()
+                .is_none());
+            scan_range(&engine, "read-retry", &mut cursor, 1, 100)
+                .await
+                .unwrap();
+            assert_eq!(cursor.unwrap().number, 100);
+            assert!(calls
+                .lock()
+                .await
+                .iter()
+                .all(|call| !call["method"].as_str().unwrap().starts_with("eth_send")));
+            server.abort();
+        }
+    }
+
+    #[tokio::test]
+    async fn conflicting_existing_commitment_is_fatal_and_does_not_advance() {
+        let (engine, store, _calls, server, _dir) = fixture(Fault::ExistingMismatch).await;
+        let mut cursor = None;
+        let error = scan_range(&engine, "conflict", &mut cursor, 1, 100)
+            .await
+            .unwrap_err();
+        assert!(!retryable(&error));
+        assert_eq!(
+            failure_category(&error),
+            "publication_requires_reconciliation"
+        );
+        assert!(cursor.is_none());
+        assert!(store
+            .get::<Cursor>("conflict".into())
+            .await
+            .unwrap()
+            .is_none());
         server.abort();
     }
 

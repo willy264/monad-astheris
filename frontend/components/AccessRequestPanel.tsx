@@ -25,7 +25,7 @@ export default function AccessRequestPanel({ owner, agentId = '1' }: { owner: st
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!reason.trim() || access.busy || access.availability !== 'ready') return;
+    if (!reason.trim() || access.busy || access.availability !== 'ready' || access.needsInboxRefresh) return;
     try { await access.requestAccess(duration, reason.trim()); setSent(true); setReason(''); }
     catch { /* The shared context displays the request error. */ }
   }
@@ -47,7 +47,7 @@ export default function AccessRequestPanel({ owner, agentId = '1' }: { owner: st
           {latest.transactionHash && <a className={styles.textButton} href={explorerTx(latest.transactionHash)} target="_blank" rel="noreferrer">View approval transaction <Icon name="external" size={13} /></a>}
           <button type="button" className={styles.textButton} onClick={openAccessNotifications}>Open notifications</button>
         </div>}
-        {access.availability === 'ready' && !pending && !active && <form className={styles.requestForm} onSubmit={submit}>
+        {access.availability === 'ready' && !access.needsInboxRefresh && !pending && !active && <form className={styles.requestForm} onSubmit={submit}>
           <div className={styles.requestWallet}><span>Requesting wallet</span><code title={access.address}>{access.address && truncate(access.address, 7)}</code></div>
           <label htmlFor={`${fieldId}-duration`}>Requested access duration</label>
           <select id={`${fieldId}-duration`} value={duration} onChange={event => setDuration(Number(event.target.value))} disabled={access.busy}>{durations.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>

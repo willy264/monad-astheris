@@ -5,6 +5,9 @@ mod router;
 mod store;
 mod x402;
 
+#[cfg(test)]
+mod health_tests;
+
 use alloy::primitives::B256;
 use alloy::providers::Provider;
 use axum::{
@@ -229,7 +232,7 @@ async fn main() -> anyhow::Result<()> {
             submission_gate,
         ));
     let app = Router::new()
-        .route("/health", get(health))
+        .merge(health_routes())
         .route("/v1/config", get(public_config))
         .route("/v1/tasks/{request_id}", get(job))
         .merge(access::routes())
@@ -269,8 +272,28 @@ fn shutdown_signal() -> anyhow::Result<impl std::future::Future<Output = ()>> {
     })
 }
 
-async fn health(State(state): State<AppState>) -> ApiResult {
-    tokio::time::timeout(Duration::from_secs(5), state.store.health_check())
+fn health_routes() -> Router<AppState> {
+    Router::new()
+        .route("/live", get(live))
+        .route("/health", get(health))
+}
+
+/// Keep the platform's restart decision local. An unavailable RPC or stopped
+/// batch worker must not replace a healthy process and erase a temporary inbox.
+/// The committed probe still fails closed when the journal cannot accept writes.
+async fn live(State(state): State<AppState>) -> ApiResult {
+    journal_probe(state.store.health_check()).await?;
+    let mut journal = journal_metadata(&state);
+    journal["writable"] = json!(true);
+    Ok(Json(json!({"status":"alive","journal":journal})).into_response())
+}
+
+async fn journal_probe(
+    probe: impl std::future::Future<Output = anyhow::Result<()>>,
+) -> Result<(), ApiError> {
+    // Render's HTTP health-check deadline is five seconds. Resolve a stuck local
+    // write before that deadline instead of depending on the external RPC.
+    tokio::time::timeout(Duration::from_secs(3), probe)
         .await
         .map_err(|_| {
             ApiError(
@@ -283,7 +306,11 @@ async fn health(State(state): State<AppState>) -> ApiResult {
                 StatusCode::SERVICE_UNAVAILABLE,
                 "Journal unavailable; preserve existing data and restore storage".into(),
             )
-        })?;
+        })
+}
+
+async fn health(State(state): State<AppState>) -> ApiResult {
+    journal_probe(state.store.health_check()).await?;
     let block = tokio::time::timeout(
         Duration::from_secs(5),
         state.engine.provider.get_block_number(),

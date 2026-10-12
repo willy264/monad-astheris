@@ -2,6 +2,14 @@
 
 This feature lets another wallet ask Agent #1’s current owner for expiring task authority. Requests and decisions are stored by the daemon and appear in the header’s **Access notifications** inbox. Connecting a wallet or sending a request does not grant authority.
 
+## Recovering an interrupted inbox
+
+A public service check and a private inbox refresh are separate. During an outage, saved requests stay visible and review controls are disabled. After **Check availability** succeeds, choose **Refresh inbox** to retrieve the current requests before approving, denying or sending another request. The public check itself does not sign a message, resume private polling or mark requests read. Old query errors no longer appear beside an ?available again? claim.
+
+If an action failed, refresh before trying it again: its response may have been interrupted. Existing approval transaction recovery remains available. On the current free Render deployment, replacement can erase an off-chain request; absence is not a denial and does not revoke an on-chain grant. Check wallet activity and existing access first. If no approval is outstanding and access is still needed, the requester can send a fresh request.
+
+The backend uses `/live` for process health and `/health` for full worker/RPC monitoring so a stopped batch worker no longer triggers a platform restart of a writable inbox. See the [outage and deployment record](../../docs/daemon-durability.md). The older observations below are dated evidence.
+
 ## October 12 backend deployment
 
 Backend release `06fa439ab84f2f38414654124c04a7f62dee677d` is deployed at [the Render service](https://monad-astheris-daemon.onrender.com/health). It became active at `2026-10-12T18:41:46Z`. At `18:43:26Z`, `/health`, `/v1/config`, `/v1/access-requests/config`, the frontend access proxy, and the Agent #2 demo configuration all returned HTTP 200. Task submission was enabled and the batch worker was running. The missing inbox API is now deployed. A brief empty 503 was observed immediately after activation before these successful checks; these observations do not establish uninterrupted availability.

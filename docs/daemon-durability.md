@@ -1,5 +1,15 @@
 # Retaining and recovering the daemon journal
 
+## October 12 inbox outage and restart correction
+
+At 21:59-22:03 UTC, Render logs showed a repeating sequence: the batch worker stopped, `/health` returned 503, Render shut down the instance, and the replacement created an empty temporary journal. The service used `/health` for its platform restart decision. This made a batch failure interrupt access requests and reset inbox history. The earlier wrapper discarded the underlying worker error, so its exact original cause remains unknown.
+
+Use `/live` for Render's platform health check. It performs a committed local journal write with a three-second deadline and returns 503 on storage failure. It does not depend on the external RPC or batch worker. Continue monitoring `/health` separately: it still reports 503 for an unavailable RPC or stopped enabled worker. This prevents a batch-only failure from deliberately recycling a working inbox; it does not make the free filesystem durable. Render documents its routing and restart behavior in [HTTP health checks](https://render.com/docs/health-checks).
+
+The worker now distinguishes read-only commitment/permission checks from uncertain publication. Transient reads before broadcast, or reads verifying an existing commitment with no locally recorded transaction, use the bounded read retry policy. Conflicting canonical state, journal errors and ambiguous broadcast/receipt outcomes still stop publication without advancing the failed checkpoint. Static stage, block/range and failure-category logs support investigation without exposing provider credentials.
+
+After an outage, the frontend preserves cached requests but requires **Refresh inbox** before a new request or review decision. **Check availability** only checks public configuration; it does not make cached requests actionable, resume private polling, mark messages read or sign anything. If replacement erased a request, the requester must first check for an existing on-chain grant or uncertain approval, then send a fresh request if still needed. Never infer approval or denial from a disappeared inbox entry.
+
 ## Explicit free testnet deployment - October 12
 
 The operator has chosen to keep Render free and accept temporary task/payment/inbox history. `TESTNET_EPHEMERAL_STORAGE=true` is an explicit exception for Monad Testnet x402 demonstrations; it is disabled by default. Use `DATABASE_PATH=aetheris.redb` and `DATABASE_REQUIRE_EXISTING=false`, without a mount. `/health` and `/v1/config` disclose the mode, whether the file was created or reopened, and the retention warning. The paid persistent-storage procedure below remains applicable when durable operation is required.
@@ -54,7 +64,7 @@ DATABASE_REQUIRE_EXISTING=true
 
 `DATABASE_MOUNT_PATH` must be an actual non-root Linux mount. The daemon checks `/proc/self/mountinfo` and rejects an ordinary empty directory, an unavailable mount, or a journal resolving outside it. Render requires both the mounted directory and an existing journal; startup cannot silently replace a missing file. Existing journal formats remain readable. Outside Render, local development can omit the mount setting and create a new journal, but retained environments should still set `DATABASE_REQUIRE_EXISTING=true`.
 
-`GET /health` now performs a committed journal write probe and returns 503 on failure/timeout. `journal.writable` describes that probe; `journal.mountVerified` describes the OS mount check, not a guarantee about the provider's storage hardware. `journal.startupRecovery` and the startup log report aggregate recovered record counts without returning signed material. A full disk or corrupt journal must stop work; never resolve it by deleting replay records.
+`GET /live` and `GET /health` perform a committed journal write probe and return 503 on failure/timeout. Configure the platform restart probe as `/live`; reserve `/health` for full dependency/worker monitoring. `journal.writable` describes that probe; `journal.mountVerified` describes the OS mount check, not a guarantee about the provider's storage hardware. `journal.startupRecovery` and the startup log report aggregate recovered record counts without returning signed material. A full disk or corrupt journal must stop work; never resolve it by deleting replay records.
 
 Render supports disks only on paid services. A disk is available to one instance at runtime, and disk-backed deployments stop the previous instance before starting the replacement. Adding a disk itself triggers deployment: export and preserve the current journal first. See [Render disk documentation](https://render.com/docs/disks). The current public pricing lists entry compute at approximately **$7/month** plus **$0.25/GB/month** for disk; a 1 GB starting disk is about **$7.25/month** before other usage, taxes or workspace charges. Confirm the actual checkout price before purchasing. See [Render pricing](https://render.com/pricing).
 

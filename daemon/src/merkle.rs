@@ -107,12 +107,26 @@ impl std::fmt::Display for PublicationError {
 }
 impl std::error::Error for PublicationError {}
 
+/// A read or validation before this operation can broadcast. Keep this separate
+/// from PublicationError: a failed transport read here has no ambiguous write.
+#[derive(Debug)]
+struct PublicationReadError(&'static str);
+impl std::fmt::Display for PublicationReadError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0)
+    }
+}
+impl std::error::Error for PublicationReadError {}
+
 /// Return only our static classification, never an RPC URL or provider error body.
 pub fn publication_error(error: &anyhow::Error) -> &'static str {
-    error.downcast_ref::<PublicationError>().map_or(
-        "block publication failed; preserve the journal and reconcile before retrying",
-        |error| error.0,
-    )
+    if let Some(error) = error.downcast_ref::<PublicationError>() {
+        error.0
+    } else if let Some(error) = error.downcast_ref::<PublicationReadError>() {
+        error.0
+    } else {
+        "block publication failed; preserve the journal and reconcile before retrying"
+    }
 }
 
 fn quantity(value: &Value) -> Result<u64> {
@@ -371,7 +385,8 @@ async fn publish_batch(engine: &Engine, batch: BlockBatch) -> Result<Publication
         .merkleBatches(batch.batch_id)
         .call()
         .await
-        .context(PublicationError(
+        .context(worker::ReadUnavailable)
+        .context(PublicationReadError(
             "unable to read the router's existing batch commitment",
         ))?;
     let already_committed = matches_commitment(&existing, &batch).context(PublicationError(
@@ -395,7 +410,8 @@ async fn publish_batch(engine: &Engine, batch: BlockBatch) -> Result<Publication
             .committers(committer)
             .call()
             .await
-            .context(PublicationError(
+            .context(worker::ReadUnavailable)
+            .context(PublicationReadError(
                 "unable to verify first-relayer committer permission",
             ))?;
         if !allowed {
@@ -403,7 +419,7 @@ async fn publish_batch(engine: &Engine, batch: BlockBatch) -> Result<Publication
                 PublicationError("first relayer is not an authorized batch committer").into(),
             );
         }
-        let source = header(engine, block).await.context(PublicationError(
+        let source = header(engine, block).await.context(PublicationReadError(
             "unable to recheck the source block before publication",
         ))?;
         check_header(&source, block, Some(hash)).context(PublicationError(
@@ -442,7 +458,7 @@ async fn publish_batch(engine: &Engine, batch: BlockBatch) -> Result<Publication
                 "publication verified but its journal update failed; preserve the existing journal",
             ))?;
     } else {
-        verify_existing_publication(engine, &batch).await.context(PublicationError(
+        verify_existing_publication(engine, &batch).await.context(PublicationReadError(
             "existing commitment could not be verified in finalized canonical state; preserve the journal",
         ))?;
     }
@@ -466,13 +482,15 @@ async fn verify_existing_publication(engine: &Engine, batch: &BlockBatch) -> Res
     let contract = AetherisRouter::new(engine.router, &engine.provider);
     let finalized = engine
         .rpc("eth_getBlockByNumber", json!(["finalized", false]))
-        .await?;
+        .await
+        .context(worker::ReadUnavailable)?;
     let finalized_number = require_finalized(block, &finalized)?;
     let stored = contract
         .merkleBatches(batch.batch_id)
         .block(BlockId::number(finalized_number))
         .call()
-        .await?;
+        .await
+        .context(worker::ReadUnavailable)?;
     ensure!(
         matches_commitment(&stored, batch)?,
         "existing commitment is not finalized"
@@ -487,7 +505,11 @@ pub async fn run_worker(
     deployment_block: u64,
     indexer_url: Option<String>,
 ) -> Result<()> {
-    worker::run(engine, deployment_block, indexer_url).await
+    let result = worker::run(engine, deployment_block, indexer_url).await;
+    if let Err(error) = &result {
+        worker::log_failure(error);
+    }
+    result
 }
 
 #[cfg(test)]
