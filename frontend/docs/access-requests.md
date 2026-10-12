@@ -2,6 +2,16 @@
 
 This feature lets another wallet ask Agent #1’s current owner for expiring task authority. Requests and decisions are stored by the daemon and appear in the header’s **Access notifications** inbox. Connecting a wallet or sending a request does not grant authority.
 
+## October 12 deployment check
+
+The screenshot's unavailable inbox is a deployment mismatch, not a wallet permission failure. At `2026-10-12T12:23:50Z`, Render still served commit `59b115336da2c9e5dedb79d7c17eb72d5f761a1c` with automatic deployment disabled. Its `/health` returned 200, but `/v1/access-requests/config` returned 404. Vercel's `/api/access-requests/config` consequently returned 503. A running task worker does not imply the newer access-request API is deployed.
+
+The frontend checks service availability before offering inbox authentication. **Check availability** retries only the public configuration GET; it does not connect a wallet, sign a message, send a request or approve access. It pauses existing private inbox polling and seen updates until an explicit inbox refresh. Once the current backend is safely deployed and configured, this check exposes the normal connect/unlock flow again. Existing inbox history and approval recovery hints remain intact during outages.
+
+To enable production requests, follow the [retained-journal deployment procedure](../../docs/daemon-durability.md), then verify both configuration endpoints return 200 with the matching chain/router/registry and complete the two-wallet acceptance test below. The current free Render instance has no durable disk. Preserve its existing task/payment journal before replacing it; pushing frontend changes to GitHub alone cannot add the missing backend route.
+
+Local verification on October 12 passed the production build, TypeScript, 15 targeted access tests, and 10 read-only browser checks at 1440 and 390 pixels. Browser checks covered the unavailable panel and notification inbox before authentication, public GET retries, absence of wallet prompts and access mutations, and horizontal layout. They did not sign in, send requests or grant access. The backend route remains unavailable, so this is outage-handling evidence rather than an end-to-end access acceptance test.
+
 ## Requester
 
 1. Open **Agent directory → Observer workspace → Request Observer access**. Connect the wallet that will sign tasks and pay for them.

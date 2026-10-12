@@ -16,7 +16,7 @@ async function checkedResponse(response: Response) {
 }
 export async function fetchAccessConfig(signal?: AbortSignal) {
   return parseAccessConfig(await checkedResponse(await fetch('/api/access-requests/config', {
-    cache: 'no-store', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
+    method: 'GET', cache: 'no-store', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
   })));
 }
 export async function sendAccessAction(auth: AccessAuth, action: AccessAction, payload: Record<string, unknown>, signal?: AbortSignal) {

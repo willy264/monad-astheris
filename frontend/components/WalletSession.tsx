@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { DynamicContextProvider, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
 import { dynamicEnvironmentId } from '@/lib/dynamic-config';
+import { dynamicLocale } from '@/lib/dynamic-locale';
 import { monadTestnet } from '@/lib/contracts';
 import { AccessContext, type AccessSession } from './AccessContext';
 import AccessRequestsProvider from './AccessRequestsProvider';
@@ -76,5 +77,5 @@ export function WalletSession({ children }: { children: ReactNode }) {
   // Preserve server-rendered page content without initializing browser storage in Node.
   // Node 25 exposes localStorage, which this SDK mistakes for a browser environment.
   if (!mounted) return <AccessContext.Provider value={initializingSession}>{children}</AccessContext.Provider>;
-  return <DynamicContextProvider theme="dark" settings={{ environmentId: dynamicEnvironmentId, appName: 'Aetheris', siweStatement: 'Sign in to Aetheris. This signature proves control of this wallet for authentication. It does not authorize a token payment or grant agent executor permissions.', cssOverrides: ':root, :host, [data-dynamic-theme], .dynamic-shadow-dom-content { --dynamic-font-family-primary: "Josefin Sans", sans-serif !important; }', walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><AccessController>{children}</AccessController></DynamicContextProvider>;
+  return <DynamicContextProvider theme="dark" locale={dynamicLocale} settings={{ environmentId: dynamicEnvironmentId, appName: 'Aetheris', siweStatement: 'Sign in to Aetheris. This signature proves control of this wallet for authentication. It does not authorize a token payment or grant agent executor permissions.', cssOverrides: ':root, :host, [data-dynamic-theme], .dynamic-shadow-dom-content { --dynamic-font-family-primary: "Josefin Sans", sans-serif !important; }', walletConnectors: [EthereumWalletConnectors], initialAuthenticationMode: 'connect-and-sign', overrides: { evmNetworks: [{ blockExplorerUrls: [monadTestnet.blockExplorers.default.url], chainId: monadTestnet.id, chainName: monadTestnet.name, iconUrls: [], name: monadTestnet.name, nativeCurrency: monadTestnet.nativeCurrency, networkId: monadTestnet.id, rpcUrls: [...monadTestnet.rpcUrls.default.http] }] } }}><AccessController>{children}</AccessController></DynamicContextProvider>;
 }

@@ -22,7 +22,7 @@ async function upstream(path: string, body?: unknown) {
   if (!response.ok) {
     const message = raw && typeof raw === 'object' && 'error' in raw && typeof raw.error === 'string'
       ? userErrorMessage(new Error(raw.error), 'The access service could not complete this request.') : 'The access service could not complete this request.';
-    throw new AccessServiceError(response.status === 404 ? 'Access requests are not available yet. The task service needs the access inbox update.' : message, [400, 401, 403, 409, 429].includes(response.status) ? response.status : 503);
+    throw new AccessServiceError(response.status === 404 ? 'Access requests are temporarily unavailable. Please try again later.' : message, [400, 401, 403, 409, 429].includes(response.status) ? response.status : 503);
   }
   return raw;
 }

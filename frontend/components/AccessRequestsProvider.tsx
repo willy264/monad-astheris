@@ -5,7 +5,8 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { isEthereumWallet } from '@dynamic-labs/ethereum';
 import { toHex, type Address, type Hex } from 'viem';
 import { accessApprovalData, accessSessionData, type AccessAction, type AccessAuth, type AccessConfig, type AccessRequest } from '@/lib/access-protocol';
-import { AccessHttpError, clearApproval, fetchAccessConfig, isWalletRejection, readApproval, saveApproval, sendAccessAction, withApprovalLock } from '@/lib/access-client';
+import { AccessHttpError, clearApproval, isWalletRejection, readApproval, saveApproval, sendAccessAction, withApprovalLock } from '@/lib/access-client';
+import { accessConfigQueryOptions, checkAccessService, type AccessAvailability } from '@/lib/access-service';
 import { ensure, hash, same } from '@/lib/demo-protocol';
 import { contracts, identityAbi, monadTestnet, routerAbi, walletPublicClient as rpc } from '@/lib/contracts';
 import { userErrorMessage } from '@/lib/user-error';
@@ -18,6 +19,7 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
   const address = session.address?.toLowerCase() as Address | undefined;
   const queryClient = useQueryClient();
   const [auth, setAuth] = useState<AccessAuth>();
+  const [inboxPaused, setInboxPaused] = useState(false);
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   const [pendingApproval, setPendingApproval] = useState<{ id: string; hash: string }>();
   const [pages, setPages] = useState<(string | undefined)[]>([undefined]);
@@ -25,12 +27,12 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
   const busyRef = useRef(false), mounted = useRef(true);
   const latest = useRef(address); latest.current = address;
   const authRef = useRef(auth); authRef.current = auth;
-  const configQuery = useQuery({ queryKey: ['access-service-config'], enabled: session.ready && !!address,
-    queryFn: ({ signal }) => fetchAccessConfig(signal), retry: false, staleTime: 30000 });
+  const configQuery = useQuery({ ...accessConfigQueryOptions, enabled: session.ready });
   const config = configQuery.data;
+  const availability: AccessAvailability = !session.ready || configQuery.isFetching || configQuery.isPending ? 'checking' : configQuery.isError || !config ? 'unavailable' : 'ready';
   const validAuth = auth && same(auth.wallet, address || '') && auth.expiresAt > Math.floor(Date.now() / 1000) ? auth : undefined;
   const inboxKey = ['access-inbox', address, config?.router, validAuth?.expiresAt, cursor];
-  const inbox = useQuery({ queryKey: inboxKey, enabled: !!validAuth && !!config,
+  const inbox = useQuery({ queryKey: inboxKey, enabled: !!validAuth && availability === 'ready' && !inboxPaused,
     queryFn: ({ signal }) => sendAccessAction(validAuth!, 'list', cursor ? { cursor } : {}, signal), retry: false, refetchInterval: 15000,
     refetchIntervalInBackground: false, staleTime: 10000 });
   const fresh = useCallback((actor: Address) => {
@@ -38,7 +40,7 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
   }, []);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
-    setAuth(undefined); setError(''); setPendingApproval(undefined); setPages([undefined]);
+    setAuth(undefined); setError(''); setPendingApproval(undefined); setPages([undefined]); setInboxPaused(false);
     // No private inbox from a previous account should remain in the query cache.
     void queryClient.cancelQueries({ queryKey: ['access-inbox'] });
     queryClient.removeQueries({ queryKey: ['access-inbox'] });
@@ -61,8 +63,7 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
     } finally { busyRef.current = false; if (mounted.current) setBusy(false); }
   }
   async function serviceConfig(): Promise<AccessConfig> {
-    const selected = config || (await configQuery.refetch()).data;
-    ensure(selected, 'Access requests are not available yet. The task service needs the access inbox update.');
+    const selected = await checkAccessService(queryClient);
     ensure(contracts.router && contracts.identity && same(selected.router, contracts.router) && same(selected.identity, contracts.identity), 'The access service belongs to a different deployment.');
     return selected;
   }
@@ -89,6 +90,7 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
     fresh(authorization.wallet);
     if (name !== 'list') await queryClient.cancelQueries({ queryKey: ['access-inbox', authorization.wallet.toLowerCase()] });
     fresh(authorization.wallet); const result = await sendAccessAction(authorization, name, payload); fresh(authorization.wallet);
+    if (name !== 'seen') setInboxPaused(false);
     if (name === 'seen') {
       await queryClient.invalidateQueries({ queryKey: ['access-inbox', authorization.wallet.toLowerCase()] });
     } else {
@@ -106,14 +108,23 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
   }
   const visibleRequests = validAuth ? inbox.data?.requests || [] : [];
   return <AccessRequestsContext.Provider value={{ address, ready: session.ready, authenticated: !!validAuth,
-    requests: visibleRequests, config, busy, pendingApproval,
+    requests: visibleRequests, config, busy, pendingApproval, availability,
+    needsInboxRefresh: !!validAuth && inboxPaused,
+    checkAvailability: async () => {
+      // A public retry must not resume private POST polling or mark notifications seen.
+      setInboxPaused(true);
+      await queryClient.cancelQueries({ queryKey: ['access-inbox'] });
+      await checkAccessService(queryClient);
+      setError('');
+    },
     hasNextPage: !!validAuth && !!inbox.data?.nextCursor, hasPreviousPage: !!validAuth && pages.length > 1,
     loading: configQuery.isFetching || (!!validAuth && inbox.isFetching),
-    error: error || (configQuery.error ? userErrorMessage(configQuery.error, 'Access requests are unavailable.') : '') || (validAuth && inbox.error ? userErrorMessage(inbox.error, 'The inbox could not be refreshed.') : ''),
+    error: availability === 'ready' ? error || (validAuth && inbox.error ? userErrorMessage(inbox.error, 'The inbox could not be refreshed.') : '') : '',
     clearError: () => setError(''),
     connect: () => run(async () => {
+      const selected = await serviceConfig();
       if (!address) { session.openSignIn(); return; }
-      const selected = await serviceConfig(), authorization = await authenticate(selected);
+      const authorization = await authenticate(selected);
       await action(selected, authorization, 'list', {});
     }),
     refresh: () => run(async () => { const selected = await serviceConfig(), authorization = await authenticate(selected); await action(selected, authorization, 'list', cursor ? { cursor } : {}); }),
@@ -137,7 +148,7 @@ export default function AccessRequestsProvider({ children }: { children: ReactNo
       await action(selected, authorization, 'deny', { id: request.id, note: note.trim() });
     }),
     markSeen: async items => {
-      if (!config || !validAuth || !items.length || busyRef.current) throw new Error('Inbox is not ready.');
+      if (!config || availability !== 'ready' || inboxPaused || !validAuth || !items.length || busyRef.current) throw new Error('Inbox is not ready.');
       await action(config, validAuth, 'seen', { items });
     },
     recoverApproval: (request, transaction) => run(async () => {
