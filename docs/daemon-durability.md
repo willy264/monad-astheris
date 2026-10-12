@@ -1,5 +1,15 @@
 # Retaining and recovering the daemon journal
 
+## Explicit free testnet deployment - October 12
+
+The operator has chosen to keep Render free and accept temporary task/payment/inbox history. `TESTNET_EPHEMERAL_STORAGE=true` is an explicit exception for Monad Testnet x402 demonstrations; it is disabled by default. Use `DATABASE_PATH=aetheris.redb` and `DATABASE_REQUIRE_EXISTING=false`, without a mount. `/health` and `/v1/config` disclose the mode, whether the file was created or reopened, and the retention warning. The paid persistent-storage procedure below remains applicable when durable operation is required.
+
+This choice accepts that replacing the free instance may lose its local records. It does not claim an export, migration, recovered payment history or durable notifications. On-chain task shards, token payments, identity and delegations remain on-chain. Missing local records cannot reconstruct uncertain settlement outcomes; do not automatically resubmit old requests. A task salt already recorded on the router is rejected before payment verification or new dispatch when its local job is missing. Existing database corruption, configured mount checks, file locks, signature checks and interrupted-job quarantine remain enforced.
+
+The release is rolled out in maintenance mode first (`TASK_SUBMISSION_ENABLED=false`, `BATCH_ENABLED=false`). Verify chain 10143, a writable journal reporting `ephemeral-testnet`, and the public access configuration. Wait for the previous process to retire before activating the same artifact with task submission and batching enabled. Keep one signer process and automatic deployment disabled. Free-host restarts can still erase inbox history; this deployment does not satisfy the durable-storage acceptance test below.
+
+## Retained storage policy and earlier observations
+
 The daemon already records task, payment, signer and Merkle state in one ACID redb database. Keep that database on a retained volume and give its signing keys to exactly one process. Moving the existing redb file to a Render persistent disk is the smallest change; replacing it with a hosted database would require a schema and concurrency migration with no benefit for the current single-instance workload.
 
 **Production status, October 11, 2026 at 13:09 UTC: BLOCKED.** A read-only Render management query still reports plan `free`, no attached disk, and automatic deployment disabled. Local recovery tests and the new configuration guards do not establish durable production storage. No Render setting or running process was changed for this work.

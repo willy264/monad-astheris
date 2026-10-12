@@ -544,6 +544,7 @@ mod tests {
             listen: "127.0.0.1:0".parse().unwrap(),
             database: String::new(),
             database_require_existing: false,
+            testnet_ephemeral_storage: false,
             database_mount_path: None,
             cors_origin: String::new(),
             confirmations: 1,

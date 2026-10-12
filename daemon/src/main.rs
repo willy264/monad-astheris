@@ -30,6 +30,9 @@ pub struct AppState {
     pub batch_health: Arc<RwLock<&'static str>>,
     pub task_submission_enabled: bool,
     pub journal_mount_verified: bool,
+    pub journal_mode: &'static str,
+    pub journal_startup_state: &'static str,
+    pub journal_require_existing: bool,
     pub recovery_summary: store::RecoverySummary,
 }
 
@@ -102,11 +105,28 @@ async fn main() -> anyhow::Result<()> {
         )
         .init();
     let config = config::Config::from_env()?;
+    let journal_existed = std::path::Path::new(&config.database)
+        .try_exists()
+        .map_err(|_| {
+            anyhow::anyhow!("cannot inspect DATABASE_PATH; preserve the existing journal")
+        })?;
     let store = store::Store::open_checked(
         &config.database,
         config.database_require_existing,
         config.database_mount_path.as_deref(),
     )?;
+    let journal_startup_state = if journal_existed {
+        "reopened"
+    } else {
+        "created"
+    };
+    if config.testnet_ephemeral_storage {
+        tracing::warn!(
+            chain_id = router::CHAIN_ID,
+            startup_state = journal_startup_state,
+            "Temporary Monad Testnet storage is enabled. Container replacement can lose task/payment history and access notifications; a newly created journal is not a migration or restored history"
+        );
+    }
     if command == Command::Serve {
         let interrupted = store.mark_interrupted_jobs().await?;
         if interrupted > 0 {
@@ -154,6 +174,15 @@ async fn main() -> anyhow::Result<()> {
         store: store.clone(),
         task_submission_enabled: config.task_submission_enabled,
         journal_mount_verified: config.database_mount_path.is_some(),
+        journal_mode: if config.testnet_ephemeral_storage {
+            "ephemeral-testnet"
+        } else if config.database_mount_path.is_some() {
+            "mounted"
+        } else {
+            "local"
+        },
+        journal_startup_state,
+        journal_require_existing: config.database_require_existing,
         recovery_summary,
         batch_health: Arc::new(RwLock::new(if config.batch_enabled {
             "running"
@@ -274,12 +303,27 @@ async fn health(State(state): State<AppState>) -> ApiResult {
     } else {
         StatusCode::OK
     };
-    Ok((code,Json(json!({"status":if stopped { "degraded" } else { "ok" },"journal":{"writable":true,"mountVerified":state.journal_mount_verified,"startupRecovery":state.recovery_summary},"batchWorker":batch_health,"batchProgress":batch_progress,"taskSubmissionEnabled":state.task_submission_enabled,"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"blockNumber":block}))).into_response())
+    let mut journal = journal_metadata(&state);
+    journal["writable"] = json!(true);
+    journal["startupRecovery"] = json!(state.recovery_summary);
+    Ok((code,Json(json!({"status":if stopped { "degraded" } else { "ok" },"journal":journal,"batchWorker":batch_health,"batchProgress":batch_progress,"taskSubmissionEnabled":state.task_submission_enabled,"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"blockNumber":block}))).into_response())
+}
+
+fn journal_metadata(state: &AppState) -> Value {
+    json!({
+        "mode": state.journal_mode,
+        "startupState": state.journal_startup_state,
+        "mountVerified": state.journal_mount_verified,
+        "requireExisting": state.journal_require_existing,
+        "warning": (state.journal_mode == "ephemeral-testnet").then_some(
+            "Temporary Monad Testnet storage: task/payment history and access notifications can be lost when the service is replaced. On-chain records remain; a new journal does not restore earlier history."
+        ),
+    })
 }
 
 async fn public_config(State(state): State<AppState>) -> Json<Value> {
     Json(
-        json!({"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"taskSubmissionEnabled":state.task_submission_enabled,"taskAuthorization":{"name":"AetherisTask","version":"1"},"payment":state.payments.required_payload()}),
+        json!({"chainId":router::CHAIN_ID,"router":state.engine.router,"relayers":state.engine.addresses(),"taskSubmissionEnabled":state.task_submission_enabled,"journal":journal_metadata(&state),"taskAuthorization":{"name":"AetherisTask","version":"1"},"payment":state.payments.required_payload()}),
     )
 }
 
@@ -345,6 +389,25 @@ async fn submit(
     };
     if let Some(existing) = canonical_job(&state, &canonical_key, canonical.intent).await? {
         return job_response(existing);
+    }
+    // A lost temporary journal must not turn a task already recorded on-chain
+    // into a new payment attempt. Existing local jobs remain idempotent above.
+    if state
+        .engine
+        .existing_shard(&task)
+        .await
+        .map_err(|_| {
+            ApiError(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "Task replay check is unavailable; no task or payment was accepted".into(),
+            )
+        })?
+        .is_some()
+    {
+        return Err(ApiError(
+            StatusCode::CONFLICT,
+            "Task already exists on-chain but its local receipt is unavailable; reconciliation required. No new task or payment was accepted".into(),
+        ));
     }
     let payment = match state.payments.verify(&headers, client).await {
         Ok(payment) => payment,

@@ -143,6 +143,18 @@ pub struct PaymentContext {
 }
 
 impl Payments {
+    #[cfg(test)]
+    pub(crate) fn test_x402(endpoint: String) -> Self {
+        Self {
+            mode: Mode::X402,
+            client: reqwest::Client::new(),
+            endpoint,
+            bearer: None,
+            requirements: json!({"scheme":"exact","network":"eip155:10143","amount":"1000"}),
+            resource_url: "http://localhost/v1/tasks".into(),
+        }
+    }
+
     pub async fn from_env(client: reqwest::Client) -> Result<Self> {
         let mode_name = env::var("PAYMENT_MODE").unwrap_or_else(|_| "x402".into());
         let resource_url = required("PUBLIC_TASK_URL")?;

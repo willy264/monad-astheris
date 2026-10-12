@@ -285,3 +285,213 @@ async fn production_process_restart_retains_receipts_and_quarantines_interrupted
     println!("zero payment verify/settle or transaction broadcasts across both actual daemon processes; missing retained journal fails before RPC");
     server.abort();
 }
+
+#[tokio::test]
+async fn temporary_render_storage_is_explicit_reports_resets_and_keeps_startup_guards() {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    let calls = Arc::new(Mutex::new(HashMap::<String, usize>::new()));
+    let rpc_calls = calls.clone();
+    let chain_id = Arc::new(AtomicU64::new(10143));
+    let rpc_chain = chain_id.clone();
+    let supported_calls = calls.clone();
+    let app = Router::new()
+        .route("/rpc", post(move |Json(request): Json<Value>| {
+            let calls = rpc_calls.clone();
+            let chain = rpc_chain.clone();
+            async move {
+                let method = request["method"].as_str().unwrap().to_owned();
+                *calls.lock().unwrap().entry(method.clone()).or_default() += 1;
+                let result = match method.as_str() {
+                    "eth_chainId" => json!(format!("0x{:x}", chain.load(Ordering::SeqCst))),
+                    "eth_getCode" => json!("0x01"),
+                    "eth_blockNumber" => json!("0x64"),
+                    "eth_call" => json!(format!("0x{:064x}", 2)),
+                    _ => panic!("temporary startup must not broadcast or replay a transaction"),
+                };
+                Json(json!({"jsonrpc": "2.0", "id": request["id"], "result": result}))
+            }
+        }))
+        .route("/supported", get(move || {
+            let calls = supported_calls.clone();
+            async move {
+                *calls.lock().unwrap().entry("supported".into()).or_default() += 1;
+                Json(json!({"kinds": [{"x402Version": 2, "scheme": "exact", "network": "eip155:10143"}]}))
+            }
+        }));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let fixture = format!("http://{}", listener.local_addr().unwrap());
+    let server = tokio::spawn(async move {
+        axum::serve(listener, app).await.unwrap();
+    });
+    let directory = tempfile::tempdir().unwrap();
+    let database = directory.path().join("temporary.redb");
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(1))
+        .build()
+        .unwrap();
+    let temporary_command = |path: &Path, port| {
+        let mut command = daemon_command(directory.path(), path, port, &fixture);
+        command
+            .env("RENDER", "true")
+            .env("TESTNET_EPHEMERAL_STORAGE", "true")
+            .env_remove("DATABASE_REQUIRE_EXISTING")
+            .env("TASK_SUBMISSION_ENABLED", "false");
+        command
+    };
+    for restart in 0..2 {
+        let reservation = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = reservation.local_addr().unwrap().port();
+        drop(reservation);
+        let mut child = temporary_command(&database, port).spawn().unwrap();
+        let base = format!("http://127.0.0.1:{port}");
+        let health = tokio::time::timeout(Duration::from_secs(20), async {
+            loop {
+                if let Ok(response) = client.get(format!("{base}/health")).send().await {
+                    if response.status().is_success() {
+                        break response.json::<Value>().await.unwrap();
+                    }
+                }
+                if let Some(status) = child.try_wait().unwrap() {
+                    panic!("temporary fixture daemon exited before health: {status}");
+                }
+                tokio::time::sleep(Duration::from_millis(50)).await;
+            }
+        })
+        .await
+        .unwrap();
+        let startup = if restart == 0 { "created" } else { "reopened" };
+        assert_eq!(health["taskSubmissionEnabled"], false);
+        assert_eq!(health["journal"]["mode"], "ephemeral-testnet");
+        assert_eq!(health["journal"]["startupState"], startup);
+        assert_eq!(health["journal"]["mountVerified"], false);
+        assert_eq!(health["journal"]["requireExisting"], false);
+        assert!(health["journal"]["warning"]
+            .as_str()
+            .unwrap()
+            .contains("can be lost"));
+        assert_eq!(
+            health["journal"]["startupRecovery"]["jobs"],
+            if restart == 0 { 0 } else { 4 }
+        );
+        let config: Value = client
+            .get(format!("{base}/v1/config"))
+            .send()
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+        assert_eq!(config["journal"]["mode"], "ephemeral-testnet");
+        assert_eq!(config["journal"]["startupState"], startup);
+        assert_eq!(
+            client
+                .get(format!("{base}/v1/access-requests/config"))
+                .send()
+                .await
+                .unwrap()
+                .status()
+                .as_u16(),
+            200
+        );
+        assert_eq!(
+            client
+                .post(format!("{base}/v1/tasks"))
+                .body("not a paid task")
+                .send()
+                .await
+                .unwrap()
+                .status()
+                .as_u16(),
+            503
+        );
+        assert_eq!(
+            client
+                .get(format!("{base}/v1/tasks/0x{:064x}", 3))
+                .send()
+                .await
+                .unwrap()
+                .status()
+                .as_u16(),
+            if restart == 0 { 404 } else { 200 }
+        );
+        child.start_kill().unwrap();
+        let output = child.wait_with_output().await.unwrap();
+        assert!(String::from_utf8_lossy(&output.stdout)
+            .contains("Temporary Monad Testnet storage is enabled"));
+        if restart == 0 {
+            seed(&database);
+        }
+    }
+    let before_failures = calls.lock().unwrap().clone();
+    for failure in [
+        "require-existing",
+        "mount",
+        "payment-mode",
+        "invalid-opt-in",
+        "corrupt",
+    ] {
+        let path = directory.path().join(format!("{failure}.redb"));
+        let mut command = temporary_command(&path, 0);
+        match failure {
+            "require-existing" => {
+                command.env("DATABASE_REQUIRE_EXISTING", "true");
+            }
+            "mount" => {
+                command.env("DATABASE_MOUNT_PATH", directory.path());
+            }
+            "payment-mode" => {
+                command.env("PAYMENT_MODE", "graph-tally");
+            }
+            "invalid-opt-in" => {
+                command.env("TESTNET_EPHEMERAL_STORAGE", "yes");
+            }
+            "corrupt" => {
+                std::fs::write(&path, b"preserve this invalid database").unwrap();
+            }
+            _ => unreachable!(),
+        }
+        let output = tokio::time::timeout(Duration::from_secs(10), command.output())
+            .await
+            .unwrap()
+            .unwrap();
+        assert!(!output.status.success(), "{failure} must reject startup");
+        assert_eq!(
+            *calls.lock().unwrap(),
+            before_failures,
+            "{failure} must fail before network initialization"
+        );
+        if failure == "corrupt" {
+            assert_eq!(
+                std::fs::read(&path).unwrap(),
+                b"preserve this invalid database"
+            );
+        } else {
+            assert!(
+                !path.exists(),
+                "{failure} must not create a replacement journal"
+            );
+        }
+    }
+    chain_id.store(1, Ordering::SeqCst);
+    let output = tokio::time::timeout(
+        Duration::from_secs(10),
+        temporary_command(&database, 0).output(),
+    )
+    .await
+    .unwrap()
+    .unwrap();
+    assert!(
+        !output.status.success(),
+        "temporary mode must still reject a non-testnet RPC"
+    );
+    assert_eq!(
+        calls.lock().unwrap().get("supported"),
+        before_failures.get("supported"),
+        "wrong-chain startup cannot reach payment initialization"
+    );
+    assert!(calls.lock().unwrap().keys().all(|key| matches!(
+        key.as_str(),
+        "eth_chainId" | "eth_getCode" | "eth_blockNumber" | "eth_call" | "supported"
+    )));
+    server.abort();
+}

@@ -28,6 +28,7 @@ sol! {
         function createShard(uint256 agentId, bytes32 taskId, uint256 sequenceNonce, address executor, bytes32 inputHash) external returns (address);
         function executeTask(address shard, bytes32 outputHash, bytes32 proofHash) external;
         function predictShardAddress(uint256 agentId, bytes32 taskId, uint256 sequenceNonce, address executor, bytes32 inputHash) external view returns (address);
+        function shardsBySalt(bytes32 salt) external view returns (address);
         function isAuthorized(uint256 agentId, address account) external view returns (bool);
         function committers(address account) external view returns (bool);
         function merkleBatches(bytes32 batchId) external view returns (bytes32 root, uint256 leafCount, uint256 fromBlock, uint256 toBlock);
@@ -214,6 +215,18 @@ impl Engine {
 
     pub fn addresses(&self) -> Vec<Address> {
         self.relayers.iter().map(|r| r.address).collect()
+    }
+
+    /// The chain can retain a task after a temporary journal is lost. Do not
+    /// treat that identity as a new paid request or invent its missing receipt.
+    pub async fn existing_shard(&self, task: &TaskRequest) -> Result<Option<Address>> {
+        let typed = task.typed()?;
+        let salt = storage_salt(typed.agentId, typed.taskId, typed.sequenceNonce);
+        let shard = AetherisRouter::new(self.router, &self.provider)
+            .shardsBySalt(salt)
+            .call()
+            .await?;
+        Ok((shard != Address::ZERO).then_some(shard))
     }
 
     pub async fn validate(&self, task: &TaskRequest) -> Result<Address> {
@@ -590,6 +603,10 @@ pub fn storage_salt(agent: U256, task: B256, nonce: U256) -> B256 {
 pub fn unix_seconds() -> Result<u64> {
     Ok(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs())
 }
+
+#[cfg(test)]
+#[path = "task_replay_tests.rs"]
+mod task_replay_tests;
 
 #[cfg(test)]
 mod tests {

@@ -12,6 +12,7 @@ pub struct Config {
     pub database: String,
     pub database_require_existing: bool,
     pub database_mount_path: Option<String>,
+    pub testnet_ephemeral_storage: bool,
     pub cors_origin: String,
     pub confirmations: u64,
     pub deployment_block: u64,
@@ -43,17 +44,18 @@ impl Config {
         let database_mount_path = env::var("DATABASE_MOUNT_PATH")
             .ok()
             .filter(|path| !path.trim().is_empty());
-        ensure!(
-            !on_render || database_mount_path.is_some(),
-            "Render requires DATABASE_MOUNT_PATH pointing to an attached persistent disk; ephemeral journals cannot safely retain paid task history"
-        );
-        let database_require_existing = parse_switch(
-            "DATABASE_REQUIRE_EXISTING",
-            env::var("DATABASE_REQUIRE_EXISTING").ok(),
-            on_render,
+        let testnet_ephemeral_storage = parse_switch(
+            "TESTNET_EPHEMERAL_STORAGE",
+            env::var("TESTNET_EPHEMERAL_STORAGE").ok(),
+            false,
         )?;
-        ensure!(!on_render || database_require_existing,
-            "Render requires DATABASE_REQUIRE_EXISTING=true; restore the retained journal before starting the service");
+        let database_require_existing = storage_policy(
+            on_render,
+            testnet_ephemeral_storage,
+            database_mount_path.is_some(),
+            env::var("DATABASE_REQUIRE_EXISTING").ok(),
+            &env::var("PAYMENT_MODE").unwrap_or_else(|_| "x402".into()),
+        )?;
         Ok(Self {
             rpc_url,
             router,
@@ -65,6 +67,7 @@ impl Config {
             database: env::var("DATABASE_PATH").unwrap_or_else(|_| "aetheris.redb".into()),
             database_require_existing,
             database_mount_path,
+            testnet_ephemeral_storage,
             cors_origin: env::var("CORS_ORIGIN").unwrap_or_else(|_| "http://localhost:3000".into()),
             deployment_block: required("DEPLOYMENT_BLOCK")?
                 .parse()
@@ -80,6 +83,35 @@ impl Config {
             max_inflight,
         })
     }
+}
+
+fn storage_policy(
+    on_render: bool,
+    testnet_ephemeral: bool,
+    has_mount: bool,
+    require_existing: Option<String>,
+    payment_mode: &str,
+) -> Result<bool> {
+    ensure!(
+        !testnet_ephemeral || payment_mode == "x402",
+        "TESTNET_EPHEMERAL_STORAGE only supports x402 payments on Monad Testnet"
+    );
+    ensure!(
+        !on_render || testnet_ephemeral || has_mount,
+        "Render requires DATABASE_MOUNT_PATH pointing to an attached persistent disk; temporary Monad Testnet storage requires explicit TESTNET_EPHEMERAL_STORAGE=true"
+    );
+    // Explicit retention settings still apply in temporary mode. In particular,
+    // a configured mount is validated by Store and a missing required file fails.
+    let require_existing = parse_switch(
+        "DATABASE_REQUIRE_EXISTING",
+        require_existing,
+        on_render && !testnet_ephemeral,
+    )?;
+    ensure!(
+        !on_render || testnet_ephemeral || require_existing,
+        "Render requires DATABASE_REQUIRE_EXISTING=true; restore the retained journal before starting the service"
+    );
+    Ok(require_existing)
 }
 
 fn parse_switch(name: &str, value: Option<String>, default: bool) -> Result<bool> {
@@ -167,6 +199,24 @@ pub fn number(name: &str, fallback: u64) -> Result<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn temporary_testnet_storage_is_explicit_and_preserves_retention_settings() {
+        assert!(!parse_switch("TESTNET_EPHEMERAL_STORAGE", None, false).unwrap());
+        assert!(!parse_switch("TESTNET_EPHEMERAL_STORAGE", Some("false".into()), false).unwrap());
+        assert!(parse_switch("TESTNET_EPHEMERAL_STORAGE", Some("true".into()), false).unwrap());
+        for value in ["", "1", "True", "yes"] {
+            assert!(parse_switch("TESTNET_EPHEMERAL_STORAGE", Some(value.into()), false).is_err());
+        }
+        assert!(storage_policy(true, false, false, None, "x402").is_err());
+        assert!(storage_policy(true, false, true, None, "x402").unwrap());
+        assert!(storage_policy(true, false, true, Some("false".into()), "x402").is_err());
+        assert!(!storage_policy(true, true, false, None, "x402").unwrap());
+        assert!(storage_policy(true, true, false, Some("true".into()), "x402").unwrap());
+        assert!(storage_policy(true, true, true, Some("true".into()), "x402").unwrap());
+        assert!(storage_policy(true, true, false, Some("yes".into()), "x402").is_err());
+        assert!(storage_policy(true, true, false, None, "graph-tally").is_err());
+    }
+
     #[test]
     fn submission_switch_defaults_on_but_rejects_ambiguous_values() {
         assert!(parse_switch("TASK_SUBMISSION_ENABLED", None, true).unwrap());
